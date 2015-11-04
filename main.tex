@@ -19,6 +19,7 @@
 % to control spacing in item lists
 \usepackage{enumitem}
 \usepackage[pagebackref=false,breaklinks=true,colorlinks,bookmarks=false]{hyperref}
+\usepackage{defs}
 
 
 % Hint: \title{what ever}, \author{who care} and \date{when ever} could stand 
@@ -49,7 +50,7 @@
 
 \hline & & \\
 $\langle \cdot, \cdot \rangle$      & $=$ & Scalar (dot) product \\
-$\bold{x}$                          & $=$ & Vector \\
+$\mathbf{x}$                        & $=$ & Vector \\
 $X$                                 & $=$ & Matrix \\
 $\omega$                            & $=$ & Angle \\
 \hline
@@ -82,7 +83,7 @@ Dans sa forme de base, la SP...
 \cite{Woodham1979}
 
 \begin{equation}
-\bold{b} = \rho L(\mathbf{\boldomega}) \langle \boldomega, {\bf n} \rangle \,,
+\mathbf{b} = \rho L(\mathbf{\boldomega}) \langle \boldomega, {\bf n} \rangle \,,
 \end{equation}
 
 \begin{figure}
@@ -99,6 +100,8 @@ Images from CSE 455, 2010 by Neel Joshi, Ira Kemelmacher and Ian Simon}
 \end{figure}
 
 PS was confined to the lab until recently.
+
+As one might expect, the answer to the question above is intrinsically tied to the orientation of a particular surface patch, the associated hemisphere of lighting directions observed by the patch, and the variation in lighting intensity in that hemisphere over the course of a day. So far, this question has only been explored in laboratory conditions or with simple directional illumination, where optimal lighting configurations can be theoretically derived~\cite{drbohlav-iccv-05,klaudiny-prl-14,shen-pg-14}. No attempt has been made at answering this question with more realistic illumination models in an outdoor setup, where lighting cannot be controlled and atmospheric effects are difficult to predict.
 
 Illumination incontrôlable, coplanarité du soleil.
 
@@ -142,6 +145,9 @@ To tackle this new challenge, a natural first strategy has been to experiment wi
 Recently, Shen~{\em et al.}~\cite{shen-pg-14} showed that, contrary to common belief, the sun path in the sky actually does not always lie within a plane. Thus, PS reconstruction can sometimes be computed in a single day even with a point light source model. The main downside of this approach is that planarity of the sun path (\ie, conditioning of PS reconstruction) depends on the latitude and the time of year. More specifically, reconstruction becomes unstable at high latitudes near the winter solstice, and worldwide near the equinoxes.
 
 % richer lighting models
+% MERGE BOTH!
+A promising approach to answer this question is to use more elaborate models of illumination---high dynamic range (HDR) environment maps~\cite{reinhard-book-05}---as input to outdoor PS. Promising results have been reported in~\cite{yu-iccp-13} for outdoor images taken within an interval of just eight hours (in a single day). However, the quality of outdoor results is reported to be inferior to that obtained in indoor environments, the decline being attributed to modest variation in sunlight. This observation leads to an interesting, yet unanswered question: had the sun path and atmosphere conditions been different on that day, could the quality of their results have been better? Or, in other words: what makes it a good day for outdoor Photometric Stereo?
+
 To compensate for limited sun motion, other approaches have proposed using richer models of illumination that account for additional atmospheric factors in the sky. Typically, this is done by employing (hemi-)spherical environment maps~\cite{debevec-siggraph-98}. On one hand, full environment maps can be captured and used with calibrated PS algorithms~\cite{yu-iccp-13,shi-3dv-14,hung-wacv-15}. On the other hand, it is also possible to estimate part of the environment map without explicitly capturing it, by synthesizing a hemispherical model of the sky using physically-based models~\cite{inose-tcva-13,jung-cvpr-15}. While these richer models do allow reconstructions from only one day, it is unknown whether the same could be done with even less data. 
 
 % hold-geoffroy
@@ -160,25 +166,85 @@ Philosophie: big-data
 
 \section{HDR database}
 
-Décrire le Mean Light Vector, décrire notre base de données de ciels, décrire comment on peut appliquer la philosophie Big Data à ce problème.
+% From ICCP
+To analyze the influence of outdoor lighting on photometric stereo, we rely on a rich dataset of high dynamic range images of the sky, captured under a wide variety of conditions. We use the environment map database of \cite{lalonde-3dv-14}, which contains HDR images of the sky captured using the approach described in \cite{stumpfel-afrigraph-04}. We augment the dataset of~\cite{lalonde-3dv-14} with an additional set of images captured using a similar setup, but at a different geographical location. In all, the dataset we used for our analysis totals 3,800 illumination conditions, captured over 23 different days. To ensure the data is properly aligned temporally, the HDR sky photos were captured during a continuous 6 hour time interval on each of these days, from 10:30 until 16:30. Fig.~\ref{fig:database} shows examples of the sky environment maps used in our analysis. Note that while the examples have been tone mapped for display, the actual sky images have extremely high dynamic range, and span the full 22 stops required to properly capture outdoor lighting~\cite{stumpfel-afrigraph-04}. In addition, all the images are converted to grayscale before the analysis is performed. 
+
+\begin{figure*}[!th]
+    \centering
+    \setlength{\tabcolsep}{0pt}
+	\newcommand{\customwidth}{.08\linewidth}
+    \begin{tabular}{@{}rcccccccccccc@{}}
+                                                     &
+    \begin{minipage}{\customwidth}\centering\scriptsize 11:00 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 11:30 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 12:00 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 12:30 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 13:00 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 13:30 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 14:00 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 14:30 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 15:00 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 15:30 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 16:00 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 16:30 \end{minipage}
+    \\
+    \begin{sideways}\begin{minipage}{\customwidth}\centering \scriptsize 08/24/2013 \\ light clouds \vspace{5pt} \end{minipage}\end{sideways} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_110040.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_113038.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_120033.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_123024.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_130014.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_133006.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_140002.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_142960.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_145957.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_152946.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_155938.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_162933.jpg}
+    \\
+    \begin{sideways}\begin{minipage}{\customwidth}\centering \scriptsize 11/06/2013 \\ mixed \vspace{5pt} \end{minipage}\end{sideways} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_110951.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_112948.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_115943.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_122939.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_125937.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_132936.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_135932.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_142922.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_145915.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_152913.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_155906.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_163057.jpg}
+
+    \\
+    \begin{sideways}\begin{minipage}{\customwidth}\centering \scriptsize 11/08/2014 \\ heavy clouds \vspace{5pt} \end{minipage}\end{sideways} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_110025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_113025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_120025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_123025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_130025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_133025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_140025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_143025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_150025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_153025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_160025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_163025.jpg}
+
+    \\
+
+    \end{tabular}
+   	\caption[]{Examples from our dataset of HDR outdoor illumination conditions. In all, our dataset contains 3,800 different illumination conditions, captured from 10:30 until 16:30, during 23 days, spread over ten months and at two geographical locations. Each image is stored in the 32-bit floating point EXR format, and shown tone mapped here for display (with $\gamma = 1.6$). The companion video\footnotemark shows time-lapse sequences for these sky environment maps.}
+	\label{fig:database}
+\end{figure*}
 
 \section{What Is a Good Day for Outdoor Photometric Stereo?}
 
-% From ICCP
-A promising approach to answer this question is to use more elaborate models of illumination---high dynamic range (HDR) environment maps~\cite{reinhard-book-05}---as input to outdoor PS. Promising results have been reported in~\cite{yu-iccp-13} for outdoor images taken within an interval of just eight hours (in a single day). However, the quality of outdoor results is reported to be inferior to that obtained in indoor environments, the decline being attributed to modest variation in sunlight. This observation leads to an interesting, yet unanswered question: had the sun path and atmosphere conditions been different on that day, could the quality of their results have been better? Or, in other words: what makes it a good day for outdoor Photometric Stereo? 
-
-As one might expect, the answer to the question above is intrinsically tied to the orientation of a particular surface patch, the associated hemisphere of lighting directions observed by the patch, and the variation in lighting intensity in that hemisphere over the course of a day. So far, this question has only been explored in laboratory conditions or with simple directional illumination, where optimal lighting configurations can be theoretically derived~\cite{drbohlav-iccv-05,klaudiny-prl-14,shen-pg-14}. No attempt has been made at answering this question with more realistic illumination models in an outdoor setup, where lighting cannot be controlled and atmospheric effects are difficult to predict.
-
-In this paper, we present a systematic analysis of the expected performance of photometric stereo algorithms in outdoor settings. To explore the influence of these effects, we exploit a large database of outdoor HDR environment maps, which provides a rich sampling of the variability in outdoor illumination. Through a theoretical analysis (inspired by \cite{sun-ivc-07}) and supported by an extensive empirical evaluation as well as a preliminary quantitative validation, we derive confidence intervals that allow us to predict when surface normals can be reconstructed more accurately and solely from the photometric cue. Instead of focusing exclusively on sun position~\cite{shen-pg-14}, our analysis incorporates the influence of all components of natural lighting: sun, sky, clouds, etc., as well as noise and surface albedo. 
-
-This paper does \emph{not} introduce a novel photometric stereo algorithm. Rather, we explore the conditions in which PS may or may not work, when faced with the challenging case of uncontrollable outdoor illumination. Our main goal is to provide guidance for future research by assessing the \emph{reconstructibility} of surface patches as a function of their orientation and the illumination conditions, given a set of HDR environment maps captured throughout a single day.
-
-% Assumptions
-To make this novel analysis tractable, we make the following assumptions. We consider Lambertian surface patches, and assume that at most one day of data can be used. We also assume that the dominant part of the light comes from the sky hemisphere (sun, sky, clouds, etc.) and surface patches are independent (cast shadows and inter-reflections are not modeled).
-
+\input{iccp15.tex}
 
 \section{$x$-hour Outdoor Photometric Stereo}
-3DV15
+
+\input{3dv15.tex}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -226,8 +292,8 @@ Décrire l'amélioration que pourrait apporter la PS utilisée conjointement ave
 Recap.
 
 {\small
-%\bibliographystyle{ieee}
-\bibliography{main}
+\bibliographystyle{ieee}
+\bibliography{main.bib}
 }
 
 \end{document}
