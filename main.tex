@@ -1,5 +1,5 @@
 \documentclass{report}
-\title{Thesis proposal}
+\title{Thesis proposal: }
 \author{Yannick Hold-Geoffroy  \\
     Universit\'e laval  \\
     }
@@ -15,6 +15,7 @@
 \usepackage{url}
 \usepackage{graphicx}
 \usepackage{rotating}
+%\usepackage{adjustbox}
 %\usepackage{authblk}
 % to control spacing in item lists
 \usepackage{enumitem}
@@ -22,10 +23,10 @@
 \usepackage{defs}
 
 
-% Hint: \title{what ever}, \author{who care} and \date{when ever} could stand 
-% before or after the \begin{document} command 
-% BUT the \maketitle command MUST come AFTER the \begin{document} command! 
-\begin{document} 
+% Hint: \title{what ever}, \author{who care} and \date{when ever} could stand
+% before or after the \begin{document} command
+% BUT the \maketitle command MUST come AFTER the \begin{document} command!
+\begin{document}
 
 \maketitle
 
@@ -65,51 +66,105 @@ $\omega$                            & $=$ & Angle \\
 %Comment la numérisation du monde est à nos portes et c'est le futur.
 %La reconstruction 3d est un sujet de plus en plus présent dans la vie de tous les jours.
 
-%Reconstruction 3D extérieure à large échelle.
+The Kinect sensor successfully found its way into everyone's home, effectively bringing 3D scanning capabilities to the masses. A plethora of new use cases emerged since its original endeavor to revitalize the entertainment industry. For instance, the 3D printing market that grew significantly over the past few years brought a new need for scans of household objects. Augmented reality is another avenue that requires models of real world objects. These are but a tiny fraction of the applications of real world scanning.
 
-%Utilisations: Jeux vidéos, préserver la culture, réalité augmentée, diffusion
+While the Kinect enabled myriads of applications in indoor environments, using such sensors outdoors is close to impossible. These kind of sensors are so-called active sensors, meaning that they interact with the scene to work. This usually means projecting light in the scene and sensing it back. But this method is problematic outside: the light patterns they emit get completely drowned by the sunlight. In outdoor settings, the only possibility is to use very expensive scanners, out of reach for the casual user due to their complexity and cost of operation. In this project, the goal is to enable the capture of large outdoor scenes with sensors as cheap and convenient as the Kinect.
 
+This thesis proposes to do so simply by using cameras, and an existing reconstruction technique dubbed "Photometric Stereo" (PS). The idea is to point a camera towards a scene to be scanned, and to capture a time-lapse sequence over time. Variations in the illumination conditions can be used by PS to reconstruct the shape of the observed scene. PS has been known in computer vision for more than 35 years, and it is still an active area of research.
 
 \section{Photometric Stereo}
 
-Décrire la PS, ses entrées, ses sorties, ses forces (1 normale par px), ses faiblesses, citer Woodham.
+%% Add: comparison to SFM, MVS
 
-%La Stéréoscopie Photométrique (SP) est une technique permettant de récupérer la structure d'une scène à partir d'indices photométriques. Elle donne en sortie une carte de normale. Cette carte définie, pour chaque pixel de l'image, la normale de la surface correspondante dans la scène. Une fois la carte de normale obtenue, il est possible de l'intégrer afin d'obtenir un maillage 3d de la surface.
+PS is a technique that recovers shapes from photometric cues. In its original form, it takes as input a sequence of images lit from different directions. The great strength of this technique is its output: 3D information will be generated for every pixel of one input image. This means that a sequence of 5 megapixels images, as can be found on many current off-the-shelf cameras and cellphones, will generate an output of 5 million 3D points using PS. This quantity of information is impressive given the cost of point and shoot cameras and the ubiquity of cellphones.
 
-%Pour fonctionner, la PS a besoin d'une séquence d'images en entrée.
+The first definition of this technique, made in 1979 by Woodham~\cite{Woodham1979}, made a lot of assumptions to simplify the problem to its essence, such as these ones:
 
-Dans sa forme de base, la SP...
+\begin{itemize} \setlength\itemsep{-0.2em}
+  \item The object surface reflectance must be
+  \vspace{-0.65em}\begin{itemize} \setlength\itemsep{0.1em}
+    \item lambertian;
+    \item constant;
+  \end{itemize} \vspace{-0.4em}
+  \item Lighting must be known;
+  \item Lighting a point light source at infinity;
+  %\item Lighting directions must not be coplanar over the whole sequence;
+  \item Sensors are noiseless;
+  \item All the images are aligned.
+\end{itemize}
 
-\cite{Woodham1979}
-
+Following these assumptions, the lambertian image formation model for a single pixel is defined as
 \begin{equation}
-\mathbf{b} = \rho L(\mathbf{\boldomega}) \langle \boldomega, {\bf n} \rangle \,,
+b_t =  \langle \mathbf{l}_t , \mathbf{n} \rangle \quad,
+\end{equation}
+where pixel $t$ will have an intensity $b_t$ when the corresponding surface patch normal $\mathbf{n}$ is lit by a point light source with an incident vector $\mathbf{l}_t$. For the sake of simplification, the surface patch normal $\mathbf{n}$ is scaled by the surface reflectance, its albedo. Likewise, the incident lighting vector $\mathbf{l}_t$ is scaled by its intensity.
+
+This means that the appearance of a pixel in an image, with the aforementionned assumptions, is dependent on 1) the normal and albedo of a visible surface patch, and 2) the incident angle and intensity of the light. Woodham realized that if a pixel appearance depends on the surface normal, it meant that this surface normal can be found from a known pixel appearance. This means that the shape of an object (through its surface normals) could be obtained by observing the pixels appearance. But there's a problem: a single pixel intensity cannot explain all three degrees of freedom of the normal to be reconstructed (scaled by its albedo), leading to an underconstrained problem.
+
+To solve this issue, it is possible to take a sequence of images, all from the same viewpoint, but with different lighting conditions. The shading difference between the different lighting conditions can constrain the problem correctly. In the case of a sequence of images, we define $L$ as the stacked incident vectors of all the $m$ images in the sequence (labeled $\mathbf{l}_{1}, \mathbf{l}_{2}, \dots \mathbf{l}_{m}$):
+\begin{equation}
+L =
+\begin{bmatrix}
+    \mathbf{l}_{1} \\
+    \mathbf{l}_{2} \\
+    \vdots \\
+    \mathbf{l}_{m}
+\end{bmatrix}
+\quad,
+\end{equation}
+which can be used to define the appearance of all pixels over all the images of the sequence, as such:
+\begin{equation}
+\label{eq:lamb_refl}
+\mathbf{b} =  \langle  \mathbf{L}, \mathbf{n}  \rangle \quad.
 \end{equation}
 
+Solving eq.~\eqref{eq:lamb_refl} for $\mathbf{n}$ gives the relation
+\begin{equation}
+\label{eq:original_form}
+\mathbf{n} =  \langle  \mathbf{L}^{-1}, \mathbf{b}  \rangle \quad,
+\end{equation}
+giving birth to the Photometric Stereo technique.
+
+$\mathbf{n}$ provides the structure of the scene visible in the image sequence, giving a single normal for each pixel of the image. This output is called a normal map because it maps a surface normal to each surface patch visible by a pixel. Integrating these normals results in a 3D model of the object visible in the image sequence.
+
+A concrete example of PS can be seen in fig.~\ref{fig:PS_example}, where a sequence of images and its lighting directions are set as inputs of eq.~\eqref{eq:original_form} to give a normal map in output.
+
+Even with all the assumption we made, one issue remains: the lighting directions over the sequence must not be coplanar. If they are coplanar, eq.~\ref{eq:original_form} will result in an underconstrained system, leaving an unknown degree of freedom. This led Woodham to believe that PS won't work outside, because the sun's path across the sky is planar over the course of a single day.
+
+%\begin{equation}
+%\mathbf{b} = \rho L(\mathbf{\boldomega}) \langle \boldomega, {\bf n} \rangle \,,
+%\end{equation}
+
 \begin{figure}
-\includegraphics[width=.1\linewidth]{PS/cat_0.png}
-\includegraphics[width=.1\linewidth]{PS/cat_3.png}
-\includegraphics[width=.1\linewidth]{PS/cat_4.png}
-\includegraphics[width=.1\linewidth]{PS/cat_5.png}
-\includegraphics[width=.1\linewidth]{PS/cat_10.png}
-\includegraphics[width=.1\linewidth]{PS/cat_11.png}
-\includegraphics[width=.1\linewidth]{PS/cat_normal_map.png}
-\caption{Exemples d'images d'entrée. 	
-Images from CSE 455, 2010 by Neel Joshi, Ira Kemelmacher and Ian Simon}
+\begin{tabular}{cccccc|cc}
+\includegraphics[width=.1\linewidth]{PS/cat_0.png} &
+\includegraphics[width=.1\linewidth]{PS/cat_3.png} &
+\includegraphics[width=.1\linewidth]{PS/cat_4.png} &
+\includegraphics[width=.1\linewidth]{PS/cat_5.png} &
+\includegraphics[width=.1\linewidth]{PS/cat_10.png} &
+\includegraphics[width=.1\linewidth]{PS/cat_11.png} &
+\includegraphics[width=.1\linewidth]{PS/cat_normal_map.png} &
+\includegraphics[width=.1\linewidth]{PS/sphere_nm.png} \\
+a) & b) & c) & d) & e) & f) & g) & h)
+\end{tabular}
+\caption{a-f) Examples of inputs lit from different directions, g) normal map obtained from the original form of the Photometric Stereo algorithm, h) sphere normal map showed as example.\newline
+{\small Images from CSE 455, 2010 by Neel Joshi, Ira Kemelmacher and Ian Simon}
+}
 \label{fig:PS_example}
 \end{figure}
 
-PS was confined to the lab until recently.
+\section{Thesis proposal}
 
-As one might expect, the answer to the question above is intrinsically tied to the orientation of a particular surface patch, the associated hemisphere of lighting directions observed by the patch, and the variation in lighting intensity in that hemisphere over the course of a day. So far, this question has only been explored in laboratory conditions or with simple directional illumination, where optimal lighting configurations can be theoretically derived~\cite{drbohlav-iccv-05,klaudiny-prl-14,shen-pg-14}. No attempt has been made at answering this question with more realistic illumination models in an outdoor setup, where lighting cannot be controlled and atmospheric effects are difficult to predict.
+A lot of work have been done on PS since its original definition. Contrary to what Woodham believed, PS has recently been applied to outdoor photographs, mainly using images captured by webcams. Unfortunately, outdoor lighting is complex and uncontrollable, therefore the techniques proposed in this domain require capturing either months of data, or the illumination conditions at each frame, none of which is a very practical scenario for the casual user. In this context, the main goal of this project is to reconstruct the shape of large-scale outdoor scenes from short time intervals, without the need for capturing the lighting conditions. To surmount the challenges caused by outdoor conditions, the two objectives of this project are to 1) provide a better understanding of natural illumination; and 2) develop a photometric stereo algorithm which takes advantage of this knowledge to recover the scene shape even under unknown, natural illumination conditions.
 
-Illumination incontrôlable, coplanarité du soleil.
+To achieve these objectives, the traditionally employed approximation models such as directional lighting will be replaced by a new data-driven model of natural illumination learned from a large database of high quality sky photographs. This database will be captured over extended periods of time, and will contain thousands of photos of the sky in different illumination conditions. By observing the sky directly, the data-driven model will accurately capture what the likely natural illumination conditions are for a given scene. This enhanced lighting model will better constrain the photometric stereo optimization algorithm, allowing it to converge toward real or plausible sky illumination conditions. The resulting shape estimation will better explain the observed input images, giving increased result quality.
 
-In this thesis [...]
+In this thesis, I propose to design and implement a 3D shape acquisition system that relies only on off-the-shelf cameras. By allowing the precise capture of large scale outdoor scenes, my system will bring high quality digitization capabilities to anyone with a camera, thus enabling the collaborative reconstruction of large scale outdoor environments. This has the potential of impacting many fields, such as the digital preservation of cultural heritage before it gets damaged by wars, natural disasters, or the passage of time; the replication of real environments in virtual scenarios for the training of first responders; the creation of novel, realistic environments for use in video games or special effects in the movie industry; etc. By making these tasks easier, I believe this project will have significant impact on 3D shape acquisition as a whole.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{State of the Art Review}
+\label{c:sota}
 
 % Expliquer les améliorations de la PS au travers du temps:
 % \begin{itemize}
@@ -123,7 +178,8 @@ In this thesis [...]
 % 	\end{itemize}
 % \end{itemize}
 
-Since its inception in 1979, PS has received a lot of attention throughout the years. Researchers tried to alleviate the restrictive assumptions of the original method, such as lambertian reflectance, noiseless sensors and known lighting. This chapter will first relate the major improvements made on PS over the years, and then focus on the efforts made to bring it outside the laboratory.
+Since its inception, Photometric Stereo has received a lot of attention throughout the years. Researchers tried to alleviate the restrictive assumptions of the original method, such as lambertian reflectance, noiseless sensors and known lighting. This chapter will first relate the major improvements made on PS over the years, and then focus on the efforts made to bring it outside the laboratory.
+
 
 \section{Photometric Stereo}
 
@@ -132,14 +188,31 @@ Since its inception in 1979, PS has received a lot of attention throughout the y
 % ...
 \cite{basri-ijcv-2007,BarskyPetrou-pami-2003,alldrin-cvpr-08,ikehata-cvpr-12,ikehata-cvpr-14}.
 
-As previously stated, PS has been studied extensively for many decades. Covering the vast amount of work done is beyond the scope of this thesis proposal. The rest of the document will focus more closely on work that have considered PS on outdoor conditions.
+As previously stated, PS has been studied extensively for many decades. Researchers worked to make the method more general by removing, or at least alleviating, the assumptions initially made. One thing they did is to make PS work on other surfaces than perfectly lambertian ones.
+
+% BRDF
+At first, specular reflections \cite{Ikeuchi1981} were studied and incorporated to the PS framework.
+
+% Horn
+A new technique called Shape from Shading~\cite{Horn1989} was born from Photometric stereo. To obtain the scene structure, a bunch of priors were employed to infer the . . Two interesting things are worth of noting from this work: 1) the shadow detection and handling, and 2) . This technique was further developed to take into account outdoor cues~\cite{Langer1994}.
+
+% Fusion with MVS
+
+% Light sources arbitrary motion
+% optimal illumination
+The illumination has also been extensively studied. At first, still assuming point light sources, the case of unknown light directions was solved \cite{Hayakawa1994} by using singular value decomposition along with a set of priors. This allowed to approximate the images lighting conditions and the surface normals jointly.
+
+
+% Arbitrary light sources
+
+Covering the vast amount of work done is beyond the scope of this thesis proposal. The rest of the document will focus more closely on work that have considered PS on outdoor conditions.
 
 \section{Outdoor Photometric Stereo}
 
 % webcams
 The first works attempting PS reconstruction on outdoor data~\cite{ackermann-cvpr-12,abrams-eccv-12} made the observation that, over the course of a day, the sun seems to move on a planar path through the sky. Unfortunately, co-planar light sources yield an under-constrained, two-source PS problem~\cite{hernandez-pami-11}, which cannot be solved without strong regularization and reconstruction artifacts. To avoid this issue, the authors therefore propose gathering months of data using webcams.
 % PLS -- Merge with pervious
-To tackle this new challenge, a natural first strategy has been to experiment with Lambertian reflectance and to model the sun as a point light source, to match a well-studied lab condition. Unfortunately, approaches based on this model have practical limitations caused by the movement of the sun in the sky for a given day. Depending on the latitude and time of year, its trajectory may lie too close to a plane~\cite{shen-pg-14}, yielding an under-constrained, two-source PS problem~\cite{hernandez-pami-11}. Possible solutions include waiting for a day when the sun trajectory is non-planar~\cite{shen-pg-14}, or capturing several months of data~\cite{ackermann-cvpr-12,abrams-eccv-12} to ensure good conditioning. 
+To tackle this new challenge, a natural first strategy has been to experiment with Lambertian reflectance and to model the sun as a point light source, to match a well-studied lab condition. Unfortunately, approaches based on this model have practical limitations caused by the movement of the sun in the sky for a given day. Depending on the latitude and time of year, its trajectory may lie too close to a plane~\cite{shen-pg-14}, yielding an under-constrained, two-source PS problem~\cite{hernandez-pami-11}. Possible solutions include waiting for a day when the sun trajectory is non-planar~\cite{shen-pg-14}, or capturing several months of data~\cite{ackermann-cvpr-12,abrams-eccv-12} to ensure good conditioning.
 
 % single day
 Recently, Shen~{\em et al.}~\cite{shen-pg-14} showed that, contrary to common belief, the sun path in the sky actually does not always lie within a plane. Thus, PS reconstruction can sometimes be computed in a single day even with a point light source model. The main downside of this approach is that planarity of the sun path (\ie, conditioning of PS reconstruction) depends on the latitude and the time of year. More specifically, reconstruction becomes unstable at high latitudes near the winter solstice, and worldwide near the equinoxes.
@@ -148,13 +221,13 @@ Recently, Shen~{\em et al.}~\cite{shen-pg-14} showed that, contrary to common be
 % MERGE BOTH!
 A promising approach to answer this question is to use more elaborate models of illumination---high dynamic range (HDR) environment maps~\cite{reinhard-book-05}---as input to outdoor PS. Promising results have been reported in~\cite{yu-iccp-13} for outdoor images taken within an interval of just eight hours (in a single day). However, the quality of outdoor results is reported to be inferior to that obtained in indoor environments, the decline being attributed to modest variation in sunlight. This observation leads to an interesting, yet unanswered question: had the sun path and atmosphere conditions been different on that day, could the quality of their results have been better? Or, in other words: what makes it a good day for outdoor Photometric Stereo?
 
-To compensate for limited sun motion, other approaches have proposed using richer models of illumination that account for additional atmospheric factors in the sky. Typically, this is done by employing (hemi-)spherical environment maps~\cite{debevec-siggraph-98}. On one hand, full environment maps can be captured and used with calibrated PS algorithms~\cite{yu-iccp-13,shi-3dv-14,hung-wacv-15}. On the other hand, it is also possible to estimate part of the environment map without explicitly capturing it, by synthesizing a hemispherical model of the sky using physically-based models~\cite{inose-tcva-13,jung-cvpr-15}. While these richer models do allow reconstructions from only one day, it is unknown whether the same could be done with even less data. 
+To compensate for limited sun motion, other approaches have proposed using richer models of illumination that account for additional atmospheric factors in the sky. Typically, this is done by employing (hemi-)spherical environment maps~\cite{debevec-siggraph-98}. On one hand, full environment maps can be captured and used with calibrated PS algorithms~\cite{yu-iccp-13,shi-3dv-14,hung-wacv-15}. On the other hand, it is also possible to estimate part of the environment map without explicitly capturing it, by synthesizing a hemispherical model of the sky using physically-based models~\cite{inose-tcva-13,jung-cvpr-15}. While these richer models do allow reconstructions from only one day, it is unknown whether the same could be done with even less data.
 
 % hold-geoffroy
 The work presented below extends our initial analysis in~\cite{holdgeoffroy-iccp-15}. Rather than presenting a new reconstruction algorithm, in~\cite{holdgeoffroy-iccp-15} we conducted an empirical analysis of the same sky database to identify which days provide more favorable atmospheric conditions for outdoor PS. However, no consideration was given to the shortest time interval of data capture needed to obtain accurate reconstructions; all results were reported on at least 6 hours (a ``full day'') of captured data. Here, instead of comparing days, we focus on analyzing different time intervals within each day. We then show that 6 hours is actually more than necessary, and detail the relationship between the appearance of the sky hemisphere and the quality of PS reconstruction.
 
 % nishino -- single image
-Finally, it is also worth mentioning shape-from-shading techniques such as~\cite{oxholm-eccv-12,johnson-cvpr-11,barron-pami-15} [Add Horn?], which push reconstruction to its limits by attempting to recover shape from a single input image. In this case, the information provided by the shading cue is obviously insufficient to define a unique solution, so these approaches rely strongly on priors of different types and complexities. In this paper, we avoid such strong priors and focus our analysis exclusively on the photometric/shading cues obtained from multiple images. 
+Finally, it is also worth mentioning shape-from-shading techniques such as~\cite{oxholm-eccv-12,johnson-cvpr-11,barron-pami-15} [Add Horn?], which push reconstruction to its limits by attempting to recover shape from a single input image. In this case, the information provided by the shading cue is obviously insufficient to define a unique solution, so these approaches rely strongly on priors of different types and complexities. In this paper, we avoid such strong priors and focus our analysis exclusively on the photometric/shading cues obtained from multiple images.
 
 
 
@@ -167,7 +240,9 @@ Philosophie: big-data
 \section{HDR database}
 
 % From ICCP
-To analyze the influence of outdoor lighting on photometric stereo, we rely on a rich dataset of high dynamic range images of the sky, captured under a wide variety of conditions. We use the environment map database of \cite{lalonde-3dv-14}, which contains HDR images of the sky captured using the approach described in \cite{stumpfel-afrigraph-04}. We augment the dataset of~\cite{lalonde-3dv-14} with an additional set of images captured using a similar setup, but at a different geographical location. In all, the dataset we used for our analysis totals 3,800 illumination conditions, captured over 23 different days. To ensure the data is properly aligned temporally, the HDR sky photos were captured during a continuous 6 hour time interval on each of these days, from 10:30 until 16:30. Fig.~\ref{fig:database} shows examples of the sky environment maps used in our analysis. Note that while the examples have been tone mapped for display, the actual sky images have extremely high dynamic range, and span the full 22 stops required to properly capture outdoor lighting~\cite{stumpfel-afrigraph-04}. In addition, all the images are converted to grayscale before the analysis is performed. 
+As one might expect, the answer to the question above is intrinsically tied to the orientation of a particular surface patch, the associated hemisphere of lighting directions observed by the patch, and the variation in lighting intensity in that hemisphere over the course of a day. So far, this question has only been explored in laboratory conditions or with simple directional illumination, where optimal lighting configurations can be theoretically derived~\cite{drbohlav-iccv-05,klaudiny-prl-14,shen-pg-14}. No attempt has been made at answering this question with more realistic illumination models in an outdoor setup, where lighting cannot be controlled and atmospheric effects are difficult to predict.
+
+To analyze the influence of outdoor lighting on photometric stereo, we rely on a rich dataset of high dynamic range images of the sky, captured under a wide variety of conditions. We use the environment map database of \cite{lalonde-3dv-14}, which contains HDR images of the sky captured using the approach described in \cite{stumpfel-afrigraph-04}. We augment the dataset of~\cite{lalonde-3dv-14} with an additional set of images captured using a similar setup, but at a different geographical location. In all, the dataset we used for our analysis totals 3,800 illumination conditions, captured over 23 different days. To ensure the data is properly aligned temporally, the HDR sky photos were captured during a continuous 6 hour time interval on each of these days, from 10:30 until 16:30. Fig.~\ref{fig:database} shows examples of the sky environment maps used in our analysis. Note that while the examples have been tone mapped for display, the actual sky images have extremely high dynamic range, and span the full 22 stops required to properly capture outdoor lighting~\cite{stumpfel-afrigraph-04}. In addition, all the images are converted to grayscale before the analysis is performed.
 
 \begin{figure*}[!th]
     \centering
@@ -239,12 +314,12 @@ To analyze the influence of outdoor lighting on photometric stereo, we rely on a
 \end{figure*}
 
 \section{What Is a Good Day for Outdoor Photometric Stereo?}
-
-\input{iccp15.tex}
+  
+%\input{iccp15.tex}
 
 \section{$x$-hour Outdoor Photometric Stereo}
 
-\input{3dv15.tex}
+%\input{3dv15.tex}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -273,15 +348,17 @@ Décrire l'amélioration que pourrait apporter la PS utilisée conjointement ave
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Échéancier}
+\chapter{Schedule}
+
+The problems will be explored in increasing order of complexity according to the following schedule. First, the hardware required to gather the sky illumination database will be setup on a tall roof nearby, and the data acquisition process will be continued over a period of several months to build a rich dataset. Second, experiments with existing PS techniques to reconstruct shape with known illumination will be conducted. Leaning on these experiments, the algorithms will then be adapted to require knowledge only of the sun direction, obtained from the capture timestamps. Finally we will experiment with images where the lighting conditions are unknown.
 
 \begin{itemize}
 	\item 2016h: Selection and Calibrated PS algorithm
-	\item 2016e: Capture, Blind PS algorithm  
+	\item 2016e: Capture, Blind PS algorithm
 	\item 2016a: Blind PS algorithm, Day \& night
 	\item 2017h: Fusion with SFM
 	\item 2017e: Capture, Fusion with Multiview Stereo Techniques
-	\item 2017a: 
+	\item 2017a:
 	\item 2018h: Écrire et soutenir.
 \end{itemize}
 

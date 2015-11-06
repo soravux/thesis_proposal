@@ -1,7 +1,7 @@
-%!TEX root = main.tex
+% !TEX root = main.tex
 
 
-\section{Outdoor PS conditioning}
+\subsection{Outdoor PS conditioning}
 \label{sec:sensitivity-analysis}
 
 In the following, we consider a small planar surface patch with normal vector ${\bf n}$ and Lambertian reflectance with albedo~$\rho$. As discussed in~\cite{holdgeoffroy-iccp-15,hung-wacv-15}, the lighting contribution of an environment map to a Lambertian surface patch can be formulated as in an equivalent problem with a single point light source $\bar{\mathbf{l}} \in \mathbb{R}^3$. This vector is the mean of the light vectors computed over the hemisphere of incoming light directions defined by ${\bf n}$. This virtual point light source $\bar{\mathbf{l}}$ is henceforth referred to as the {\em mean light vector} (MLV). It is important to note that, as opposed to the traditional PS scenario where point light sources are fixed and thus independent of ${\bf n}$, here the {\em per-pixel} MLV is a function of $\mathbf{n}$. Thus, patches with different orientations define different sets of MLVs (as discussed later and shown in fig.~\ref{fig:realShiftNormal}).
@@ -50,8 +50,8 @@ From \eqref{eqn:confidence-xyz}, note that the only light-dependent stability fa
 To make our analysis tractable, we do not model cast shadows and inter-reflections. In addition, we assume that the sky hemisphere (around zenith) provides the dominant part of incoming light. Unless stated otherwise, our simulations consider a day near an equinox, which corresponds to the worst case scenario with coplanar sun directions~\cite{shen-pg-14}.
 
 
-\section{$x$-hour outdoor PS}
-%\section{Time interval analysis}
+\subsection{$x$-hour outdoor PS}
+%\subsection{Time interval analysis}
 \label{sec:analysis}
 
 This section provides the first answers to the questions raised above by looking at collections of mean light vectors (MLVs) from both simulated and real sky data. The main goal is to analyze the behavior of the illumination factors $\lambda_k$ (and associated confidence interval) of normal estimation. More specifically, we investigate numerical stability (MLV coplanarity) as a function of the apparent sun motion and cloud coverage within capture intervals of different durations, containing different atmospheric events. We also compare the resulting performance measures of $x$-hour outdoor PS to those of full-day outdoor PS.
@@ -77,7 +77,7 @@ This section provides the first answers to the questions raised above by looking
 \end{figure*}
 % -----------------------------------------------------------------------------
 
-\subsection{Cloud coverage and MLV shifting}
+\subsubsection{Cloud coverage and MLV shifting}
 \label{subsec:mlv-clouds}
 
 As shown in~\cite{holdgeoffroy-iccp-15}, with data captured under clear skies, the MLVs of the model above will point nearly towards the sun, from which arrives most of the incoming light. Thus, near an equinox (worldwide), the resulting set of MLVs are nearly coplanar~\cite{shen-pg-14}, resulting in poor performance, fig.~\ref{fig:MLVshift}(a). For a day with an overcast sky, performance is also poor because the set of MLVs are nearly colinear and shifted towards the patch normal ${\bf n}$, fig.~\ref{fig:MLVshift}(b). Finally, in partly cloudy days (mixed skies), the sun is often obscured by clouds and such occlusion shifts some MLVs away from the solar plane, improving numerical stability, fig.~\ref{fig:MLVshift}(c). 
@@ -86,7 +86,7 @@ As shown in~\cite{holdgeoffroy-iccp-15}, with data captured under clear skies, t
 % This improvement in conditioning is more significant with lower sun elevations, as the MLVs are shifted towards zenith.
 
 
-\subsection{Solar arcs and MLV elevation}
+\subsubsection{Solar arcs and MLV elevation}
 \label{subsec:solararcs-mlvelevation}
 
 %If we assume equinox, then the sun actually moves on a plane worldwide (i.e. independent of latitude) and is also visible 12 hours worldwide (although terrain and atmosphere play a small role and change that). Thus, this simulation requires the equinox assumption. What does vary with latitude (at equinox) is: (1) the inclination of the solar plane, and (2) the frequency of cloud coverage (if the sun is lower in the sky most of the day). Anything else?
@@ -110,7 +110,7 @@ Fig.~\ref{fig:v123gain}(a) shows that the noise gain $\lambda_{\max}$ drops quic
 A second important prediction from fig.~\ref{fig:v123gain}, considering (more realistic) small to moderate amounts of MLV shifts $\theta_e \leq 40^\circ$, is that conditioning will improve very little for data capture intervals above 3 hours ($45^\circ$ solar arcs). Reducing data capture from 3 to 2 hours would lead to an additional increase in uncertainty ($\lambda_{\max}$) of less than $30\%$ (from about 2.8 to nearly 3.6). Still, 2-hour outdoor PS with noise gains under $4\times$ may be possible if an MLV shift of $\theta_e > 20^\circ$ is introduced by atmospheric events during capture. Uncertainty in the results of 1-hour outdoor PS would be about 5 to 7 times that of full-day (6-hour) outdoor PS.
 
 
-\subsection{MLV shifts in real sky probes}
+\subsubsection{MLV shifts in real sky probes}
 
 % how much MLV shift is expected?
 % but how much uncertainty can we expect? look into real sky probes...
@@ -173,7 +173,7 @@ Although these MLVs were computed from environment maps captured in the Northern
 % -----------------------------------------------------------------------------
 
 
-\subsection{Evolution of noise gain over time}
+\subsubsection{Evolution of noise gain over time}
 
 In this section, we show how the conditioning of outdoor PS evolves over time. Analyzing the patterns in its evolution will allow us to isolate important ``events''---points at which uncertainty suddenly drops---and investigate whether such events occur in close succession.
 
@@ -203,7 +203,7 @@ Of course, this could be due to a simple fact: the first interval is longer than
 \label{fig:events}
 \end{figure*}
 
-\subsection{Overall performance of $x$-hour PS}  
+\subsubsection{Overall performance of $x$-hour PS}  
 
 We noted in fig.~\ref{fig:events}(d) that sufficient conditions for low uncertainty could be met in as little as 2 hours. In this section, we evaluate how often one can achieve low uncertainty in short time intervals. This is done by assessing the distribution of noise gains from short time intervals, and aggregating results over multiple days.
 
@@ -275,7 +275,7 @@ The ratios $r_\lambda$ were then computed for all normals, over all days in the 
     \vspace{-2mm}
 \end{figure*}
 
-\section{Experimental validation}
+\subsection{Experimental validation}
 
 We validate the analyses in sec.~\ref{sec:sensitivity-analysis} and \ref{sec:analysis} via calibrated outdoor PS on synthetic and real object images with known ground truth normals. These normals are used as an optimal initialization for computing ground-truth MLVs, thus avoiding convergence issues of nonlinear optimization and allowing us to focus on assessing errors due to illumination effects in the real sky probes. We then perform calibrated outdoor PS on these images using the algorithm in \cite{yu-iccp-13}, with the following two differences: (\emph{i}) we use all possible pairs of images to compute ratios, instead of selecting a single denominator image; and (\emph{ii}) we apply anisotropic regularization~\cite{hernandez-pami-11} to mitigate the impact of badly-conditioned pixels on the surface reconstruction.
 
@@ -305,7 +305,7 @@ Another similar experiment considered real photos of a real owl statuette. To ca
 The validation results with real data are shown in fig.~\ref{fig:real-results}. As predicted by the noise gain values of fig.~\ref{fig:real-results}~(left), similar reconstruction performance is obtained from three different time intervals shown in the top three rows of fig.~\ref{fig:real-results}~(right). Once again, the performances of 1-hour (15:30--16:30) and 3.5-hour (13:00--16:30) outdoor PS are indeed quite close to that of ``full-day'' outdoor PS (10:30--16:30). However, not all one-hour intervals are equally good, as shown for the interval 12:00--13:00 at the bottom of fig.~\ref{fig:real-results}.
 
 
-\subsection{Discussion}
+\subsubsection{Discussion}
 \label{sec:3dv-discussion}
 
 In this paper, we present what we believe is the first study of the time requirements for single-day outdoor PS. In particular, we seek to determine the relationship between expected performance in normal estimation and: (\emph{i}) the duration of data capture within a single, arbitrary day; and (\emph{ii}) specific atmospheric events that introduce beneficial lighting variations during that time interval. To achieve this goal, we use a large database of natural, outdoor illumination (sky probes) and take a detailed look at the conditions under which surface normals can be reconstructed reliably. \mbox{Finally,} we investigate whether these conditions are observed in less than a full day of data capture.
