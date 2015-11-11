@@ -1,5 +1,5 @@
 \documentclass{report}
-\title{Thesis proposal: }
+\title{Thesis proposal: Short-Term Outdoor Photometric Stereo}
 \author{Yannick Hold-Geoffroy  \\
     Universit\'e laval  \\
     }
@@ -178,34 +178,43 @@ In this thesis, I propose to design and implement a 3D shape acquisition system 
 % 	\end{itemize}
 % \end{itemize}
 
-Since its inception, Photometric Stereo has received a lot of attention throughout the years. Researchers tried to alleviate the restrictive assumptions of the original method, such as lambertian reflectance, noiseless sensors and known lighting. This chapter will first relate the major improvements made on PS over the years, and then focus on the efforts made to bring it outside the laboratory.
+Since its inception, Photometric Stereo has received a lot of attention throughout the years. Researchers tried to alleviate the restrictive assumptions of the original method, such as lambertian reflectance, noiseless sensors and known lighting. This chapter will first relate briefly the major improvements made on PS over the years, and then focus on the efforts made to bring it outside the laboratory.
 
 
 \section{Photometric Stereo}
 
-% Ackermann
-% Basri
-% ...
-\cite{basri-ijcv-2007,BarskyPetrou-pami-2003,alldrin-cvpr-08,ikehata-cvpr-12,ikehata-cvpr-14}.
-
-As previously stated, PS has been studied extensively for many decades. Researchers worked to make the method more general by removing, or at least alleviating, the assumptions initially made. One thing they did is to make PS work on other surfaces than perfectly lambertian ones.
+As previously stated, PS has been studied extensively for many decades. Researchers worked to make the method more general by removing, or at least alleviating, the assumptions initially made.
 
 % BRDF
-At first, specular reflections \cite{Ikeuchi1981} were studied and incorporated to the PS framework.
+One thing they did is make PS work on other surfaces than perfectly lambertian ones. At first, specular reflections \cite{Ikeuchi1981} were studied and incorporated to the PS framework. This also brought the idea of distributed light sources instead of point light sources to the field, an important idea discussed later on. Over the years, most of the reflectance assumptions were removed, allowing PS to work on surfaces yielding varying reflectance using either a parametric~\cite{hertzmann-pami-05,goldman-tpami-10} or a data-driven approach~\cite{alldrin-cvpr-08}.
 
 % Horn
-A new technique called Shape from Shading~\cite{Horn1989} was born from Photometric stereo. To obtain the scene structure, a bunch of priors were employed to infer the . . Two interesting things are worth of noting from this work: 1) the shadow detection and handling, and 2) . This technique was further developed to take into account outdoor cues~\cite{Langer1994}.
+A new technique called Shape from Shading~\cite{Horn1989} was born from Photometric stereo. In this technique, a bunch of priors is assumed to infer the structure from a single image instead of a sequence of images. Two interesting elements from this work are worth noting for general PS use: 1) the shadow detection and handling, and 2) uniform illumination (an ambient light source) is taken into account. This technique was further developed to take into account outdoor photometric cues on cloudy days~\cite{Langer1994}. This work recognized that cloudy days could be approximated as diffuse light sources and treated them differently than point light sources, a key insight that will be discussed in details in \ref{iccp15}. Even though it uses photometric cues like PS, Shape from Shading nowadays won't be very interesting for knowledge transfer, since work on this technique has mainly focused on finding tight constraints, strong priors or semantic segmentation.
 
 % Fusion with MVS
+\cite{HernandezEsteban2008}
+
+
+% Bas-Relief Ambiguity
+It is worth of note that
+
+% Shadows and robustness
+\cite{BarskyPetrou-pami-2003,ikehata-cvpr-12,ikehata-cvpr-14}
 
 % Light sources arbitrary motion
 % optimal illumination
 The illumination has also been extensively studied. At first, still assuming point light sources, the case of unknown light directions was solved \cite{Hayakawa1994} by using singular value decomposition along with a set of priors. This allowed to approximate the images lighting conditions and the surface normals jointly.
 
+\cite{spence-iwtas-03,drbohlav-iccv-05}
+
+% diffuse light
+\cite{Angelopoulou2013}
+
 
 % Arbitrary light sources
 
 Covering the vast amount of work done is beyond the scope of this thesis proposal. The rest of the document will focus more closely on work that have considered PS on outdoor conditions.
+\cite{basri-ijcv-2007}
 
 \section{Outdoor Photometric Stereo}
 
@@ -314,10 +323,12 @@ To analyze the influence of outdoor lighting on photometric stereo, we rely on a
 \end{figure*}
 
 \section{What Is a Good Day for Outdoor Photometric Stereo?}
-  
+\label{iccp15}
+
 %\input{iccp15.tex}
 
 \section{$x$-hour Outdoor Photometric Stereo}
+\label{3dv15}
 
 %\input{3dv15.tex}
 
