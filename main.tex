@@ -1,12 +1,22 @@
 \documentclass{report}
 \title{Thesis proposal: Short-Term Outdoor Photometric Stereo}
-\author{Yannick Hold-Geoffroy  \\
-    Universit\'e laval  \\
-    }
+\author{Yannick Hold-Geoffroy}
+%\programme{Doctorat en g\'enie \'electrique}
+%\annee{2015}
+
 
 \date{\today}
 
+%\usepackage{hyperref}
+%\hypersetup{colorlinks,allcolors=ULlinkcolor}
 
+%\frenchbsetup{%
+%  CompactItemize=false,         % ne pas compacter les listes
+%  ThinSpaceInFrenchNumbers=true % espace fine dans les nombres
+%}
+
+
+\usepackage[letterpaper, margin=1in]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage{times}
 \usepackage{amsmath}
@@ -23,13 +33,15 @@
 \usepackage[pagebackref=false,breaklinks=true,colorlinks,bookmarks=false]{hyperref}
 \usepackage{defs}
 
+\linespread{1.5}
 
-% Hint: \title{what ever}, \author{who care} and \date{when ever} could stand
-% before or after the \begin{document} command
-% BUT the \maketitle command MUST come AFTER the \begin{document} command!
+
 \begin{document}
 
+%\frontmatter                    % pages liminaires
+
 \maketitle
+%\pagetitreonlyone                     % production des pages de titre
 
 \tableofcontents
 
@@ -39,9 +51,6 @@
 \newcommand{\bolddelta}{\boldsymbol \delta} % bold delta
 
 \graphicspath{{figures/}}
-
-%\begin{abstract}
-%\end{abstract}
 
 
 \chapter*{Symbols and notations}
@@ -61,17 +70,12 @@ $\omega$                            & $=$ & Angle \\
 \end{table}
 
 
+%\mainmatter                     % corps du document
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introduction}
 
-%Comment la numérisation du monde est à nos portes et c'est le futur.
-%La reconstruction 3d est un sujet de plus en plus présent dans la vie de tous les jours.
 
-The Kinect sensor successfully found its way into everyone's home, effectively bringing 3D scanning capabilities to the masses. A plethora of new use cases emerged since its original endeavor to revitalize the entertainment industry. For instance, the 3D printing market that grew significantly over the past few years brought a new need for scans of household objects. Augmented reality is another avenue that requires models of real world objects. These are but a tiny fraction of the applications of real world scanning.
-
-While the Kinect enabled myriads of applications in indoor environments, using such sensors outdoors is close to impossible. These kind of sensors are so-called active sensors, meaning that they interact with the scene to work. This usually means projecting light in the scene and sensing it back. But this method is problematic outside: the light patterns they emit get completely drowned by the sunlight. In outdoor settings, the only possibility is to use very expensive scanners, out of reach for the casual user due to their complexity and cost of operation. In this project, the goal is to enable the capture of large outdoor scenes with sensors as cheap and convenient as the Kinect.
-
-This thesis proposes to do so simply by using cameras, and an existing reconstruction technique dubbed "Photometric Stereo" (PS). The idea is to point a camera towards a scene to be scanned, and to capture a time-lapse sequence over time. Variations in the illumination conditions can be used by PS to reconstruct the shape of the observed scene. PS has been known in computer vision for more than 35 years, and it is still an active area of research.
 
 \section{Photometric Stereo}
 
@@ -161,6 +165,14 @@ A lot of work have been done on PS since its original definition. Contrary to wh
 To achieve these objectives, the traditionally employed approximation models such as directional lighting will be replaced by a new data-driven model of natural illumination learned from a large database of high quality sky photographs. This database will be captured over extended periods of time, and will contain thousands of photos of the sky in different illumination conditions. By observing the sky directly, the data-driven model will accurately capture what the likely natural illumination conditions are for a given scene. This enhanced lighting model will better constrain the photometric stereo optimization algorithm, allowing it to converge toward real or plausible sky illumination conditions. The resulting shape estimation will better explain the observed input images, giving increased result quality.
 
 In this thesis, I propose to design and implement a 3D shape acquisition system that relies only on off-the-shelf cameras. By allowing the precise capture of large scale outdoor scenes, my system will bring high quality digitization capabilities to anyone with a camera, thus enabling the collaborative reconstruction of large scale outdoor environments. This has the potential of impacting many fields, such as the digital preservation of cultural heritage before it gets damaged by wars, natural disasters, or the passage of time; the replication of real environments in virtual scenarios for the training of first responders; the creation of novel, realistic environments for use in video games or special effects in the movie industry; etc. By making these tasks easier, I believe this project will have significant impact on 3D shape acquisition as a whole.
+
+\section{Anticipated impact}
+
+The Kinect sensor successfully found its way into everyone's home, effectively bringing 3D scanning capabilities to the masses. A plethora of new use cases emerged since its original endeavor to revitalize the entertainment industry. For instance, the 3D printing market that grew significantly over the past few years brought a new need for scans of household objects. Augmented reality is another avenue that requires models of real world objects. These are but a tiny fraction of the applications of real world scanning.
+
+While the Kinect enabled myriads of applications in indoor environments, using such sensors outdoors is close to impossible. These kind of sensors are so-called active sensors, meaning that they interact with the scene to work. This usually means projecting light in the scene and sensing it back. But this method is problematic outside: the light patterns they emit get completely drowned by the sunlight. In outdoor settings, the only possibility is to use very expensive scanners, out of reach for the casual user due to their complexity and cost of operation. In this project, the goal is to enable the capture of large outdoor scenes with sensors as cheap and convenient as the Kinect.
+
+This thesis proposes to do so simply by using cameras, and an existing reconstruction technique dubbed "Photometric Stereo" (PS). The idea is to point a camera towards a scene to be scanned, and to capture a time-lapse sequence over time. Variations in the illumination conditions can be used by PS to reconstruct the shape of the observed scene. PS has been known in computer vision for more than 35 years, and it is still an active area of research.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -330,7 +342,7 @@ To analyze the influence of outdoor lighting on photometric stereo, we rely on a
 % Metho!
 
 \begin{equation}
-b_t = \frac{\rho}{\pi} \int_{\Omega_{\bf n}} L_t(\mathbf{\boldomega}) \langle \boldomega, {\bf n} \rangle d\omega \,,
+b_t = \frac{\rho}{\pi} \int_{\Omega_{\mathbf n}} L_t(\mathbf{\boldomega}) \langle \boldomega, {\mathbf n} \rangle d\omega \,,
 \end{equation}
 
 \section{Calibrated outdoor reconstruction}
@@ -370,9 +382,11 @@ The problems will be explored in increasing order of complexity according to the
 
 Recap.
 
+%\appendix
+
 {\small
-\bibliographystyle{ieee}
-\bibliography{main.bib}
+\bibliographystyle{acm}
+\bibliography{main}
 }
 
 \end{document}
