@@ -21,7 +21,11 @@
 \usepackage{times}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{cite}   % sort citation numbers automatically
+%\bibliographystyle{unsrtnat}
+\usepackage[numbers,sort&compress]{natbib}
+%\usepackage[numbers]{natbib}
+%\usepackage{cite}   % sort citation numbers automatically
+\usepackage{notoccite}
 \usepackage{url}
 \usepackage{graphicx}
 \usepackage{rotating}
@@ -70,20 +74,16 @@ $\omega$                            & $=$ & Angle \\
 \end{table}
 
 
-%\mainmatter                     % corps du document
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introduction}
 
+Real world scanning of outdoors structures gained a lot of interest recently. The emergence of cheap and easy-to-use 3D sensors brought its share of new applications, enabling the digitization of the world by the masses. Most of common everyday 3D scanning devices are captive of the indoors, though. There is yet to find a way to give everyone the chance to scan building-scale objects, bridging the gap between indoor and outdoor scanning.
 
+This thesis proposes to do so simply by using cameras, and an existing reconstruction technique dubbed "Photometric Stereo" (PS). The idea is to point a camera towards a scene to be scanned, and to capture a time-lapse sequence over time. Variations in the illumination conditions can be used by PS to reconstruct the shape of the observed scene. PS has been known in computer vision for more than 35 years, and is still an active area of research.
 
 \section{Photometric Stereo}
 
-%% Add: comparison to SFM, MVS
-
-PS is a technique that recovers shapes from photometric cues. In its original form, it takes as input a sequence of images lit from different directions. The great strength of this technique is its output: 3D information will be generated for every pixel of one input image. This means that a sequence of 5 megapixels images, as can be found on many current off-the-shelf cameras and cellphones, will generate an output of 5 million 3D points using PS. This quantity of information is impressive given the cost of point and shoot cameras and the ubiquity of cellphones.
-
-The first definition of this technique, made in 1979 by Woodham~\cite{Woodham1979}, made a lot of assumptions to simplify the problem to its essence, such as these ones:
+The first definition of PS, made in 1979 by Woodham~\cite{Woodham1979}, made a lot of assumptions to simplify the problem to its essence, such as these ones:
 
 \begin{itemize} \setlength\itemsep{-0.2em}
   \item The object surface reflectance must be
@@ -91,18 +91,17 @@ The first definition of this technique, made in 1979 by Woodham~\cite{Woodham197
     \item lambertian;
     \item constant;
   \end{itemize} \vspace{-0.4em}
-  \item Lighting must be known;
-  \item Lighting a point light source at infinity;
-  %\item Lighting directions must not be coplanar over the whole sequence;
+  \item Lighting is known;
+  \item Lighting is a distant point light source;
   \item Sensors are noiseless;
   \item All the images are aligned.
 \end{itemize}
 
 Following these assumptions, the lambertian image formation model for a single pixel is defined as
 \begin{equation}
-b_t =  \langle \mathbf{l}_t , \mathbf{n} \rangle \quad,
+b_t =  \rho \; \mathbf{l} \mathbf{n}_t \quad,
 \end{equation}
-where pixel $t$ will have an intensity $b_t$ when the corresponding surface patch normal $\mathbf{n}$ is lit by a point light source with an incident vector $\mathbf{l}_t$. For the sake of simplification, the surface patch normal $\mathbf{n}$ is scaled by the surface reflectance, its albedo. Likewise, the incident lighting vector $\mathbf{l}_t$ is scaled by its intensity.
+where pixel $t$ will have an intensity $b_t$ when the corresponding surface patch normal $\mathbf{n}_t$ of albedo $\rho$ is lit by a point light source with an incident vector $\mathbf{l}$. For the sake of simplification, its albedo. Likewise, the incident lighting vector $\mathbf{l}$ is scaled by its intensity.
 
 This means that the appearance of a pixel in an image, with the aforementionned assumptions, is dependent on 1) the normal and albedo of a visible surface patch, and 2) the incident angle and intensity of the light. Woodham realized that if a pixel appearance depends on the surface normal, it meant that this surface normal can be found from a known pixel appearance. This means that the shape of an object (through its surface normals) could be obtained by observing the pixels appearance. But there's a problem: a single pixel intensity cannot explain all three degrees of freedom of the normal to be reconstructed (scaled by its albedo), leading to an underconstrained problem.
 
@@ -120,59 +119,80 @@ L =
 which can be used to define the appearance of all pixels over all the images of the sequence, as such:
 \begin{equation}
 \label{eq:lamb_refl}
-\mathbf{b} =  \langle  \mathbf{L}, \mathbf{n}  \rangle \quad.
+\mathbf{b} =  \mathbf{L} \mathbf{n} \quad.
 \end{equation}
 
 Solving eq.~\eqref{eq:lamb_refl} for $\mathbf{n}$ gives the relation
 \begin{equation}
 \label{eq:original_form}
-\mathbf{n} =  \langle  \mathbf{L}^{-1}, \mathbf{b}  \rangle \quad,
+\mathbf{n} =  \mathbf{L}^{-1} \mathbf{b} \quad,
 \end{equation}
 giving birth to the Photometric Stereo technique.
 
-$\mathbf{n}$ provides the structure of the scene visible in the image sequence, giving a single normal for each pixel of the image. This output is called a normal map because it maps a surface normal to each surface patch visible by a pixel. Integrating these normals results in a 3D model of the object visible in the image sequence.
+$\mathbf{n}$ provides the structure of the scene visible in the image sequence, giving a single normal for each pixel of the image. This output is called a normal map, because it maps a surface normal to each surface patch visible by a pixel. Integrating this normal map results in an height map (also called depth map), which represents the height of the surface at each sample point. To summarize, PS outputs a normal map, the gradient of the height map.
 
-A concrete example of PS can be seen in fig.~\ref{fig:PS_example}, where a sequence of images and its lighting directions are set as inputs of eq.~\eqref{eq:original_form} to give a normal map in output.
+A concrete example of PS can be seen in fig.~\ref{fig:PS_example}, where a sequence of images and its lighting directions are set as inputs of eq.~\eqref{eq:original_form} to give a normal map in output and its integrated surface.
 
-Even with all the assumption we made, one issue remains: the lighting directions over the sequence must not be coplanar. If they are coplanar, eq.~\ref{eq:original_form} will result in an underconstrained system, leaving an unknown degree of freedom. This led Woodham to believe that PS won't work outside, because the sun's path across the sky is planar over the course of a single day.
+The great strength of this technique is its output density: 3D information will be generated for every pixel of one input image. This means that a sequence of 5 megapixels images, as can be found on many current off-the-shelf cameras and cellphones, will generate an output of 5 million 3D points using PS. This quantity of information is impressive given the cost of point and shoot cameras and the ubiquity of cellphones.
+
+Even with all the assumption we made, one issue remains: the lighting directions over the sequence must not be coplanar. If they are coplanar, eq.~\ref{eq:original_form} will result in an underconstrained system, leaving an unknown degree of freedom. This led Woodham to believe that PS ``does not apply to outdoor images taken at different times during the same day [...] since the sun's path across the sky is planar''.
 
 %\begin{equation}
 %\mathbf{b} = \rho L(\mathbf{\boldomega}) \langle \boldomega, {\bf n} \rangle \,,
 %\end{equation}
 
 \begin{figure}
-\begin{tabular}{cccccc|cc}
-\includegraphics[width=.1\linewidth]{PS/cat_0.png} &
-\includegraphics[width=.1\linewidth]{PS/cat_3.png} &
-\includegraphics[width=.1\linewidth]{PS/cat_4.png} &
-\includegraphics[width=.1\linewidth]{PS/cat_5.png} &
-\includegraphics[width=.1\linewidth]{PS/cat_10.png} &
-\includegraphics[width=.1\linewidth]{PS/cat_11.png} &
-\includegraphics[width=.1\linewidth]{PS/cat_normal_map.png} &
-\includegraphics[width=.1\linewidth]{PS/sphere_nm.png} \\
-a) & b) & c) & d) & e) & f) & g) & h)
+\begin{tabular}{cccccc|ccc}
+\includegraphics[width=.08\linewidth]{PS/cat_0.png} &
+\includegraphics[width=.08\linewidth]{PS/cat_3.png} &
+\includegraphics[width=.08\linewidth]{PS/cat_4.png} &
+\includegraphics[width=.08\linewidth]{PS/cat_5.png} &
+\includegraphics[width=.08\linewidth]{PS/cat_10.png} &
+\includegraphics[width=.08\linewidth]{PS/cat_11.png} &
+\includegraphics[width=.08\linewidth]{PS/cat_normal_map.png} &
+\includegraphics[width=.04\linewidth]{PS/sphere_nm.png} &
+\includegraphics[width=.18\linewidth]{PS/3d.png} \\
+a) & b) & c) & d) & e) & f) & g) & h) & i)
 \end{tabular}
-\caption{a-f) Examples of inputs lit from different directions, g) normal map obtained from the original form of the Photometric Stereo algorithm, h) sphere normal map showed as example.\newline
-{\small Images from CSE 455, 2010 by Neel Joshi, Ira Kemelmacher and Ian Simon}
+\caption{a-f) Examples of inputs lit from different directions, g) normal map obtained from the original form of the Photometric Stereo algorithm, h) sphere normal map showed as example, i) reconstructed surface from 3 viewpoints.\newline
+{\small input images from CSE 455, 2010 by Neel Joshi, Ira Kemelmacher and Ian Simon}
 }
 \label{fig:PS_example}
 \end{figure}
 
+\section{Outdoor Photometric Stereo}
+
+A lot of work have been done on PS since its original definition. Contrary to what Woodham believed, PS has recently been applied to outdoor photographs, mainly images captures by outdoor cameras. Unfortunately, outdoor lighting is complex and uncontrollable, therefore the techniques proposed in this domain require capturing either months of data, or the illumination conditions at each frame, none of which is a very practical scenario for the casual user.
+
+To make PS work outdoor, the traditionally employed approximation models such as directional lighting will be replaced by a new data-driven model of natural illumination learned from a large database of high quality sky photographs. This database will be captured over extended periods of time, and will contain thousands of photos of the sky in different illumination conditions. By observing the sky directly, the data-driven model will accurately capture what the likely natural illumination conditions are for a given scene. This enhanced lighting model will better constrain the PS optimization algorithm, allowing it to converge toward real or plausible sky illumination conditions. The resulting shape estimation will better explain the observed input images, giving increased result quality. The key to bring PS outdoor is to understand natural illumination.
+
 \section{Thesis proposal}
 
-A lot of work have been done on PS since its original definition. Contrary to what Woodham believed, PS has recently been applied to outdoor photographs, mainly using images captured by webcams. Unfortunately, outdoor lighting is complex and uncontrollable, therefore the techniques proposed in this domain require capturing either months of data, or the illumination conditions at each frame, none of which is a very practical scenario for the casual user. In this context, the main goal of this project is to reconstruct the shape of large-scale outdoor scenes from short time intervals, without the need for capturing the lighting conditions. To surmount the challenges caused by outdoor conditions, the two objectives of this project are to 1) provide a better understanding of natural illumination; and 2) develop a photometric stereo algorithm which takes advantage of this knowledge to recover the scene shape even under unknown, natural illumination conditions.
+The main goal of this project is to reconstruct the shape of large-scale outdoor scenes from short time intervals, without the need for capturing the lighting conditions.
 
-To achieve these objectives, the traditionally employed approximation models such as directional lighting will be replaced by a new data-driven model of natural illumination learned from a large database of high quality sky photographs. This database will be captured over extended periods of time, and will contain thousands of photos of the sky in different illumination conditions. By observing the sky directly, the data-driven model will accurately capture what the likely natural illumination conditions are for a given scene. This enhanced lighting model will better constrain the photometric stereo optimization algorithm, allowing it to converge toward real or plausible sky illumination conditions. The resulting shape estimation will better explain the observed input images, giving increased result quality.
+In this thesis, I propose to:
+\begin{enumerate}
+  \item bring a deeper understanding of the way PS can work outdoors;
+  \item develop practical algorithms that allow precise shape recovery under unknown, uncontrolled outdoor lighting.
+\end{enumerate}
+These objectives can be attained by a better comprehension of natural illumination and its impact on shading. This knowledge can then be leveraged to improve existing reconstruction algorithms or make new ones that works with complex and uncontrolled lighting conditions.
 
-In this thesis, I propose to design and implement a 3D shape acquisition system that relies only on off-the-shelf cameras. By allowing the precise capture of large scale outdoor scenes, my system will bring high quality digitization capabilities to anyone with a camera, thus enabling the collaborative reconstruction of large scale outdoor environments. This has the potential of impacting many fields, such as the digital preservation of cultural heritage before it gets damaged by wars, natural disasters, or the passage of time; the replication of real environments in virtual scenarios for the training of first responders; the creation of novel, realistic environments for use in video games or special effects in the movie industry; etc. By making these tasks easier, I believe this project will have significant impact on 3D shape acquisition as a whole.
+This thesis will bring answers to questions like:
+\begin{itemize}
+  \item What is the minimum timelapse interval required to perform PS outside?
+  \item What are the characteristics a PS practitioner needs to check in a sky to perform outside?
+  \item How can we reconstruct an object with natural illumination using PS?
+  \item What is the optimal input for PS when considering a 24h interval?
+  \item Can we merge PS with other techniques to improve its performance outside?
+\end{itemize}
 
 \section{Anticipated impact}
 
-The Kinect sensor successfully found its way into everyone's home, effectively bringing 3D scanning capabilities to the masses. A plethora of new use cases emerged since its original endeavor to revitalize the entertainment industry. For instance, the 3D printing market that grew significantly over the past few years brought a new need for scans of household objects. Augmented reality is another avenue that requires models of real world objects. These are but a tiny fraction of the applications of real world scanning.
+3D scanning has become a part of everyday life, with sensors such as the Kinect now in everyone's home, effectively bringing 3D scanning capabilities to the masses. Taking the Kinect as example, a plethora of new use cases emerged since its original endeavor to revitalize the entertainment industry. For instance, the 3D printing market that grew significantly over the past few years, brought a new need for scans of household objects. Augmented reality is another avenue that requires a lot of models of real world objects. These are but a tiny fraction of the applications of real world scanning.
 
-While the Kinect enabled myriads of applications in indoor environments, using such sensors outdoors is close to impossible. These kind of sensors are so-called active sensors, meaning that they interact with the scene to work. This usually means projecting light in the scene and sensing it back. But this method is problematic outside: the light patterns they emit get completely drowned by the sunlight. In outdoor settings, the only possibility is to use very expensive scanners, out of reach for the casual user due to their complexity and cost of operation. In this project, the goal is to enable the capture of large outdoor scenes with sensors as cheap and convenient as the Kinect.
+While the Kinect enabled myriads of applications in indoor environments, using such sensors outdoors is close to impossible. These kind of sensors are so-called active sensors, meaning that they interact with the scene to work. This usually means projecting light in the scene and sensing it back. But this method is problematic outside: the light patterns they emit are completely drowned by the sunlight. In outdoor settings, the only current possibility is to use very expensive scanners, out of reach for the casual user due to their complexity and operational cost. The idea is to bring back the availability and cheapness of sensors such as the Kinect to the outside world.
 
-This thesis proposes to do so simply by using cameras, and an existing reconstruction technique dubbed "Photometric Stereo" (PS). The idea is to point a camera towards a scene to be scanned, and to capture a time-lapse sequence over time. Variations in the illumination conditions can be used by PS to reconstruct the shape of the observed scene. PS has been known in computer vision for more than 35 years, and it is still an active area of research.
+The level of understanding I propose in this thesis would allow the design and implementation a 3D shape acquisition system that relies only on off-the-shelf cameras, capable of bringing high quality digitization capabilities to anyone with a camera, thus enabling the collaborative reconstruction of large scale outdoor environments. This has the potential of impacting many fields, such as the digital preservation of cultural heritage before it gets damaged by wars, natural disasters, or the passage of time; the replication of real environments in virtual scenarios for the training of first responders or to improve urban planning; the creation of novel, realistic environments for use in video games or special effects in the movie industry; etc. By making these tasks easier, I believe this project will have significant impact on 3D shape acquisition as a whole.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -201,8 +221,8 @@ As previously stated, PS has been studied extensively for many decades. Research
 % BRDF
 One thing they did is make PS work on other surfaces than perfectly lambertian ones. At first, specular reflections \cite{Ikeuchi1981} were studied and incorporated to the PS framework. This also brought the idea of distributed light sources instead of point light sources to the field, an important idea discussed later on. Over the years, most of the reflectance assumptions were removed, allowing PS to work on surfaces yielding varying reflectance using either a parametric~\cite{hertzmann-pami-05,goldman-tpami-10} or a data-driven approach~\cite{alldrin-cvpr-08}.
 
-% Horn
-A new technique called shape-from-shading~\cite{Horn1989} was born from Photometric stereo. In this technique, a bunch of priors is assumed to infer the structure from a single image instead of a sequence of images. Two interesting elements from this work are worth noting for general PS use: 1) the shadow detection and handling, and 2) uniform illumination (an ambient light source) is taken into account. This technique was further developed to take into account outdoor photometric cues on cloudy days~\cite{Langer1994}. This work recognized that cloudy days could be approximated as diffuse light sources and treated them differently than point light sources, a key insight that will be discussed in details in \ref{iccp15}. Even though work still continues on outdoors shape-from-shading~\cite{oxholm-eccv-12,johnson-cvpr-11,barron-pami-15}, it is of limited interest in the scope of this thesis. This is due to the fact that work on this technique has mainly focused on finding tight constraints, strong priors or semantic segmentation, which are interesting topics, but far from photometric and shading cues.
+% SfS
+A new technique called shape-from-shading~\cite{Horn1989} was born from Photometric stereo. In this technique, a bunch of priors is assumed to infer the structure from a single image instead of a sequence of images. Two interesting elements from this work are worth noting for general PS use: 1) the shadow detection and handling, and 2) uniform illumination (an ambient light source) is taken into account. This technique was further developed to take into account outdoor photometric cues on cloudy days~\cite{Langer1994}. This work recognized that cloudy days could be approximated as diffuse light sources and treated them differently than point light sources, a key insight that will be discussed in details in \ref{iccp15}. Lately, a framework to infer local shape based from shading cues was proposed~\cite{Xiong2013}, yielding intuitions transferable to a PS algorithm. Even though work still continues on outdoors shape-from-shading~\cite{oxholm-eccv-12,johnson-cvpr-11,barron-pami-15}, it is of limited interest in the scope of this thesis. This is due to the fact that work on this technique has mainly focused on finding tight constraints, strong priors or semantic segmentation, which are interesting topics, but far from photometric and shading cues.
 
 % Fusion with MVS
 After the Shape from Shading spinoff, PS was also used in conjunction with other shape reconstruction techniques to enhance their performance. The main idea is to ally the strength of PS (usually its output density) with the strength of another technique. As an example, merging a Multi-View Stereo algorithm with PS was done with great success~\cite{HernandezEsteban2008}.
@@ -215,7 +235,7 @@ More recently, work has been done to increase the technique stability and robust
 The impact of illumination on PS has also been extensively studied. At first, still assuming point light sources, the case of unknown light directions was solved by using singular value decomposition along with a set of priors~\cite{Hayakawa1994}. This allowed to approximate the images lighting conditions and the surface normals jointly. It is worth of note that the reconstruction is always up to a bas-relief ambiguity in the case of unknown light sources~\cite{Belhumeur1999}. This means that every reconstruction with unknown light sources are up to a scaling factor that is impossible to determine theoretically.
 
 % Optimal Illumination control
-All this work suppose that the controlled light spans "enough" the space, meaning that the experimenter should stop when he feels he has enough data to work with. This brought the question: ``is there an optimal placement for the lights to optimize the reconstruction performance of PS?'' Many researchers thought that the optimal light placement was a tradeoff between ideal incident illumination and shadow coverage. Mathematically, having orthogonal light sources is optimal for the reconstruction, but where is it optimal? It was found that the optimal light position is a slant angle of 54.74\degree from the camera at equal distance in circles around it~\cite{spence-iwtas-03,drbohlav-iccv-05}. [figure]
+All this work suppose that the controlled light spans ``enough'' the space, meaning that the experimenter should stop when he feels he has enough data to work with. This brought the question: ``is there an optimal placement for the lights to optimize the reconstruction performance of PS?'' Many researchers thought that the optimal light placement was a tradeoff between ideal incident illumination and shadow coverage. Mathematically, having orthogonal light sources is optimal for the reconstruction, but where is it optimal? It was found that the optimal light position is a slant angle of 54.74\degree from the camera at equal distance in circles around it~\cite{spence-iwtas-03,drbohlav-iccv-05}. [figure]
 
 % diffuse light
 Contrarily to laboratory conditions, real world lighting is not purely directional. There is always an ambient illumination, also called uniform illumination. This ambient illumination is mainly due to reflections on surfaces like walls and floors and can be far from negligible when a strong light source such as the sun (through a window, for instance) is present. The impact of this ambient illumination on PS was recently looked into~\cite{Angelopoulou2013}. They show surprising results revealing that strong directional light is the most important factor to obtain good reconstruction performance. Useful results can be obtained even when the ambient illumination is up to nine times the strength of the directional lighting, as long as this directional lighting in itself is strong. Weak directional lighting produces bad results, even in the absence of ambient illumination.
@@ -250,6 +270,8 @@ Before: Better models of illumination, but how long is it needed?
 Philosophie: big-data
 
 \section{HDR database}
+
+% Hint: take info from JF's 3DV paper
 
 % From ICCP
 As one might expect, the answer to the question above is intrinsically tied to the orientation of a particular surface patch, the associated hemisphere of lighting directions observed by the patch, and the variation in lighting intensity in that hemisphere over the course of a day. So far, this question has only been explored in laboratory conditions or with simple directional illumination, where optimal lighting configurations can be theoretically derived~\cite{drbohlav-iccv-05,klaudiny-prl-14,shen-pg-14}. No attempt has been made at answering this question with more realistic illumination models in an outdoor setup, where lighting cannot be controlled and atmospheric effects are difficult to predict.
