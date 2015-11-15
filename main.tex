@@ -59,7 +59,7 @@
 
 \chapter*{Symbols and notations}
 
-\begin{table}[htbp]\caption{Symboles et notations}
+\begin{table}[htbp]\caption{Symbols and notations}
 \centering % to have the caption near the table
 \begin{tabular}{r c p{10cm} }
 
@@ -271,7 +271,7 @@ To compensate for limited sun motion, a promising approach is to use richer mode
 
 The work done so far on understanding outdoor illumination for use in PS is presented in this chapter. It mainly consist of data capture and its analysis.
 
-First, the database of sky data is presented with its capture details and statistics. Then, our work on modeling the sky and its impact on one-day PS is presented~\cite{holdgeoffroy-iccp-15}. Lastly, our work on the link between what happens in the sky and the reconstruction performance is presented~\cite{holdgeoffroy-3dv-15}.
+First, the database of sky data is presented with its capture details and statistics. Then, our work on modeling the sky and its impact on one-day PS is presented~\cite{holdgeoffroy-iccp-15}. Lastly, our work on the link between what happens in the sky and the reconstruction performance is presented~\cite{holdgeoffroy-3dv-15}. The latter received an award for ``Best Paper (Runner Up)'' at 3DV 2015.
 
 \section{HDR database}
 \label{sec:hdrdb}
@@ -371,29 +371,103 @@ To analyze the influence of outdoor lighting on photometric stereo, we rely on a
 %\input{3dv15.tex}
 
 
+
+%\begin{equation}
+%b_t = \frac{\rho}{\pi} \int_{\Omega_{\mathbf n}} L_t(\mathbf{\boldomega}) \langle \boldomega, {\mathbf n} \rangle d\omega \,,
+%\end{equation}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Proposed contributions}
-
 % Metho!
 
-\begin{equation}
-b_t = \frac{\rho}{\pi} \int_{\Omega_{\mathbf n}} L_t(\mathbf{\boldomega}) \langle \boldomega, {\mathbf n} \rangle d\omega \,,
-\end{equation}
+
+% Clear that the community has an interest
+From the overwhelming positive reviews and great comments we received for our previous work, it seems clear to me that the community is interested in outdoors PS. Reviewers found the work ``refreshing'', praising its ``concrete actionable predictions that can be of interest for practitioners'' and the pertinence of this line of work. Based on this feedback from the community, I look forward to build upon the existing contributions.
+
+% Based on the work already done
+Previous contributions mainly focused on the analysis of the complex illumination conditions of outdoor scenes. This analysis brought us a good deal of knowledge that will enable me to enhance existing algorithms.
+
+But first, something is missing among the community to continue experiments with outdoor PS: a database of diverse objects publicly available. Just as the sky database we built, I propose to capture and share unsaturated HDR images of objects under various natural illumination conditions.
+
+Then, using this database and the previous work we did, I will be able to modify existing PS algorithms to work for outdoor conditions. This work will be split in steps: first, I'll tackle the case when the illumination is known and gradually move toward the case where only some object images are required. This includes merging ideas from other 3D reconstruction techniques to simplify the problem or correct some issues that PS is not able to fix in the general case.
+
+After having improved existing PS reconstruction algorithms using knowledge from the day lit sky, I'll focus on the other things that a practitioner could do to make PS work in problematic cases.
+
+
+\section{Database of objects}
+
+As explained previously (\ref{sec:hdrdb}), having realized that the research community was missing it, we've built a publicly available database of unsaturated HDR sky captures. This led me to realize that something else is missing: the same database for objects instead of skies. This database would allow researchers to analyze the shading of surfaces in conjunction with their illumination conditions. The goal is to obtain and share pictures of objects synchronized with the sky captures. These images will effectively give a direct link between the aspect of a sky and the appearance of objects lit by it. More importantly for me, it will also give the inverse: given a picture of an object, what sky lit it.
+
+% Cite AMOS http://amos.cse.wustl.edu/
+Similar databases already exist in the community (e.g., AMOS~\cite{jacobs-cvpr-2007}, Yahoo!'s databases~\cite{thomee-arxiv-15}), leading me to believe that this kind of data is wanted and appreciated by the researchers. Data available is usually very rich, yielding a lot of different content and objects with various reflectances. The issue of this data, in our case, is the lighting conditions. A full HDR capture of the sky synchronized with the images is not available. Furthermore, it is often difficult to estimate what the illumination looked like. Images may, or may not, have GPS coordinates, sometimes with the wrong information. Date and time in the EXIF data of the images are often wrong or skewed. Camera orientation (such as azimuth) is mostly never provided with these databases. It is then hard to guess the position of the sun in the sky.
+
+% small & big
+The idea of the database would be to gather images of various objects. At first, simple matte surfaces will be the focus, since it is simpler to work with. Objects with more complex reflectances will come later on. Two key characteristics are important for my analysis: small and big objects. Small objects are mandatory, because we can obtain easily a ground truth mesh from them using a handheld 3D scanner. Having a ground truth will greatly help the development of reconstruction algorithm and the measurement of its performance. Big objects are also important, because they are the main interest of using outdoor PS. To scan building-scale objects, handheld 3D scanners require quite a long time to operate, making them impracticable in this case. On the long term, reconstructing such big objects, like sculptures and buildings, is the goal I set to achieve. Having the data ready to perform the rest of the project is a logical step in the right direction that this database will achieve. 
+
+% Build on existing infrastructure
+A lot of effort is required to build and share a new dataset. This is why I plan on reusing the infrastructure we already have for the sky database. The capture system is already available, as well as the sharing interface. All that is left is to take the captures and move them to the existing database. The goal is to be as efficient as possible and put the minimum effort into the system \emph{per se} to focus on the objects to be captured and the rest of the project.
+
+% Technical side
+On the technical side, a Canon 5D mark III camera will be used in addition to the system already in place for the sky capture described in \ref{sec:hdrdb}. There will be 5 burst captures taken of the object
+
 
 \section{Calibrated outdoor reconstruction}
 
-\section{Blind outdoor reconstruction}
+% Up to now, only analysis. Make something with it.
 
-\section{Emploi d'autres astres que le soleil}
 
-Décrire le projet day \& night.
+% Calibrated case.
 
-\section{Augmentation avec d'autres techniques}
+% Three avenues are interesting: regularization, selection and algorithmic improvements
+
+% One thing we noticed during our analysis is that not all pixels nor axis are equal.
+% Figure, axis uncertainty
+
+% Discrepancy between simulation and real world captures. Investigate it. We witness: selecting some images of the sequence may improve or degrade dramatically reconstruction performance.
+
+% MRF, reference Jung's, tell our differences.
+
+% To do that, we'll need to merge some ideas from other techniques because sometimes, some pixels cannot be recovered. Bas-Relief Amb. Silouhettes, Data-Driven priors.
+
+\section{Uncalibrated outdoor reconstruction}
+
+% . reconstruction, don't need lighting condition is a plus
+
+% Data-driven approach, what can the DB tell us on the image.
+
+% First, reconstruction of the ground only.
+
+% Then, estimation of the sky using the GPS coordinates and date & time. Then, without date and time.
+
+% Lastly fully uncalibrated
+
+\section{Looking farther than the sun}
+
+% Up until now, we only considered the atmosphere during the day for reconstruction. The main problem, coplanar.
+
+\subsection{Day \& Night}
+During the night, the moon presents another plane.
+
+% Figures
+
+
+\subsection{Artificial}
+
+% Diffusers
+
+% City lights
+
+
+\subsection{Other techniques}
+
+
+
+%\section{Augmentation avec d'autres techniques}
 
 % from ICCP
-While these techniques can lead to well-defined solutions, they are not always practical in many scenarios with strict temporal or geographical constraints. A second strategy has therefore been to combine PS with other techniques such as multi-view stereo~\cite{inose-tcva-13,shi-3dv-14}, or use reference objects as in \cite{johnson-cvpr-11} or example-based PS~\cite{hertzmann-pami-05,ackermann-3dv-14}. But can we accurately reconstruct surface geometry simply based on the photometric cue in an outdoor setting, without overly restrictive temporal and geographical constraints?
+%While these techniques can lead to well-defined solutions, they are not always practical in many scenarios with strict temporal or geographical constraints. A second strategy has therefore been to combine PS with other techniques such as multi-view stereo~\cite{inose-tcva-13,shi-3dv-14}, or use reference objects as in \cite{johnson-cvpr-11} or example-based PS~\cite{hertzmann-pami-05,ackermann-3dv-14}. But can we accurately reconstruct surface geometry simply based on the photometric cue in an outdoor setting, without overly restrictive temporal and geographical constraints?
 
-Décrire l'amélioration que pourrait apporter la PS utilisée conjointement avec du SFM et la stéréo multivues standard.
+%Décrire l'amélioration que pourrait apporter la PS utilisée conjointement avec du SFM et la stéréo multivues standard.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
