@@ -368,6 +368,7 @@ To analyze the influence of outdoor lighting on photometric stereo, we rely on a
 \section{$x$-hour Outdoor Photometric Stereo}
 \label{3dv15}
 
+Best theoretical reconstruction performance.
 %\input{3dv15.tex}
 
 
@@ -408,37 +409,60 @@ The idea of the database would be to gather images of various objects. At first,
 A lot of effort is required to build and share a new dataset. This is why I plan on reusing the infrastructure we already have for the sky database. The capture system is already available, as well as the sharing interface. All that is left is to take the captures and move them to the existing database. The goal is to be as efficient as possible and put the minimum effort into the system \emph{per se} to focus on the objects to be captured and the rest of the project.
 
 % Technical side
-On the technical side, a Canon 5D mark III camera will be used in addition to the system already in place for the sky capture described in \ref{sec:hdrdb}. There will be 5 burst captures taken of the object
+On the technical side, a Canon 5D mark III camera will be used in addition to the system already in place for the sky capture described in \ref{sec:hdrdb}. This additional camera will perform 5 burst captures of the object, in order to gather all the information needed to build an unsaturated HDR photo. A small chrome sphere is inserted in this camera's field of view to allow calibration with the sky camera. Hence, the precise rotation will be known between both camera. A system based on ROS developed by interns\footprint{Available publicly at \url{https://github.com/lvsn/CameraNetwork}} orchestrates the camera network and synchronizes the captures among cameras.
 
 
 \section{Calibrated outdoor reconstruction}
+\label{sec:calib}
 
 % Up to now, only analysis. Make something with it.
-
+Until now, the work done revolves around the analysis of natural skies. The next step is to use this new knowledge to build a reconstruction algorithm. At first, many simplifications will be done to the problem to be able to modify an existing algorithm and make it work outside. Here are described what I want to achieve first, followed by the insights that will make it work.
 
 % Calibrated case.
+In the beginning, I assume the whole sky is known to the algorithm as well as its calibration with respect to the object pictures. This means that the lighting matrix $L$ is known \emph{a priori}. Object surfaces will be assumed to be mostly Lambertian, but are not required to be constant. While complex reflectances could be found relatively easily from the sky capture, this step will be necessary to simplify the upcoming uncalibrated version of the algorithm, discussed in \ref{sec:uncalib}.
 
-% Three avenues are interesting: regularization, selection and algorithmic improvements
+The images must all be aligned. Image alignment or registration is another field of study which is solved for the case useful for PS. This is discussed in~\cite{ackermann-cvpr-12}, as previously explained. I will suppose the images were already aligned using such technique in the algorithm I propose.
+
+% Explain the DLT
+
+
+% What's coming up next
+Four avenues will be discussed on how I plan to make a PS algorithm work for outdoors. First, using the observations we made in our analysis brought us some ideas as how to improve the reconstruction performance. Two of such ideas are discussed. Then, interesting elements found in other algorithms and their inclusion in the proposed algorithm will be explained. Lastly, shadow detection is discussed, as pixels in shadows are difficult to handle.
+
+\subsection{Regularization}
 
 % One thing we noticed during our analysis is that not all pixels nor axis are equal.
 % Figure, axis uncertainty
 
+
+\subsection{Selection}
 % Discrepancy between simulation and real world captures. Investigate it. We witness: selecting some images of the sequence may improve or degrade dramatically reconstruction performance.
 
+
+\subsection{Algorithmic improvements}
 % MRF, reference Jung's, tell our differences.
 
 % To do that, we'll need to merge some ideas from other techniques because sometimes, some pixels cannot be recovered. Bas-Relief Amb. Silouhettes, Data-Driven priors.
 
+\subsection{Shadow detection}
+3DV15 article with cool SD
+
 \section{Uncalibrated outdoor reconstruction}
+\label{sec:uncalib}
 
 % . reconstruction, don't need lighting condition is a plus
 
 % Data-driven approach, what can the DB tell us on the image.
 
+\subsection{Half-calibrated case}
 % First, reconstruction of the ground only.
 
+
+\subsection{Mostly uncalibrated}
 % Then, estimation of the sky using the GPS coordinates and date & time. Then, without date and time.
 
+
+\subsection{Fully uncalibrated}
 % Lastly fully uncalibrated
 
 \section{Looking farther than the sun}
@@ -490,6 +514,11 @@ The problems will be explored in increasing order of complexity according to the
 \chapter{Conclusion}\label{conclusion}
 
 Recap.
+
+\chapter*{Acknowledgments}
+
+Mathieu Garon
+Julien Becirovski
 
 %\appendix
 
