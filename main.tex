@@ -30,6 +30,7 @@
 \usepackage{graphicx}
 \usepackage{rotating}
 \usepackage{gensymb}
+\usepackage{xcolor}
 %\usepackage{adjustbox}
 %\usepackage{authblk}
 % to control spacing in item lists
@@ -53,6 +54,10 @@
 \newcommand{\boldomega}{\boldsymbol \omega} % bold omega
 \newcommand{\boldmu}{\boldsymbol \mu} % bold omega
 \newcommand{\bolddelta}{\boldsymbol \delta} % bold delta
+
+\newcommand\norm[1]{\left\lVert#1\right\rVert}
+
+\newcommand\todo[1]{\textcolor{red}{#1}}
 
 \graphicspath{{figures/}}
 
@@ -82,6 +87,7 @@ Real world scanning of outdoors structures gained a lot of interest recently. Th
 This thesis proposes to do so simply by using cameras, and an existing reconstruction technique dubbed "Photometric Stereo" (PS). The idea is to point a camera towards a scene to be scanned, and to capture a time-lapse sequence over time. Variations in the illumination conditions can be used by PS to reconstruct the shape of the observed scene. PS has been known in computer vision for more than 35 years, and is still an active area of research.
 
 \section{Photometric Stereo}
+\label{sec:ps_ori}
 
 The first definition of PS, made in 1979 by Woodham~\cite{Woodham1979}, made a lot of assumptions to simplify the problem to its essence, such as these ones:
 
@@ -119,13 +125,13 @@ L =
 which can be used to define the appearance of all pixels over all the images of the sequence, as such:
 \begin{equation}
 \label{eq:lamb_refl}
-\mathbf{b} =  \mathbf{L} \mathbf{n} \quad.
+\mathbf{b} =  \rho \mathbf{L} \mathbf{n} \quad.
 \end{equation}
 
 Solving eq.~\eqref{eq:lamb_refl} for $\mathbf{n}$ gives the relation
 \begin{equation}
 \label{eq:original_form}
-\mathbf{n} =  \mathbf{L}^{-1} \mathbf{b} \quad,
+\rho \mathbf{n} =  \mathbf{L}^{-1} \mathbf{b} \quad,
 \end{equation}
 giving birth to the Photometric Stereo technique.
 
@@ -409,7 +415,7 @@ The idea of the database would be to gather images of various objects. At first,
 A lot of effort is required to build and share a new dataset. This is why I plan on reusing the infrastructure we already have for the sky database. The capture system is already available, as well as the sharing interface. All that is left is to take the captures and move them to the existing database. The goal is to be as efficient as possible and put the minimum effort into the system \emph{per se} to focus on the objects to be captured and the rest of the project.
 
 % Technical side
-On the technical side, a Canon 5D mark III camera will be used in addition to the system already in place for the sky capture described in \ref{sec:hdrdb}. This additional camera will perform 5 burst captures of the object, in order to gather all the information needed to build an unsaturated HDR photo. A small chrome sphere is inserted in this camera's field of view to allow calibration with the sky camera. Hence, the precise rotation will be known between both camera. A system based on ROS developed by interns\footprint{Available publicly at \url{https://github.com/lvsn/CameraNetwork}} orchestrates the camera network and synchronizes the captures among cameras.
+On the technical side, a Canon 5D mark III camera will be used in addition to the system already in place for the sky capture described in \ref{sec:hdrdb}. This additional camera will perform 5 burst captures of the object, in order to gather all the information needed to build an unsaturated HDR photo. A small chrome sphere is inserted in this camera's field of view to allow calibration with the sky camera. Hence, the precise rotation will be known between both camera. A system based on ROS developed by interns\footnote{Available publicly at \url{https://github.com/lvsn/CameraNetwork}} orchestrates the camera network and synchronizes the captures among cameras.
 
 
 \section{Calibrated outdoor reconstruction}
@@ -424,7 +430,91 @@ In the beginning, I assume the whole sky is known to the algorithm as well as it
 The images must all be aligned. Image alignment or registration is another field of study which is solved for the case useful for PS. This is discussed in~\cite{ackermann-cvpr-12}, as previously explained. I will suppose the images were already aligned using such technique in the algorithm I propose.
 
 % Explain the DLT
+The basic algorithm on which I will base my work is called the Direct Linear Tranform (DLT) PS. The core of the technique is to rewrite the original PS equation,
 
+\begin{equation}
+\mathbf{b} = \rho L \mathbf{n}  \quad,
+\end{equation}
+
+into an set of homogeneous linear equations. Two important differences are made from the original PS algorithm as defined in \ref{sec:ps_ori}. First, it is possible to remove the albedo $\rho$ from the equation to cancel the effect of the surface reflectance, making the algorithm robust to albedo variability. Secondly, instead of solving for the normals, it is possible to solve for the surface estimation directly. 
+
+To remove the albedo $\rho$ from these equation, the trick is to divide an image by another one. Mathematically, this pixelwise division on, let's say image 1 by image 2, is represented as
+
+\begin{equation}
+\frac{b_{t,1}}{b_{t,2}} = \frac{\rho_t \mathbf{l}_1 \mathbf{n}_t}{\rho_t \mathbf{l}_2 \mathbf{n}_t} \quad,
+\end{equation}
+for pixel $t$. The albedo $\rho_t$ cancels out, giving the relation
+\begin{equation}
+\label{eq:ratio_images}
+\left( b_{t,1} \mathbf{l}_2 - b_{t,2} \mathbf{l}_1 \right) \mathbf{n}_t = 0  \quad.
+\end{equation}
+
+This relation was used a lot before~\cite{yu-iccp-13,wu-pami-06}. The algorithm usually consist of taking a denominator image minimally affected by shadows and highlights and dividing all the other images of the sequence by this one. While this removes the constant albedo assumption, it leaves us with an image less in our sequence. Another possibility is to take all the possible permutations of images, translating in a better robustness. The problem with this approach is that it makes the problem grow quadratically (see annexe \ref{anx:permutations}, which quickly becomes problematic to solve quickly on computers having a finite amount of memory. Stochastically taking a predetermined amount can do the trick, but more a more sound selection is discussed and planned later on.
+ 
+Solving for the surface height instead of the normals can be obtained by analyzing the relation between the two. Given pixel $t$ and its depth $z_t$, its homologue normal $\mathbf{n}_t$ can be expressed as
+\begin{equation}
+r_t = 
+\begin{bmatrix}
+\nabla z_{t,x} \\
+\nabla z_{t,y} \\
+-1
+\end{bmatrix}
+\end{equation}
+\begin{equation}
+\mathbf{n}_t =
+\frac{r_t}{\norm{r_t}} \quad.
+\end{equation}
+This supposes that the surface is pointing toward $-1$, hence the camera is at $[0, 0, -1]$.
+
+When merged with the albedo removal technique (equation \eqref{eq:ratio_images}) and letting down the normalization, we obtain
+\begin{equation}
+\label{eq:pre-dlt}
+\left( b_{t,1} \mathbf{l}_2 - b_{t,2} \mathbf{l}_1 \right)
+\begin{bmatrix}
+\nabla z_{t,x} \\
+\nabla z_{t,y} \\
+-1
+\end{bmatrix}
+= 0  \quad.
+\end{equation}
+
+All that is left is to convert this equation a set of homogeneous linear equations, the proper DLT. To do so, we must consider the left part of the equation, $\left( b_{t,1} \mathbf{l}_2 - b_{t,2} \mathbf{l}_1 \right)$, as being a vector of three scalars, let's say $\left[ i_t, j_t, k_t \right]$. When considering the division of an image $a$ by $a'$ as a whole instead of single pixels, we get the vectors $\mathbf{i}_{aa'}$, $\mathbf{j}{aa'}$ and $\mathbf{k}{aa'}$. Equation \eqref{eq:pre-dlt} can now be rewritten as
+\begin{equation}
+\left[ \mathrm{diag}(\mathbf{i}_{aa'}) \; \mathrm{diag}(\mathbf{j}_{aa'}) \; \mathrm{diag}(\mathbf{k}_{aa'})\right]
+\begin{bmatrix}
+\nabla \mathbf{z}_{x} \\
+\nabla \mathbf{z}_{y} \\
+-1
+\end{bmatrix}
+= 0 \quad,
+\end{equation}
+which can be rewritten as
+\begin{equation}
+\left[ \mathrm{diag}(\mathbf{i}_{aa'}) \; \mathrm{diag}(\mathbf{j}_{aa'}) \right]
+\begin{bmatrix}
+\nabla \mathbf{z}_{x} \\
+\nabla \mathbf{z}_{y} \\
+\end{bmatrix}
+= \mathbf{k}_{aa'} \quad.
+\end{equation}
+
+\todo{Redo this}
+It is possible to reformulate this equation as such:
+\begin{equation}
+\begin{bmatrix}
+D_{ii} & D_{ij} \\
+D_{ij} & D_{jj} \\
+\end{bmatrix}
+z =
+\begin{bmatrix}
+D_i \mathbf{k} \\
+D_j \mathbf{k} \\
+\end{bmatrix} \quad,
+\end{equation}
+where $D_i = \mathrm{diag}(\mathbf{i}_{aa'})$ and $ D_{ij} = \mathrm{diag}\left(\mathbf{i}_{aa'} \circ \mathbf{j}_{aa'}\right)$ ($\circ$ being the elementwise, or Hadamard, product). This gives the DLT formulation of the PS problem with the two explained enhancements.
+
+% Normalization
+\todo{Normalization}
 
 % What's coming up next
 Four avenues will be discussed on how I plan to make a PS algorithm work for outdoors. First, using the observations we made in our analysis brought us some ideas as how to improve the reconstruction performance. Two of such ideas are discussed. Then, interesting elements found in other algorithms and their inclusion in the proposed algorithm will be explained. Lastly, shadow detection is discussed, as pixels in shadows are difficult to handle.
@@ -520,7 +610,26 @@ Recap.
 Mathieu Garon
 Julien Becirovski
 
-%\appendix
+\chapter*{Annexes}
+
+\section{Permutations of pair of images}
+\label{anx:permutations}
+
+From a set of $n$ images, the quantity of possible pairs of images is expressed as a special case of the permutation without repetition:
+\begin{equation}
+\frac{n!}{\left( n - 2 \right)!} \quad.
+\end{equation}
+
+By the definition of the factorial, this equation can be simplified to
+\begin{equation}
+\frac{n \times (n-1) \times (n-2) \times (n-3) \times \cdots \times 2}{(n-2) \times (n-3) \times \cdots \times 2} \quad.
+\end{equation}
+
+By simplifying, we find that the quantity is exactly
+\begin{equation}
+n^2 - n\quad,
+\end{equation}
+giving a quadratic expression (also called $\mathcal{O}(n^2)$ in Bachmann-Landau notation).
 
 {\small
 \bibliographystyle{acm}
