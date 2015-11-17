@@ -542,12 +542,61 @@ for the first order, and
 \end{equation}
 for the second order. Here, $z$ is, as before, the height, $\alpha$ and $\beta$ are the regularization weights and $H(z)$ is the Hessian matrix of $z$, its second-order derivatives. While the first order works to smooth the slopes, the second order enforces smooth curvature.
 
+While the idea is similar, I am confronted to a problem which is a bit different. When the surface uncertainty is inferred directly from the lighting, it won't be purely in a single direction as described in Hernández \emph{et al.}. The uncertainty may be any combination of two orthogonal vectors, and may even end up with an isotropic behavior (i.e., the uncertainty is equal in both directions). As such, the $\mathbf{u}$ vector must be changed to $\mathbf{u}(x,y)$, with $x$ and $y$ being the coordinates in pixel-space.
 
-\subsection{Selection}
+We can simplify $\mathbf{u}(x,y)$ to a set of two orthogonal vectors along both axes. Since the uncertainty is computed directly on the $x$ and $y$ axes, we can rewrite the regularization as a linear combination of these two vectors:
+\begin{equation}
+\alpha \lvert \mathbf{u}_x \nabla z + \mathbf{u}_y \nabla z\rvert ^2 +
+\beta \lvert \mathbf{u}_x H(z)\nabla z + \mathbf{u}_y H(z)\nabla z\rvert ^2
+\quad,
+\end{equation}
+where $\mathbf{u}_x$ and $\mathbf{u}_y$ are the perpendicular components of the uncertainty.
+\todo{In the case of edges?}
+
+This new formulation is still untested. As such, my plan is to incorporate it into the reconstruction algorithm and to monitor its performance improvements.
+
+
+\subsection{Selection and scaling}
 % Discrepancy between simulation and real world captures. Investigate it. We witness: selecting some images of the sequence may improve or degrade dramatically reconstruction performance.
+While working on the previous contributions, we witnessed a strange behavior in the reconstruction performance. Two symptoms were noticed, which -- we believe -- come from the same root, and will be solved by a single solution.
+
+First, simulations on cloudy and semi-cloudy lighting conditions were really near the real captured data. But when the sun was directly visible by a surface patch, a drift in the intensity values was observed. This showed
+\todo{show lines}
+
+The second curious behavior detected can be easily deducted from the mathematical formulation. Sometimes, by adding images, the reconstruction uncertainty was increased, leading to worse results. At first, it may seem counter-intuitive: why would adding more data be harmful to the algorithm? The answer lies in the stability of the PS technique. As shown in the previous work, reconstruction uncertainty depends on three things:
+\begin{enumerate}
+  \item The sensor noise;
+  \item The surface albedo;
+  \item The stability of the lighting matrix.
+\end{enumerate}
+Over different sequences of images of the same lambertian object taken with the same photo camera, the sensor noise and the surface albedo does not change. The stability of the lighting matrix $L$-- the sequence of mean light vectors seen for a given surface -- will change, though. This means that the uncertainty will also change. As shown in our previous contributions, this uncertainty change is based on the singular values of the $L$ matrix. Adding repetitive or coplanar data to this matrix will increase the gap between the maximum and the minimum singular value. This has the effect of degrading the conditioning of the matrix, meaning that the stability will be impacted negatively. This translates in an increase of the uncertainty of the overall PS reconstruction. Conceptually, this means that the reconstruction algorithm will have an accuracy bias toward a certain direction.
+
+Both of these issues touch two very important concepts:
+\begin{enumerate}
+\item Which information among the dataset is important;
+\item How can they be improved.
+\end{enumerate}
+Not all data is equal, in that repetitive data is actually harmful for the algorithm. Then, which combination of input images should be kept? Which combination is optimal? What kind of preprocessing can we perform on the images to improve the result?
+
+Using the condition number as a stability measure of the $L$ matrix, simply stacking images will sometimes increase or decrease the condition number, as can be seen in fig.~\ref{fig:}. But when ordering the input images by their contributions to define the singular vectors of the $L$ matrix (ranked from the most important to the least important) as shown in fig.~\ref{fig:}, we see that there's a clear optimal quantity of images. Past this quantity, the reconstruction quality is degraded.
+
+\todo{figures condition value ordered and not ordered}
+
+Even though this analysis shows promising results, it is based on the condition number and not a direct reconstruction performance assessment measure such as the uncertainty, as we used in our previous contributions. But even basing this analysis on the uncertainty won't give the best solution in our case. This analysis is static, meaning that it orders the input images regardless of the quantity we aim for. Maybe a completely different subset of images than the sorted one would be optimal for a certain quantity of input image.
+
+To solve this problem, I propose to transfer some knowledge from the linear algebra and machine learning domains to PS. From the linear algebra domain, Golub \emph{et al.}~\cite{Golub1977} studied the rank degeneracy of matrices in the least squares problem. From the machine learning domain, a whole area of research called ``feature selection'' is based on a similar idea. Both of them have a similar goal: to select some columns of a matrix while optimizing some property, such as the condition number. In order to do so, the common way to perform this is by matrix factorization. I plan on reviewing these two fields of studies to gain a global understanding of the problem. This will allow me to use the uncertainty as measure instead of the condition number, and to modify an existing algorithm to solve this problem.
+\todo{explain more}
+
+Furthermore, once the optimal input images are selected, the conditioning of the problem may still be suboptimal. In that case, is there some processing that could be done on the images that could enhance the results? The bad conditioning can come from great variances in the lighting intensity. A common example is when the sun is shining at noon and a cloud occludes the sun in the afternoon. They both define a mean light vector (MLV) for a given normal. This MLV can potentially be very interesting vectors, but the intensity of the first one drowns the second. This means that the first vector will have an norm significantly higher than the second vector. When taken in the least squares sense, the first vector will have more importance when solving than the second vector. But in reality, we don't what this to happen; both are valid pixels gathered from the surface, explaining the first vector should be as important as explaining the second one.
+
+This vector importance issue can be fixed by scaling the data by an arbitrary factor. By scaling both the input images and the computed MLV(s) to be of the same magnitude, the input images should be treated equally. Keeping in mind the impact of sensor noise, it is better to scale down the bright images than scaling up the dark images. The latter would boosting the sensor noise, giving inaccurate data, and thus a high reconstruction uncertainty.
 
 
 \subsection{Algorithmic improvements}
+
+% In some cases, bleh
+The analysis in our previous contributions showed that sometimes, even with the best possible surface with the lowest sensor noise, there is not enough photometric cue to recover certain normals or surfaces over the sphere.
+
 % MRF, reference Jung's, tell our differences.
 
 % To do that, we'll need to merge some ideas from other techniques because sometimes, some pixels cannot be recovered. Bas-Relief Amb. Silouhettes, Data-Driven priors.
