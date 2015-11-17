@@ -94,7 +94,7 @@ The first definition of PS, made in 1979 by Woodham~\cite{Woodham1979}, made a l
 \begin{itemize} \setlength\itemsep{-0.2em}
   \item The object surface reflectance must be
   \vspace{-0.65em}\begin{itemize} \setlength\itemsep{0.1em}
-    \item lambertian;
+    \item Lambertian;
     \item constant;
   \end{itemize} \vspace{-0.4em}
   \item Lighting is known;
@@ -103,13 +103,13 @@ The first definition of PS, made in 1979 by Woodham~\cite{Woodham1979}, made a l
   \item All the images are aligned.
 \end{itemize}
 
-Following these assumptions, the lambertian image formation model for a single pixel is defined as
+Following these assumptions, the Lambertian image formation model for a single pixel is defined as
 \begin{equation}
 b_t =  \rho \; \mathbf{l} \mathbf{n}_t \quad,
 \end{equation}
 where pixel $t$ will have an intensity $b_t$ when the corresponding surface patch normal $\mathbf{n}_t$ of albedo $\rho$ is lit by a point light source with an incident vector $\mathbf{l}$. For the sake of simplification, its albedo. Likewise, the incident lighting vector $\mathbf{l}$ is scaled by its intensity.
 
-This means that the appearance of a pixel in an image, with the aforementionned assumptions, is dependent on 1) the normal and albedo of a visible surface patch, and 2) the incident angle and intensity of the light. Woodham realized that if a pixel appearance depends on the surface normal, it meant that this surface normal can be found from a known pixel appearance. This means that the shape of an object (through its surface normals) could be obtained by observing the pixels appearance. But there's a problem: a single pixel intensity cannot explain all three degrees of freedom of the normal to be reconstructed (scaled by its albedo), leading to an underconstrained problem.
+This means that the appearance of a pixel in an image, with the aforementioned assumptions, is dependent on 1) the normal and albedo of a visible surface patch, and 2) the incident angle and intensity of the light. Woodham realized that if a pixel appearance depends on the surface normal, it meant that this surface normal can be found from a known pixel appearance. This means that the shape of an object (through its surface normals) could be obtained by observing the pixels appearance. But there's a problem: a single pixel intensity cannot explain all three degrees of freedom of the normal to be reconstructed (scaled by its albedo), leading to an underconstrained problem.
 
 To solve this issue, it is possible to take a sequence of images, all from the same viewpoint, but with different lighting conditions. The shading difference between the different lighting conditions can constrain the problem correctly. In the case of a sequence of images, we define $L$ as the stacked incident vectors of all the $m$ images in the sequence (labeled $\mathbf{l}_{1}, \mathbf{l}_{2}, \dots \mathbf{l}_{m}$):
 \begin{equation}
@@ -217,7 +217,7 @@ The level of understanding I propose in this thesis would allow the design and i
 % 	\end{itemize}
 % \end{itemize}
 
-Since its inception, Photometric Stereo has received a lot of attention throughout the years. Researchers tried to alleviate the restrictive assumptions of the original method, such as lambertian reflectance, noiseless sensors and known lighting. This chapter will first relate briefly the major improvements made on PS over the years, and then focus on the efforts made to bring it outside the laboratory.
+Since its inception, Photometric Stereo has received a lot of attention throughout the years. Researchers tried to alleviate the restrictive assumptions of the original method, such as Lambertian reflectance, noiseless sensors and known lighting. This chapter will first relate briefly the major improvements made on PS over the years, and then focus on the efforts made to bring it outside the laboratory.
 
 
 \section{Photometric Stereo}
@@ -226,7 +226,7 @@ As previously stated, PS has been studied extensively for many decades. Research
 
 \subsection{Surface reflectance}
 % BRDF
-One thing they did is make PS work on other surfaces than perfectly lambertian ones. At first, specular reflections \cite{Ikeuchi1981} were studied and incorporated to the PS framework. This also brought the idea of distributed light sources instead of point light sources to the field, an important idea discussed later on. Over the years, most of the reflectance assumptions were removed, allowing PS to work on surfaces yielding varying reflectance using either a parametric~\cite{hertzmann-pami-05,goldman-tpami-10} or a data-driven approach~\cite{alldrin-cvpr-08}.
+One thing they did is make PS work on other surfaces than perfectly Lambertian ones. At first, specular reflections \cite{Ikeuchi1981} were studied and incorporated to the PS framework. This also brought the idea of distributed light sources instead of point light sources to the field, an important idea discussed later on. Over the years, most of the reflectance assumptions were removed, allowing PS to work on surfaces yielding varying reflectance using either a parametric~\cite{hertzmann-pami-05,goldman-tpami-10} or a data-driven approach~\cite{alldrin-cvpr-08}.
 
 \subsection{Shape from Shading}
 % SfS
@@ -251,7 +251,7 @@ All this work suppose that the controlled light spans ``enough'' the space, mean
 Contrarily to laboratory conditions, real world lighting is not purely directional. There is always an ambient illumination, also called uniform illumination. This ambient illumination is mainly due to reflections on surfaces like walls and floors and can be far from negligible when a strong light source such as the sun (through a window, for instance) is present. The impact of this ambient illumination on PS was recently looked into~\cite{Angelopoulou2013}. They show surprising results revealing that strong directional light is the most important factor to obtain good reconstruction performance. Useful results can be obtained even when the ambient illumination is up to nine times the strength of the directional lighting, as long as this directional lighting in itself is strong. Weak directional lighting produces bad results, even in the absence of ambient illumination.
 
 % Arbitrary light sources
-Research on indoors illumination made a big leap when generic lighting conditions were estimated alongside traditional PS~\cite{basri-ijcv-2007}. This work considered the illumination as a complete sphere around the scene instead of a sum of discrete point light sources. The lighting conditions recovered are, however, limited to low-frequencies. While it can be quite enough for simple materials, it won't work for materials exhibiting specularities or yielding non-lambertian reflectance.
+Research on indoors illumination made a big leap when generic lighting conditions were estimated alongside traditional PS~\cite{basri-ijcv-2007}. This work considered the illumination as a complete sphere around the scene instead of a sum of discrete point light sources. The lighting conditions recovered are, however, limited to low-frequencies. While it can be quite enough for simple materials, it won't work for materials exhibiting specularities or yielding non-Lambertian reflectance.
 
 %Covering the vast amount of work done on PS as a whole is beyond the scope of this thesis proposal. The rest of the document will focus more closely on work that have considered PS on outdoor conditions.
 
@@ -430,13 +430,7 @@ In the beginning, I assume the whole sky is known to the algorithm as well as it
 The images must all be aligned. Image alignment or registration is another field of study which is solved for the case useful for PS. This is discussed in~\cite{ackermann-cvpr-12}, as previously explained. I will suppose the images were already aligned using such technique in the algorithm I propose.
 
 % Explain the DLT
-The basic algorithm on which I will base my work is called the Direct Linear Tranform (DLT) PS. The core of the technique is to rewrite the original PS equation,
-
-\begin{equation}
-\mathbf{b} = \rho L \mathbf{n}  \quad,
-\end{equation}
-
-into an set of homogeneous linear equations. Two important differences are made from the original PS algorithm as defined in \ref{sec:ps_ori}. First, it is possible to remove the albedo $\rho$ from the equation to cancel the effect of the surface reflectance, making the algorithm robust to albedo variability. Secondly, instead of solving for the normals, it is possible to solve for the surface estimation directly. 
+Two important differences are made from the original PS algorithm as defined in \ref{sec:ps_ori} and the basis algorithm I plan to build my work upon. First, it is possible to remove the albedo $\rho$ from the equation to cancel the effect of the surface reflectance, making the algorithm robust to albedo variability. Secondly, instead of solving for the normals, it is possible to solve for the surface estimation directly. 
 
 To remove the albedo $\rho$ from these equation, the trick is to divide an image by another one. Mathematically, this pixelwise division on, let's say image 1 by image 2, is represented as
 
@@ -478,7 +472,9 @@ When merged with the albedo removal technique (equation \eqref{eq:ratio_images})
 = 0  \quad.
 \end{equation}
 
-All that is left is to convert this equation a set of homogeneous linear equations, the proper DLT. To do so, we must consider the left part of the equation, $\left( b_{t,1} \mathbf{l}_2 - b_{t,2} \mathbf{l}_1 \right)$, as being a vector of three scalars, let's say $\left[ i_t, j_t, k_t \right]$. When considering the division of an image $a$ by $a'$ as a whole instead of single pixels, we get the vectors $\mathbf{i}_{aa'}$, $\mathbf{j}{aa'}$ and $\mathbf{k}{aa'}$. Equation \eqref{eq:pre-dlt} can now be rewritten as
+This new PS formulation is the base of my work. In order to make it easier to handle, a Direct Linear Tranform (DLT) method is applied to rewrite equation~\eqref{eq:pre-dlt}, into an set of homogeneous linear equations.
+
+To do so, we must consider the left part of the equation, $\left( b_{t,1} \mathbf{l}_2 - b_{t,2} \mathbf{l}_1 \right)$, as being a vector of three scalars, let's say $\left[ i_t, j_t, k_t \right]$. When considering the division of an image $a$ by $a'$ as a whole instead of single pixels, we get the vectors $\mathbf{i}_{aa'}$, $\mathbf{j}{aa'}$ and $\mathbf{k}{aa'}$. Equation \eqref{eq:pre-dlt} can now be rewritten as
 \begin{equation}
 \left[ \mathrm{diag}(\mathbf{i}_{aa'}) \; \mathrm{diag}(\mathbf{j}_{aa'}) \; \mathrm{diag}(\mathbf{k}_{aa'})\right]
 \begin{bmatrix}
@@ -523,6 +519,14 @@ Four avenues will be discussed on how I plan to make a PS algorithm work for out
 
 % One thing we noticed during our analysis is that not all pixels nor axis are equal.
 % Figure, axis uncertainty
+During our analysis, we noticed that not all pixel have the same uncertainty. Certain portions of the sphere were more prone to exhibit erratic reconstructions than others. Moreover, we found that a single pixel would often not have the same uncertainty with regard to its direction. This means that a normal recovered from a pixel could have a high accuracy on its azimuth and be very inaccurate on its elevation. As previously mentioned, this is due to the lighting condition variations over the image sequence.
+
+We could leverage this information by performing regularization. Regularization is a type of prior we can put into the problem to favor some kind of solution over others. The kind of solution to be favored is chosen arbitrarily. In the case of object surfaces, a prior often made is the assumption of smoothness. This means that the optimization will be biased toward smooth solutions, i.e. not having abrupt curves. This is the prior that I will use for the rest of the section.
+
+\todo{Add figure about reg.?}
+Since we are on a 2D surface, two types of regularization exist: isotropic and anisotropic. Isotropic regularization means enforcing the same penalty for abrupt changes, regardless of the direction, whether the $x$ or the $y$ axis. Anisotropic regularization is the contrary: penalty won't be the same depending on axis the roughness, even for the same irregularity in the surface.
+
+\cite{hernandez-pami-11}
 
 
 \subsection{Selection}
