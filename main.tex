@@ -526,7 +526,21 @@ We could leverage this information by performing regularization. Regularization 
 \todo{Add figure about reg.?}
 Since we are on a 2D surface, two types of regularization exist: isotropic and anisotropic. Isotropic regularization means enforcing the same penalty for abrupt changes, regardless of the direction, whether the $x$ or the $y$ axis. Anisotropic regularization is the contrary: penalty won't be the same depending on axis the roughness, even for the same irregularity in the surface.
 
-\cite{hernandez-pami-11}
+This idea was exploited in~\cite{hernandez-pami-11}, where they used first and second order anisotropic shape regularization. They worked on the case where the sequence of images is limited to three images, one of which is partially in shadow. This case led them to define the characteristic curve as the constraint induced by two lights, meaning a curve that has one degree of freedom. All the pixels lying on this curve are constrained in one direction (along the characteristic curve), but have no information on the other direction.
+\todo{figure 3 of Hernandez}
+
+In order to deal with this unknown direction, they choose to perform shape regularization. Without regularization, the results may be quite far from the ground truth~\ref{fig:her-2}. 
+\todo{figure 2}
+
+The regularization must be performed along directions that are perpendicular to the characteristic curves, let's call them $\mathbf{u}$. Hence, the regularization they use is of the form
+\begin{equation}
+\alpha \lvert \mathbf{u}^T \nabla z \rvert ^2
+\end{equation}
+for the first order, and 
+\begin{equation}
+\beta \lvert \mathbf{u}^T H(z)\nabla z \rvert ^2
+\end{equation}
+for the second order. Here, $z$ is, as before, the height, $\alpha$ and $\beta$ are the regularization weights and $H(z)$ is the Hessian matrix of $z$, its second-order derivatives. While the first order works to smooth the slopes, the second order enforces smooth curvature.
 
 
 \subsection{Selection}
