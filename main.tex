@@ -592,24 +592,41 @@ Furthermore, once the optimal input images are selected, the conditioning of the
 This vector importance issue can be fixed by scaling the data by an arbitrary factor. By scaling both the input images and the computed MLV(s) to be of the same magnitude, the input images should be treated equally. Keeping in mind the impact of sensor noise, it is better to scale down the bright images than scaling up the dark images. The latter would boosting the sensor noise, giving inaccurate data, and thus a high reconstruction uncertainty.
 
 
-\subsection{Algorithmic improvements}
-
-% In some cases, bleh
-The analysis in our previous contributions showed that sometimes, even with the best possible surface with the lowest sensor noise, there is not enough photometric cue to recover certain normals or surfaces over the sphere.
-
-% MRF, reference Jung's, tell our differences.
-
-% To do that, we'll need to merge some ideas from other techniques because sometimes, some pixels cannot be recovered. Bas-Relief Amb. Silouhettes, Data-Driven priors.
-
 \subsection{Shadow detection}
 3DV15 article with cool SD
+
+
+\subsection{Algorithmic improvements}
+
+\todo{Is envmap defined before?}
+
+% MRF, reference Jung's, tell our differences.
+When performing a calibrated PS algorithm on environment maps, a chicken-and-egg problem arise. The part of the environment map visible by a surface patch is defined by its normal, but the normal is what we want to find using the lighting information. To solve this problem, as explained in our previous contributions, we can split a icosahedron three times to sample uniformly over the sphere a bunch of samples. Then, we can fit how well a pixel intensity in the image matches the MLV of all the sampled vectors in the environment map.
+
+This scheme may work pretty well, but lacks a fundamental element: spatial coherence, which is very present in real world structures. As a way to enforce this, I propose to insert a new step to initialize the normals. To coarsely initialize the surface normals, the problem can be formalized as a Markov Random Field (MRF) by doing the hypothesis that a vertex normal is in some way related to its neighbors. This requires the definition of a unary and a pairwise term.
+
+First, the unary term defines the cost of affecting a normal to a pixel. This unary term represents how well a normal explains the pixel intensity throughout the sequence of environment maps. This is done by computing the PS equation with the candidate normal and to compute its residual error. The residual error is the sum of all errors when predicting the pixel intensity from the MLVs over the image sequence. The higher this residual error is, the less the candidate normal explains well the pixel.
+
+Then, the pairwise term defines the cost of a normal given its neighbors. A simple smoothness factor could be used, for example based on the angle between two evaluated normals. An interesting remark is made by~\cite{jung-cvpr-15}. Instead of the usual smoothness prior, one could base this pairwise terms on the likeness between pixels. They argue that pixels behaving similarly through the image sequence should also have similar surface normals. Technically, they base their similarity measure on the Pearson correlation coefficient.
+
+The idea of using an MRF is to try all the normals of the icosahedron subdivided three times on all the pixels. This will give one residual error per candidate normal. All these residual errors compose the unary term of the MRF. The chosen pairwise weights explained earlier link neighboring pixels. This gives a MRF formulation that can be optimized using a standard library~\cite{Boykov2001a,Kolmogorov2004a,Boykov2004,Bagon2006}.
+
+While this MRF formulation was used recently to perform PS reconstruction~\cite{jung-cvpr-15}, it has been used only used as a final smoothing step to fix zones in shadow during most of the sequence. I believe this technique can be employed to initialize the PS procedure, followed by the standard fine-grained normal optimization used by all PS algorithms.
+
+
+% To do that, we'll need to merge some ideas from other techniques because sometimes, some pixels cannot be recovered. Silhouettes, Data-Driven priors.
+The ideas previously conveyed will improve the reconstruction performance of outdoors PS and bring a better understanding of the impact of natural illumination on reconstruction algorithms based on photometric cues. But even if we improve a PS algorithm by a large margin, the analysis in our previous contributions showed that sometimes, even with the best possible surface with the lowest sensor noise, there is not enough photometric cues to recover certain normals or surfaces over the sphere.
+
+To fix this issue, merging another technique with PS is the only choice. When data was captured on an unsuitable day, it will then be possible to still perform a 3D reconstruction, even in the uncertain zones. Previous work have shown that merging PS with Multi-View Stereo (MVS)~\cite{Beljan2012,Zhou2013,ackermann-3dv-14,HernandezEsteban2008} and even Structure from Motion~\cite{zhang-iccv-03,lim-iccv-05}. [...]
+
 
 \section{Uncalibrated outdoor reconstruction}
 \label{sec:uncalib}
 
-% . reconstruction, don't need lighting condition is a plus
+% reconstruction, don't need lighting condition is a plus
 
 % Data-driven approach, what can the DB tell us on the image.
+%Bas-Relief Amb. 
 
 \subsection{Half-calibrated case}
 % First, reconstruction of the ground only.
