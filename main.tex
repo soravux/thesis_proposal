@@ -617,10 +617,9 @@ While this MRF formulation was used recently to perform PS reconstruction~\cite{
 % To do that, we'll need to merge some ideas from other techniques because sometimes, some pixels cannot be recovered. Silhouettes, Data-Driven priors.
 The ideas previously conveyed will improve the reconstruction performance of outdoors PS and bring a better understanding of the impact of natural illumination on reconstruction algorithms based on photometric cues. But even if we improve a PS algorithm by a large margin, the analysis in our previous contributions showed that sometimes, even with the best possible surface with the lowest sensor noise, there is not enough photometric cues to recover certain normals or surfaces over the sphere.
 
-To fix this issue, merging another technique with PS is the only choice. When data was captured on an unsuitable day, it will then be possible to still perform a 3D reconstruction, even in the uncertain zones. Previous work have shown that merging PS with Multi-View Stereo (MVS)~\cite{Beljan2012,Zhou2013,ackermann-3dv-14,HernandezEsteban2008} and even Structure from Motion (SfM)~\cite{zhang-iccv-03,lim-iccv-05} yield promising results. The difference between both technique is the calibration between the cameras. In Multi-View Stereo, the calibration of the cameras is known and the extrinsics between them is also known, while in Structure from Motion, the cameras are uncalibrated, which gives a projective ambiguity called the bas-relief ambiguity.
+To fix this issue, merging another technique with PS is the only choice. When data was captured on an unsuitable day, it will then be possible to still perform a 3D reconstruction, even in the uncertain zones. Previous work have shown that merging PS with Multi-View Stereo (MVS)~\cite{Beljan2012,Zhou2013,ackermann-3dv-14,HernandezEsteban2008,inose-tcva-13,shi-3dv-14} and even Structure from Motion (SfM)~\cite{zhang-iccv-03,lim-iccv-05} yield promising results. The difference between both technique is the calibration between the cameras. In Multi-View Stereo, the calibration of the cameras is known and the extrinsics between them is also known, while in Structure from Motion, the cameras are uncalibrated, which gives a projective ambiguity called the bas-relief ambiguity.
 
 The idea I propose in the cases of unsolvable reconstructions using pure PS is to take some photos from another point of view, then performing a standard SfM algorithm to first get a coarse estimate of the scene. This will allow to fill the gaps with the dense result of PS that can constrain well on at least an axis in the worst case. For the other axis, the SfM result can be propagated to obtain a result.
-
 
 \section{Uncalibrated outdoor reconstruction}
 \label{sec:uncalib}
@@ -638,35 +637,105 @@ In order to make PS work uncalibrated, I plan to use a data-driven approach. By 
 
 I suspect this lighting constraint to be enough to alleviate the GBR ambiguity issue. In the case this constraint is not enough, I plan to use an optimization method on the material albedo as proposed by the authors previously mentioned.
 
+Overall, the GBR ambiguity is just a minor issue mostly already solved in the literature. What is left to do, though, is an uncalibrated outdoor short term PS algorithm that brings performances similar to the laboratory conditions. The current state-of-the-art technique~\cite{jung-cvpr-15} obtain between 30\% and 40\% of the recovered normals under 30\degree of error, which is far away from the impressive precision obtained using PS in laboratory conditions.
+
+In the following, I propose a succession of steps in order to take the calibrated algorithm proposed earlier and push it to a fully uncalibrated one.
+
+
 \subsection{Half-calibrated case}
 % First, reconstruction of the ground only.
+A full environment map is hard to capture. This means that a full sphere of irradiance must be captured. Usually, sky capture apparatus is composed of a wide angle lens pointing toward up (zenith), capturing only at best a small portion of the horizon. Building a full environment map is done by adding the ground, which requires the stitching of two captures.
+
+The first enhancement to the system I propose is to get rid of the ground and estimate it. As of now, in our previous contributions we estimate the ground to be a single constant, repeated over the bottom (nadir) hemisphere. This is a good enough approximation on objects that have been laid carefully on a uniform piece of cloth, but is likely to break on real building-scale structures.
+
+One thing that can be done is an 
 
 
 \subsection{Mostly uncalibrated}
 % Then, estimation of the sky using the GPS coordinates and date & time. Then, without date and time.
+In order to move toward an uncalibrated algorithm, it feels a logical next step to remove the environment map altogether from the inputs of the method. To simplify a bit this big step, I propose to work with the GPS coordinates alongside with the date and time. This type of information is sometimes available (and right) on the EXIF data of pictures, making this kind of input not as farfetched as it may seem.
+
+With the GPS coordinates and the date and time, it is possible to know where the sun should have been in the sky. With this information, it is possible to determine whether the sun is occluded by clouds or not, depending on the intensity of the object image. If it is not occluded, the MLV of pixels not in shadow are constrained to be on a circle at a fixed elevation. This circle is due to the unknown object rotation. This elevation is found with the sun position.
+
+By using previous work on finding the low frequency illumination~\cite{basri-ijcv-2007} or by using matrix factorization techniques~\cite{shi-cvpr-10}, it is possible to know the maximum light direction. If we have at least one image where the sun is shining onto the object, is it then possible to assign this maximum light direction to the sun, resolving the rotation ambiguity.
+
+The sky could then be estimated by a two component parametric model of the sky, like~\cite{jung-cvpr-15} did. But I propose instead to take advantage of our sky database in order to either find or synthesize a new sky explaining the observed scene. This approach has the advantage of producing real-looking physically-based environment maps.
+
+Synthesizing new skies can be a complex task. When talking about synthesizing, the meaning is basically to find an environment map that fits globally the required specifications and, at need, rotate it so the energy comes from the desired directions. More complex synthesizing could be interesting to test, for example generating a new environment map using texture synthesis, and will come if the need arise.
+
+It is then possible to remove the time as an input of the method. Previously, we knew exactly the azimuth and elevation of the sun in the sky. Now, these values are constrained to an arc in the sky. I still assume the camera and object orientation are unknown. Now, using two images where the sun is not occluded, it is possible to solve this problem. Still using the maximum light direction technique, once two light directions are found, it is possible to find the camera azimuth (or object rotation). Using more images than two will provide an overconstrained system of equation, solvable using a standard least squares approach. As a bonus, the capture time can also be estimated.
 
 
 \subsection{Fully uncalibrated}
 % Lastly fully uncalibrated
+The last step is to provide a fully uncalibrated PS algorithm. Building on the mostly uncalibrated technique, it is possible to remove the GPS coordinates and the date from the technique. By reusing the scheme of finding the maximum light direction, it is possible to synthesize a sequence of skies with the desired intensity coming from any direction. It is expected that at least some captures over the sequence will be sunlit, yielding a high overall image intensity and giving a clear principal light direction. By fitting these principal light directions, it is possible to find the sun arc in the sky, allowing a self-calibration.
+
+This proposed technique will be a major contribution that iterates over the previous state of the art by adding a richer data-driven sky illumination model.
+
 
 \section{Looking farther than the sun}
 
 % Up until now, we only considered the atmosphere during the day for reconstruction. The main problem, coplanar.
+All the previous proposed work only considered the atmosphere during the day. The main problem, which is the coplanarity of the sun trajectory over the course of a day, can be solved by richer and more complex sky models. Another interesting avenue is to revert to the simple case: the point light sources. In this case, using solely the sun as a light source will, most of the time, give an underconstrained problem that will not perform well.
 
-\subsection{Day \& Night}
-During the night, the moon presents another plane.
-
-% Figures
+Keeping this analysis, though, it is possible to bring something else into play in order to better constrain the problem. It is hard to find something capable of competing with the sun in terms intensity in the sky through a day, but the moon can up to par in terms of quantity of information needed to constrain the problem correctly. Another avenue is to manually modify the lighting, either by distorting the sun light or adding new light sources.
 
 
-\subsection{Artificial}
+\subsection{Day \& Night PS}
+When seen during the day, the moon doesn't bring much lighting to a scene. But during the night, it can be strong enough to cast clearly visible and sharp shadows on the ground. But the main interesting thing about the moon is that is presents lighting from a plane different than the sun. Using this to our advantage could turn a data capture failure for PS (e.g., during a fully sunny day) into a successful reconstruction, by simplifying the illumination model and letting the capture continue overnight.
+
+Over the course of 24 hours, the sun and moon paths in the sky are each mostly coplanar. Examples of such trajectories are shown in fig.~\ref{fig:DN-sunmoon-trajectories}. Both of them are parallel, which is not surprising because the earth, the sun and the moon are roughly on the same plane in the solar system. But the inclination of the earth makes both trajectories superposed in the sky during the equinoxes, which occurs around 81 days (spring) and 264 days (fall) after January 1st.
+
+\begin{figure}
+\centering
+\begin{tabular}{cc}
+\includegraphics[height=0.49\linewidth]{DayNight/20150225_lat47.png} &
+\includegraphics[height=0.49\linewidth]{DayNight/20150225_lat75.png} \\
+a) & b)
+\end{tabular}
+\caption{Example of the trajectories of the sun and the moon for 2015-02-25 at latitude a) 47 and b) 75. Two things are interesting to note: First, the moon trajectory suddenly stops because at this moment the sun rises. The moon is then not considered as a dominant light source. Secondly, as the latitude gets higher, the trajectories becomes more and more circular.}
+\label{fig:DN-sunmoon-trajectories}
+\end{figure}
+
+The measure used to analyze the PS reconstruction potential using both days is the maximum gain. This maximum gain is the factor that multiplies the sensor noise, as explained in the previous contributions. The higher it is, the more uncertain (or wrong) the reconstruction will be. So the lower is the maximum gain, the better will be the reconstruction performance.
+
+Such an analysis for year 2015 is found in fig.~\ref{fig:DN-maximum_gain} for the University Laval location and fig.~\ref{fig:DN-maximum_gain_latitude} \todo{for most of earth latitudes}. As we can see, the two major peaks around days 81 and 264 are explained by the equinox trajectory alignment. Since both trajectories are almost superposed, the system of equations is pretty badly conditioned, leaving a high maximum gain. Another interesting thing to notice is the small sinusoid with a 29.54 days period present over the whole year. When not much of the moon is visible during a night, for example it may be rise at 4 am. Since the sun's dawn is pretty near, the moonlit duration is small, giving only a small arc of the moon plane. When this happens, the maximum gain increases. The increase is not so bad when far from the equinoxes, because this analysis supposes at least one capture is available with the moon, reducing the problem to a matrix of coplanar vectors with the addition of (at least) a single vector outside of this plane, which is enough to constrain the problem.
+
+\begin{figure}
+\centering
+\includegraphics[height=8cm]{DayNight/maximum_gain.pdf}
+\caption{Maximum gain for PS reconstruction assuming an illumination of 24 hours (sun and moon) for the year 2015. The color-coded moon illumination represent the phase of the moon, full moon being 1 and new moon being 0. The location is the University Laval Campus (Latitude and Longitude = 46.779077, -71.275778 ). }
+\label{fig:DN-maximum_gain}
+\end{figure}
+
+%\begin{figure}
+%\centering
+%\includegraphics[height=8cm]{DayNight/maximum_gain_over_latitude.png}
+%\caption{Maximum gain in function of the day for the year 2015 and the latitude of the observer. This gain is clipped to 1.}
+%\label{fig:DN-maximum_gain_latitude}
+%\end{figure}
+
+Another notion worth of mention is the moon illumination. Over the course of its cycle, the moon will have an illumination of
+\begin{equation}
+k = \frac{1 + \cos(\phi)}{2}  \quad,
+\end{equation}
+where $\phi$ is the lunar phase in radians~\cite{Meeus1991}. While the technique will obviously not work when the illumination is null, the rest of the time, the reconstruction performance will be highly dependent upon the light pollution at the capture location. This light pollution can be approximated by an ambient illumination term, which is analyzed by~\cite{Angelopoulou2013}.
+
+Statues, historical bridges and architectural monuments are often lit using spotlights during the night.
+
+The main problem with this idea, as can be seen from the unusual astronomical arguments made in this section, is the knowledge transfer between the astronomical domain and computer vision. We can assume that most of the people aware of PS have little to no knowledge of the side effects of the cycle of the moon and its trajectory in the sky. By investigating this field of study and summarizing the pertinent informations, I am certain that performing day \& night PS will bring a nice contribution to the community.
+
+
+%\subsection{Artificial alterations}
+
+%The sun, when taken as a point light source, may have a coplanar trajectory over the course of a day, but nothing prevents the addition or modification of this lighting.
 
 % Diffusers
 
 % City lights
 
 
-\subsection{Other techniques}
+%\subsection{Other techniques}
 
 
 
@@ -681,7 +750,9 @@ During the night, the moon presents another plane.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Schedule}
 
-The problems will be explored in increasing order of complexity according to the following schedule. First, the hardware required to gather the sky illumination database will be setup on a tall roof nearby, and the data acquisition process will be continued over a period of several months to build a rich dataset. Second, experiments with existing PS techniques to reconstruct shape with known illumination will be conducted. Leaning on these experiments, the algorithms will then be adapted to require knowledge only of the sun direction, obtained from the capture timestamps. Finally we will experiment with images where the lighting conditions are unknown.
+\todo{Add scheduled contributions.}
+
+%The problems will be explored in increasing order of complexity according to the following schedule. First, the hardware required to gather the sky illumination database will be setup on a tall roof nearby, and the data acquisition process will be continued over a period of several months to build a rich dataset. Second, experiments with existing PS techniques to reconstruct shape with known illumination will be conducted. Leaning on these experiments, the algorithms will then be adapted to require knowledge only of the sun direction, obtained from the capture timestamps. Finally we will experiment with images where the lighting conditions are unknown.
 
 \begin{itemize}
 	\item 2016h: Selection and Calibrated PS algorithm
@@ -690,7 +761,7 @@ The problems will be explored in increasing order of complexity according to the
 	\item 2017h: Fusion with SFM
 	\item 2017e: Capture, Fusion with Multiview Stereo Techniques
 	\item 2017a:
-	\item 2018h: Écrire et soutenir.
+	\item 2018h: Thesis writing and defense.
 \end{itemize}
 
 
@@ -703,6 +774,7 @@ Recap.
 
 Mathieu Garon
 Julien Becirovski
+Paulo F.U. Gotardo
 
 \chapter*{Annexes}
 
@@ -727,7 +799,7 @@ giving a quadratic expression (also called $\mathcal{O}(n^2)$ in Bachmann-Landau
 
 {\small
 \bibliographystyle{acm}
-\bibliography{main}
+\bibliography{library}
 }
 
 \end{document}
