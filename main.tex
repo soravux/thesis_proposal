@@ -617,16 +617,26 @@ While this MRF formulation was used recently to perform PS reconstruction~\cite{
 % To do that, we'll need to merge some ideas from other techniques because sometimes, some pixels cannot be recovered. Silhouettes, Data-Driven priors.
 The ideas previously conveyed will improve the reconstruction performance of outdoors PS and bring a better understanding of the impact of natural illumination on reconstruction algorithms based on photometric cues. But even if we improve a PS algorithm by a large margin, the analysis in our previous contributions showed that sometimes, even with the best possible surface with the lowest sensor noise, there is not enough photometric cues to recover certain normals or surfaces over the sphere.
 
-To fix this issue, merging another technique with PS is the only choice. When data was captured on an unsuitable day, it will then be possible to still perform a 3D reconstruction, even in the uncertain zones. Previous work have shown that merging PS with Multi-View Stereo (MVS)~\cite{Beljan2012,Zhou2013,ackermann-3dv-14,HernandezEsteban2008} and even Structure from Motion~\cite{zhang-iccv-03,lim-iccv-05}. [...]
+To fix this issue, merging another technique with PS is the only choice. When data was captured on an unsuitable day, it will then be possible to still perform a 3D reconstruction, even in the uncertain zones. Previous work have shown that merging PS with Multi-View Stereo (MVS)~\cite{Beljan2012,Zhou2013,ackermann-3dv-14,HernandezEsteban2008} and even Structure from Motion (SfM)~\cite{zhang-iccv-03,lim-iccv-05} yield promising results. The difference between both technique is the calibration between the cameras. In Multi-View Stereo, the calibration of the cameras is known and the extrinsics between them is also known, while in Structure from Motion, the cameras are uncalibrated, which gives a projective ambiguity called the bas-relief ambiguity.
+
+The idea I propose in the cases of unsolvable reconstructions using pure PS is to take some photos from another point of view, then performing a standard SfM algorithm to first get a coarse estimate of the scene. This will allow to fill the gaps with the dense result of PS that can constrain well on at least an axis in the worst case. For the other axis, the SfM result can be propagated to obtain a result.
 
 
 \section{Uncalibrated outdoor reconstruction}
 \label{sec:uncalib}
 
 % reconstruction, don't need lighting condition is a plus
+All the proposed work up until now supposes we know the full environment map that lit the scene we observe. After the development of the fully calibrated algorithm described, I plan to overcome the need for capturing the sky. Getting rid of the lighting capture is a big plus, allowing the technique to be easily brought on the field. A single camera is required, simplifying the capture apparatus.
+
+Uncalibrated PS reconstruction has an issue that its calibrated counterpart doesn't have: the Generalized Bas-Relief Ambiguity (called GBR ambiguity in the literature). Because the light intensity and direction as well as the surface albedo is not known beforehand, the reconstruction of the surface height is up to an unknown factor, impossible to determine without prior knowledge of the surface or constrains external to photometric cues.
+
+Authors over the years have basically proposed two ideas to surmount the GBR ambiguity. First, doing it manually (i.e., forcing a depth to an arbitrary value)~\cite{basri-ijcv-2007}. But most researchers proposed a wide amount of priors and optimization schemes on the object material~\cite{tan-cvpr-07,alldrin-cvpr-08,abrams-eccv-12,queau-jmiv-14} to solve this problem.
 
 % Data-driven approach, what can the DB tell us on the image.
-%Bas-Relief Amb. 
+%Bas-Relief Amb.
+In order to make PS work uncalibrated, I plan to use a data-driven approach. By taking advantage of the sky database we already have, we can lead an algorithm to learn what a physically plausible sky looks like, constraining greatly the problem. The quantity of real world skies that can explain well enough the illumination on a scene is quite small, if we take the similar skies as one.
+
+I suspect this lighting constraint to be enough to alleviate the GBR ambiguity issue. In the case this constraint is not enough, I plan to use an optimization method on the material albedo as proposed by the authors previously mentioned.
 
 \subsection{Half-calibrated case}
 % First, reconstruction of the ground only.
