@@ -1,0 +1,70 @@
+% !TEX root = main.tex
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{State of the Art Review}
+\label{c:sota}
+
+% Expliquer les améliorations de la PS au travers du temps:
+% \begin{itemize}
+%   \item Unknown lighting
+%   \item Unknown BRDF
+%   \item Robustness
+%   \item Outdoor (algorithme et analyse)
+%   \begin{itemize}
+%       \item Yu
+%       \item Boxin shi
+%   \end{itemize}
+% \end{itemize}
+
+Since its inception, Photometric Stereo has received a lot of attention throughout the years. Researchers tried to alleviate the restrictive assumptions of the original method, such as Lambertian reflectance, noiseless sensors and known lighting. This chapter will first relate briefly the major improvements made on PS over the years, and then focus on the efforts made to bring it outside the laboratory.
+
+
+\section{Photometric Stereo}
+
+As previously stated, PS has been studied extensively for many decades. Researchers worked to make the method more general by removing, or at least alleviating, the assumptions initially made.
+
+\subsection{Surface reflectance}
+% BRDF
+One thing they did is make PS work on other surfaces than perfectly Lambertian ones. At first, specular reflections \cite{Ikeuchi1981} were studied and incorporated to the PS framework. This also brought the idea of distributed light sources instead of point light sources to the field, an important idea discussed later on. Over the years, most of the reflectance assumptions were removed, allowing PS to work on surfaces yielding varying reflectance using either a parametric~\cite{hertzmann-pami-05,goldman-tpami-10} or a data-driven approach~\cite{alldrin-cvpr-08}.
+
+\subsection{Shape from Shading}
+% SfS
+A new technique called shape-from-shading~\cite{Horn1989} was born from Photometric stereo. In this technique, a bunch of priors is assumed to infer the structure from a single image instead of a sequence of images. Two interesting elements from this work are worth noting for general PS use: 1) the shadow detection and handling, and 2) uniform illumination (an ambient light source) is taken into account. This technique was further developed to take into account outdoor photometric cues on cloudy days~\cite{Langer1994}. This work recognized that cloudy days could be approximated as diffuse light sources and treated them differently than point light sources, a key insight that will be discussed in details in \ref{iccp15}. Lately, a framework to infer local shape based from shading cues was proposed~\cite{Xiong2013}, yielding interesting intuitions transferable to a PS algorithm. Even though work still continues on outdoors shape-from-shading~\cite{oxholm-eccv-12,johnson-cvpr-11,barron-pami-15}, it is of limited interest in the scope of this thesis. This is due to the fact that work on this technique has mainly focused on finding tight constraints, strong priors or semantic segmentation, which are interesting topics, but far from photometric and shading cues.
+
+\subsection{Reconstruction algorithm improvements}
+% Fusion with MVS
+After the Shape from Shading spinoff, PS was also used in conjunction with other shape reconstruction techniques to enhance their performance. The main idea is to ally the strength of PS (usually its output density) with the strength of another technique. As an example, merging a Multi-View Stereo algorithm with PS was done with great success~\cite{HernandezEsteban2008}.
+[Should I talk more about this?]
+
+% Shadows and robustness
+More recently, work has been done to increase the stability of and robustness to shadows, highlights, image noise~\cite{BarskyPetrou-pami-2003,ikehata-cvpr-12,ikehata-cvpr-14}.
+
+\subsection{Lighting}
+% Light sources arbitrary motion & Bas-Relief Ambiguity
+The impact of illumination on PS has also been extensively studied. At first, still assuming point light sources, the case of unknown light directions was solved by using singular value decomposition along with a set of priors~\cite{Hayakawa1994}. This allowed to approximate the images lighting conditions and the surface normals jointly. It is worth of note that the reconstruction is always up to a bas-relief ambiguity in the case of unknown light sources~\cite{Belhumeur1999}. This means that every reconstruction with unknown light sources are up to a scaling factor that is impossible to determine theoretically.
+
+% Optimal Illumination control
+All this work suppose that the controlled light spans ``enough'' the space, meaning that the experimenter should stop when he feels he has enough data to work with. This brought the question: ``is there an optimal placement for the lights to optimize the reconstruction performance of PS?'' Many researchers thought that the optimal light placement was a tradeoff between ideal incident illumination and shadow coverage. Mathematically, having orthogonal light sources is optimal for the reconstruction, but where is it optimal? It was found that the optimal light position is a slant angle of 54.74\degree from the camera at equal distance in circles around it~\cite{spence-iwtas-03,drbohlav-iccv-05}. [figure]
+
+% diffuse light
+Contrarily to laboratory conditions, real world lighting is not purely directional. There is always an ambient illumination, also called uniform illumination. This ambient illumination is mainly due to reflections on surfaces like walls and floors and can be far from negligible when a strong light source such as the sun (through a window, for instance) is present. The impact of this ambient illumination on PS was recently looked into~\cite{Angelopoulou2013}. They show surprising results revealing that strong directional light is the most important factor to obtain good reconstruction performance. Useful results can be obtained even when the ambient illumination is up to nine times the strength of the directional lighting, as long as this directional lighting in itself is strong. Weak directional lighting produces bad results, even in the absence of ambient illumination.
+
+% Arbitrary light sources
+Research on indoors illumination made a big leap when generic lighting conditions were estimated alongside traditional PS~\cite{basri-ijcv-2007}. This work considered the illumination as a complete sphere around the scene instead of a sum of discrete point light sources. The lighting conditions recovered are, however, limited to low-frequencies. While it can be quite enough for simple materials, it won't work for materials exhibiting specularities or yielding non-Lambertian reflectance.
+
+%Covering the vast amount of work done on PS as a whole is beyond the scope of this thesis proposal. The rest of the document will focus more closely on work that have considered PS on outdoor conditions.
+
+
+\section{Outdoor Photometric Stereo}
+
+% webcams
+To tackle the new challenge that posed outdoor PS, a natural first strategy has been to experiment with Lambertian reflectance and to model the sun as a point light source, to match a well-studied lab condition. Unfortunately, approaches based on this model have practical limitations caused by the movement of the sun in the sky for a given day. Depending on the latitude and time of year, its trajectory may lie too close to a plane, yielding an under-constrained, two-source PS problem~\cite{hernandez-pami-11}. Possible solutions include waiting for a day when the sun trajectory is non-planar~\cite{shen-pg-14}, or capturing several months of data~\cite{ackermann-cvpr-12,abrams-eccv-12} to ensure good conditioning.
+
+% single day
+Recently, Shen~{\em et al.}~\cite{shen-pg-14} showed that, contrary to common belief, the sun path in the sky actually does not always lie within a perfect plane. Thus, PS reconstruction can sometimes be computed in a single day even with a point light source model. The main downside of this approach is that planarity of the sun path (\ie, conditioning of PS reconstruction) depends on the latitude and the time of year. More specifically, reconstruction becomes unstable at high latitudes near the winter solstice, and worldwide near the equinoxes.
+
+% richer lighting models
+To compensate for limited sun motion, a promising approach is to use richer models of illumination that account for additional atmospheric factors in the sky. Typically, more elaborate models of illumination is done by employing (hemi-)spherical high dynamic range (HDR) environment maps~\cite{debevec-siggraph-98,reinhard-book-05} as input to outdoor PS. Encouraging results have been reported in~\cite{yu-iccp-13} for outdoor images taken within an interval of just eight hours (in a single day). On one hand, full environment maps can be captured and used with calibrated PS algorithms~\cite{yu-iccp-13,shi-3dv-14,hung-wacv-15}. On the other hand, it is also possible to estimate part of the environment map without explicitly capturing it, by synthesizing a hemispherical model of the sky using physically-based models~\cite{inose-tcva-13,jung-cvpr-15}.
+
+% hold-geoffroy
+%The work presented below extends our initial analysis in~\cite{holdgeoffroy-iccp-15}. Rather than presenting a new reconstruction algorithm, in~\cite{holdgeoffroy-iccp-15} we conducted an empirical analysis of the same sky database to identify which days provide more favorable atmospheric conditions for outdoor PS. However, no consideration was given to the shortest time interval of data capture needed to obtain accurate reconstructions; all results were reported on at least 6 hours (a ``full day'') of captured data. Here, instead of comparing days, we focus on analyzing different time intervals within each day. We then show that 6 hours is actually more than necessary, and detail the relationship between the appearance of the sky hemisphere and the quality of PS reconstruction.

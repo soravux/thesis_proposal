@@ -1,0 +1,20 @@
+\chapter{Combinatorics}
+
+\section{Permutations of pair of images}
+\label{anx:permutations}
+
+From a set of $n$ images, the quantity of possible pairs of images is expressed as a special case of the permutation without repetition:
+\begin{equation}
+\frac{n!}{\left( n - 2 \right)!} \quad.
+\end{equation}
+
+By the definition of the factorial, this equation can be simplified to
+\begin{equation}
+\frac{n \times (n-1) \times (n-2) \times (n-3) \times \cdots \times 2}{(n-2) \times (n-3) \times \cdots \times 2} \quad.
+\end{equation}
+
+By simplifying, we find that the quantity is exactly
+\begin{equation}
+n^2 - n\quad,
+\end{equation}
+giving a quadratic expression (also called $\mathcal{O}(n^2)$ in Bachmann-Landau notation).

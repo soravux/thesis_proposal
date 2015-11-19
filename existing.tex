@@ -1,0 +1,113 @@
+% !TEX root = main.tex
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Existing contributions}
+\label{ch:existing}
+
+The work done so far on understanding outdoor illumination for use in PS is presented in this chapter. It mainly consist of data capture and its analysis.
+
+First, the database of sky data is presented with its capture details and statistics. Then, our work on modeling the sky and its impact on one-day PS is presented~\cite{holdgeoffroy-iccp-15}. Lastly, our work on the link between what happens in the sky and the reconstruction performance is presented~\cite{holdgeoffroy-3dv-15}. The latter received an award for ``Best Paper (Runner Up)'' at 3DV 2015.
+
+\section{HDR database}
+\label{sec:hdrdb}
+
+% From ICCP
+%As one might expect, the answer to the question above is intrinsically tied to the orientation of a particular surface patch, the associated hemisphere of lighting directions observed by the patch, and the variation in lighting intensity in that hemisphere over the course of a day. So far, this question has only been explored in laboratory conditions or with simple directional illumination, where optimal lighting configurations can be theoretically derived~\cite{drbohlav-iccv-05,klaudiny-prl-14,shen-pg-14}. No attempt has been made at answering this question with more realistic illumination models in an outdoor setup, where lighting cannot be controlled and atmospheric effects are difficult to predict.
+
+To analyze the influence of outdoor lighting on photometric stereo, we rely on a rich dataset of high dynamic range images of the sky, captured under a wide variety of conditions. We use the environment map database of \cite{lalonde-3dv-14}, which contains HDR images of the sky captured using the approach described in \cite{stumpfel-afrigraph-04}. We augment the dataset of~\cite{lalonde-3dv-14} with an additional set of images captured using a similar setup, but at a different geographical location. In all, the dataset we used for our analysis totals 3,800 illumination conditions, captured over 23 different days. To ensure the data is properly aligned temporally, the HDR sky photos were captured during a continuous 6 hour time interval on each of these days, from 10:30 until 16:30. Fig.~\ref{fig:database} shows examples of the sky environment maps used in our analysis. Note that while the examples have been tone mapped for display, the actual sky images have extremely high dynamic range, and span the full 22 stops required to properly capture outdoor lighting~\cite{stumpfel-afrigraph-04}. In addition, all the images are converted to grayscale before the analysis is performed.
+
+% From JF's 3DV
+%We introduce a novel dataset of image collections, where each image is associated with its ground truth HDR lighting conditions. In all, our dataset contains 1,850 images of 22 different outdoor landmarks, captured under 350 different illumination conditions, see fig. 2. Each image has high dynamic range, is radiometrically and geometrically calibrated, and is aligned with its corresponding light probe. In this section, we describe how the dataset was captured, calibrated and aligned. The dataset, software, and many additional results are available on the project website [1].
+
+%In this work, we assume that outdoor scenes are illuminated by light emitted solely from the sun and sky, and ignore local illumination effects such as light bouncing off the ground or nearby objects. As such, we capture the outdoor lighting conditions with wide angle, HDR photographs of the entire sky hemisphere. To do so, we follow the approach proposed by Stumpfel et al. [22]. We captured seven exposures of the sky ranging from 1/8000 to 1 second, using a Canon EOS 5D Mark III camera installed on a tripod, and fitted with a SIGMA EXDG 8mm fisheye lens. A 3.0 ND filter was installed behind the lens, necessary to accurately measure the sun intensity. The exposures were stored as 14-bit RAW images at the full resolution of the camera. The camera was controlled using a Raspberry Pi via a USB connection, and the setup was mounted on the roof of a tall building to capture the entire sky hemisphere. The seven exposures were captured every two minutes over a span of between three and ten hours on 25 different days spread over a period of six months from June to December 2013. A total of 3,380 different lighting conditions were captured. The fisheye lens was radiometrically calibrated following [22] (to account for chromaticity shifts caused by the ND filter), geometrically calibrated using [19], and the resulting light probes mapped to the angular environment map representation [17] for storage in floating-point EXR format. We merged the seven exposures using [4] to create one HDR sky probe per exposure set. Because the camera may have shifted from one capture day to another, we automatically align all sky probes to the world reference frame.
+
+%This was done by detecting the sun in at least 3 images for a given day, and by computing the rotation matrix which best aligned the detected positions and the real sun coordinates (obtained with [16]). For days when the sun was never visible, the probes were manually aligned using other aligned light probes as examples, and by matching visible buildings close to the horizon. The second row of fig. 2 shows examples sky probes captured with our system. Note that while the examples have been tone mapped for display, the actual sky probes have extremely high dynamic range (see fig. 3).
+
+% Stats
+~~~
+
+\begin{figure*}[!th]
+    \centering
+    \setlength{\tabcolsep}{0pt}
+    \newcommand{\customwidth}{.08\linewidth}
+    \begin{tabular}{@{}rcccccccccccc@{}}
+                                                     &
+    \begin{minipage}{\customwidth}\centering\scriptsize 11:00 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 11:30 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 12:00 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 12:30 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 13:00 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 13:30 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 14:00 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 14:30 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 15:00 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 15:30 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 16:00 \end{minipage} &
+    \begin{minipage}{\customwidth}\centering\scriptsize 16:30 \end{minipage}
+    \\
+    \begin{sideways}\begin{minipage}{\customwidth}\centering \scriptsize 08/24/2013 \\ light clouds \vspace{5pt} \end{minipage}\end{sideways} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_110040.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_113038.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_120033.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_123024.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_130014.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_133006.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_140002.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_142960.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_145957.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_152946.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_155938.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20130824_162933.jpg}
+    \\
+    \begin{sideways}\begin{minipage}{\customwidth}\centering \scriptsize 11/06/2013 \\ mixed \vspace{5pt} \end{minipage}\end{sideways} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_110951.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_112948.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_115943.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_122939.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_125937.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_132936.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_135932.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_142922.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_145915.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_152913.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_155906.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20131106_163057.jpg}
+
+    \\
+    \begin{sideways}\begin{minipage}{\customwidth}\centering \scriptsize 11/08/2014 \\ heavy clouds \vspace{5pt} \end{minipage}\end{sideways} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_110025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_113025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_120025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_123025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_130025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_133025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_140025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_143025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_150025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_153025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_160025.jpg} &
+    \includegraphics[width=\customwidth]{./figures/database/20141108_163025.jpg}
+
+    \\
+
+    \end{tabular}
+    \caption[]{Examples from our dataset of HDR outdoor illumination conditions. In all, our dataset contains 3,800 different illumination conditions, captured from 10:30 until 16:30, during 23 days, spread over ten months and at two geographical locations. Each image is stored in the 32-bit floating point EXR format, and shown tone mapped here for display (with $\gamma = 1.6$). The companion video\footnotemark shows time-lapse sequences for these sky environment maps.}
+    \label{fig:database}
+\end{figure*}
+
+\section{What Is a Good Day for Outdoor Photometric Stereo?}
+\label{iccp15}
+
+%\input{iccp15.tex}
+
+\section{$x$-hour Outdoor Photometric Stereo}
+\label{3dv15}
+
+Best theoretical reconstruction performance.
+%\input{3dv15.tex}
+
+
+
+%\begin{equation}
+%b_t = \frac{\rho}{\pi} \int_{\Omega_{\mathbf n}} L_t(\mathbf{\boldomega}) \langle \boldomega, {\mathbf n} \rangle d\omega \,,
+%\end{equation}
