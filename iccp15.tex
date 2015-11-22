@@ -139,16 +139,16 @@ Now that we are equipped with a tool to characterize the stability of surface no
 
 \begin{figure}[t]
     \centering
-    \begin{sideways}\begin{minipage}{.45\linewidth}\centering \scriptsize 08/24/2013 \\ 85\% sun visibility \vspace{5pt} \end{minipage}\end{sideways}
-    \includegraphics[width=.9\linewidth]{./figures/confidenceIntervals/20130824_10pm.png} \\
+    \begin{sideways}\begin{minipage}{.25\linewidth}\centering \scriptsize 08/24/2013 \\ 85\% sun visibility \vspace{5pt} \end{minipage}\end{sideways}
+    \includegraphics[width=.5\linewidth]{./figures/confidenceIntervals/20130824_10pm.png} \\
     \vspace{-.8em} \noindent\rule{\linewidth}{0.1pt}
-    \begin{sideways}\begin{minipage}{.45\linewidth}\centering \scriptsize 11/06/2013 \\ 41\% sun visibility \vspace{5pt} \end{minipage}\end{sideways}
-    \includegraphics[width=.9\linewidth]{./figures/confidenceIntervals/20131106_10pm.png} \\
+    \begin{sideways}\begin{minipage}{.25\linewidth}\centering \scriptsize 11/06/2013 \\ 41\% sun visibility \vspace{5pt} \end{minipage}\end{sideways}
+    \includegraphics[width=.5\linewidth]{./figures/confidenceIntervals/20131106_10pm.png} \\
     \vspace{-.8em} \noindent\rule{\linewidth}{0.1pt}
-    \begin{sideways}\begin{minipage}{.45\linewidth}\centering \scriptsize 11/08/2014 \\ 16\% sun visibility \vspace{5pt} \end{minipage}\end{sideways}
-    \includegraphics[width=.9\linewidth]{./figures/confidenceIntervals/20141108_10pm.png} \\
+    \begin{sideways}\begin{minipage}{.25\linewidth}\centering \scriptsize 11/08/2014 \\ 16\% sun visibility \vspace{5pt} \end{minipage}\end{sideways}
+    \includegraphics[width=.5\linewidth]{./figures/confidenceIntervals/20141108_10pm.png} \\
     \vspace{3mm}
-    \includegraphics[width=1.01\linewidth]{./figures/confidenceIntervals/colorbar.png}
+    \includegraphics[width=.51\linewidth]{./figures/confidenceIntervals/colorbar.png}
     \caption{Uncertainty in normal estimation with $\sigma=1\%$ is indicated by 95\% confidence intervals (in degrees), as a function of ground-truth surface normal. Results are shown for three different days in our dataset (same days as in fig.~\ref{fig:database}). The plots show the full sphere of normals from two different viewpoints: South (left), and North (right). Cardinal directions are shown for reference. The color-coding is indicated below the plots. See companion video for an animated version of these plots.}
     \label{fig:confidence-intervals}
 \end{figure}
@@ -182,19 +182,19 @@ We approximate cloud coverage by computing the fraction of time that the sun is 
 
 \begin{figure}[t]
     \centering
-    \begin{sideways}\begin{minipage}{.45\linewidth}\centering \scriptsize Clear (85-100\%)\vspace{5pt} \end{minipage}\end{sideways}
-    \includegraphics[width=.9\linewidth]{./figures/confidenceIntervals/clear-mean_10pm.png} \\
+    \begin{sideways}\begin{minipage}{.25\linewidth}\centering \scriptsize Clear (85-100\%)\vspace{5pt} \end{minipage}\end{sideways}
+    \includegraphics[width=.5\linewidth]{./figures/confidenceIntervals/clear-mean_10pm.png} \\
     \vspace{-.8em} \noindent\rule{\linewidth}{0.1pt}
-    \begin{sideways}\begin{minipage}{.45\linewidth}\centering \scriptsize Mixed Clear (50-85\%)\vspace{5pt} \end{minipage}\end{sideways}
-    \includegraphics[width=.9\linewidth]{./figures/confidenceIntervals/mixed-clear-mean_10pm.png} \\
+    \begin{sideways}\begin{minipage}{.25\linewidth}\centering \scriptsize Mixed Clear (50-85\%)\vspace{5pt} \end{minipage}\end{sideways}
+    \includegraphics[width=.5\linewidth]{./figures/confidenceIntervals/mixed-clear-mean_10pm.png} \\
     \vspace{-.8em} \noindent\rule{\linewidth}{0.1pt}
-    \begin{sideways}\begin{minipage}{.45\linewidth}\centering \scriptsize Mixed Overcast (15-50\%)\vspace{5pt} \end{minipage}\end{sideways}
-    \includegraphics[width=.9\linewidth]{./figures/confidenceIntervals/mixed-overcast-mean_10pm.png} \\
+    \begin{sideways}\begin{minipage}{.25\linewidth}\centering \scriptsize Mixed Overcast (15-50\%)\vspace{5pt} \end{minipage}\end{sideways}
+    \includegraphics[width=.5\linewidth]{./figures/confidenceIntervals/mixed-overcast-mean_10pm.png} \\
     \vspace{-.8em} \noindent\rule{\linewidth}{0.1pt}
-    \begin{sideways}\begin{minipage}{.45\linewidth}\centering \scriptsize Overcast (0-15\%)\vspace{5pt} \end{minipage}\end{sideways}
-    \includegraphics[width=.9\linewidth]{./figures/confidenceIntervals/overcast-mean_10pm.png} \\
+    \begin{sideways}\begin{minipage}{.25\linewidth}\centering \scriptsize Overcast (0-15\%)\vspace{5pt} \end{minipage}\end{sideways}
+    \includegraphics[width=.5\linewidth]{./figures/confidenceIntervals/overcast-mean_10pm.png} \\
     \vspace{3mm}
-    \includegraphics[width=1.01\linewidth]{./figures/confidenceIntervals/colorbar.png}
+    \includegraphics[width=.51\linewidth]{./figures/confidenceIntervals/colorbar.png}
     \caption{Influence of cloud cover on the 95\% confidence intervals with $\sigma=1\%$. Each row shows a different type of sky, based on sun visibility. For example, the top row shows confidence intervals averaged over all days with direct sun visibility in the range 85\%-100\%. The averaged days presented similar sun elevations. As with fig.~\ref{fig:confidence-intervals}, the plots show the full sphere of normals from two different viewpoints: South (left), and North (right).}
     \label{fig:cloud-cover}
 \end{figure}
@@ -208,7 +208,7 @@ The improved conditioning in mixed skies is explained by the following key obser
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{./figures/mlvFig/mlvFig.pdf}
+    \includegraphics[width=0.5\linewidth]{./figures/mlvFig/mlvFig.pdf}
     \caption{Cloud effect on the mean light direction over one day: while the sun path (orange) yields nearly co-planar directions of illumination, the mean light directions (red dots) provide a much more varied set (data from 11/06/2013, 2nd row of fig.~\ref{fig:database}).}
     \label{fig:mlv}
 \end{figure}
