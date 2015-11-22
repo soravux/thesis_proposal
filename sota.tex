@@ -43,6 +43,9 @@ More recently, work has been done to increase the stability of and robustness to
 % Light sources arbitrary motion & Bas-Relief Ambiguity
 The impact of illumination on PS has also been extensively studied. At first, still assuming point light sources, the case of unknown light directions was solved by using singular value decomposition along with a set of priors~\cite{Hayakawa1994}. This allowed to approximate the images lighting conditions and the surface normals jointly. It is worth of note that the reconstruction is always up to a bas-relief ambiguity in the case of unknown light sources~\cite{Belhumeur1999}. This means that every reconstruction with unknown light sources are up to a scaling factor that is impossible to determine theoretically.
 
+\todo{Merge with previous:}
+Since both techniques doesn't know what are the lighting intensities nor the surface albedo, they are subject to the Generalized Bas-Relief (GBR) ambiguity. This ambiguity rise because the problem is ill-posed. A normal could be the result of an infinity of lighting-reflectance ratios. As such, it is possible to obtain a surface normal up to a degree of freedom. This last degree of freedom cannot be constrained without external information such as known albedo for some pixels or precise light intensity.
+
 % Optimal Illumination control
 All this work suppose that the controlled light spans ``enough'' the space, meaning that the experimenter should stop when he feels he has enough data to work with. This brought the question: ``is there an optimal placement for the lights to optimize the reconstruction performance of PS?'' Many researchers thought that the optimal light placement was a tradeoff between ideal incident illumination and shadow coverage. Mathematically, having orthogonal light sources is optimal for the reconstruction, but where is it optimal? It was found that the optimal light position is a slant angle of 54.74\degree from the camera at equal distance in circles around it~\cite{spence-iwtas-03,drbohlav-iccv-05}. [figure]
 
@@ -58,13 +61,93 @@ Research on indoors illumination made a big leap when generic lighting condition
 \section{Outdoor Photometric Stereo}
 
 % webcams
-To tackle the new challenge that posed outdoor PS, a natural first strategy has been to experiment with Lambertian reflectance and to model the sun as a point light source, to match a well-studied lab condition. Unfortunately, approaches based on this model have practical limitations caused by the movement of the sun in the sky for a given day. Depending on the latitude and time of year, its trajectory may lie too close to a plane, yielding an under-constrained, two-source PS problem~\cite{hernandez-pami-11}. Possible solutions include waiting for a day when the sun trajectory is non-planar~\cite{shen-pg-14}, or capturing several months of data~\cite{ackermann-cvpr-12,abrams-eccv-12} to ensure good conditioning.
+To tackle the new challenge that posed outdoor PS, a natural first strategy has been to experiment with Lambertian reflectance and to model the sun as a point light source, to match a well-studied lab condition. Unfortunately, approaches based on this model have practical limitations caused by the movement of the sun in the sky for a given day. Depending on the latitude and time of year, its trajectory may lie too close to a plane, yielding an under-constrained, two-source PS problem, which has been discussed previously.
 
+\subsection{Months of data}
+The first method that was proposed to make outdoor PS work is to capture several months of data~\cite{ackermann-cvpr-12,abrams-eccv-12} to ensure a good conditioning of the problem, as is shown on fig.~\ref{fig:abrams-sunpath}. Both these work aim to take advantage of online image collections, more precisely webcam timelapses. There is a variety of such databases available (e.g., WILD~\cite{narasimhan-eccv-06} and AMOS~\cite{jacobs-cvpr-2007}).
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\linewidth]{sota/fig_2b.png}
+\caption{Input solar lighting direction on a camera using 1 month, 3 months and 6 months (from left to right). Points are color-coded based on their coordinates: red for north, green for east and blue to make the color a unit-length vector ($b = \sqrt{1 - r - g}$). Figure from~\cite{abrams-eccv-12}.}
+\label{fig:abrams-sunpath}
+\end{figure}
+
+% Explain Ackermann
+A quick overview of~\cite{ackermann-cvpr-12} is presented as they propose a full PS pipeline. They propose a PS reconstruction algorithm working on webcam timelapses. Their algorithm is divided in three major steps:
+\begin{enumerate}
+  \item Selection;
+  \item Calibration;
+  \item PS iterative optimization.
+\end{enumerate}% Selection
+First, a selection is made from all the images of the sequence. In their analysis, they considered intervals of 6 months or more of data. This amounts to a large quantity of images in a single sequence. They must detect and remove some outliers amongst the images, but they also must select the best images. They found that input images with low contrast or mainly dark were actually harmful for the PS algorithm. They remove images having more than 10\% of its pixels in highlights, or were dark. This allowed to take care of the outliers. To select the best images, they define a contrast measure using the gradient of the object and the portion of the sky visible in the image separately. When strong gradients are found on the object, this means that a strong directional light illuminates the scene, giving a typically interesting input image. They also measure some characteristics of the sky, such as its color, to determine if the image should be kept or not. They use a prior saying that if the visible sky in the image is mostly blue, then there is a high risk of the sun shining directly on the object to be reconstructed. These images are good, because a strong directional lighting is what makes PS work. Once they blend these two measures together, they select the best images and perform the rest of the algorithm on them.
+
+% Calibration
+Once the best images are chosen, they perform the image alignment. Because mostly of the wind, cameras can move substantially over few months, even when firmly set. In order to work, PS requires an single static viewpoint. Using unaligned images, even so slightly, can have a dramatic performance impact on the reconstruction. To fix this issue, the authors performs a subpixel alignment method (also called image registration) on the input images. Outdoor images can have a very wide variety of illumination condition over the course of many months, making the image registration somewhat problematic. Usually, image registration is done by searching similar zones between two images. But two images lit by two largely different natural illuminations will be so different, especially in terms of contrast, that most common image registration algorithms fails in this case. To overcome this problem, they propose to align the gradient of the sequence of images. To summarize, they use the mean of all the image gradients to compare a new image. After registration, this new image is embedded into the mean gradient image. A prior art subpixel registration method is employed on these gradient images to perform this step. An example of the alignment distances and mean image is shown in fig.~\ref{fig:ackermann-alignment}.
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{sota/fig_4.png}
+\caption{Motion vectors for image alignment (left): Each arrow corresponds to an image that has been aligned along the direction of its arrow. The axes show the distance of the alignment in pixels. One can see that alignment is very subtle, barely more than a single pixel. The average gradient is shown on the right. Figure and caption from~\cite{ackermann-cvpr-12}.}
+\label{fig:ackermann-alignment}
+\end{figure}
+
+Then, a radiometric and photometric calibration is performed to recover the response curve of the camera. In most recent PS algorithms, such as this one, this calibration is made by prior art and won't be the main focus of this thesis. It is however important to point out that this calibration is what ensures the image pixels can be related to a radiance power, 
+
+Afterwards, they employ the method of~\cite{lalonde-ijcv-10} to find the camera azimuth and zenith angles. With this information, the time of day and the approximate GPS coordinates, it is possible to get the sun position with respect to the camera. This gives the light direction needed to perform PS.
+
+The last step of their calibration is an important part of PS in general: shadow detection. Pixels in shadows should be detected and treated differently because they can mess the PS reconstruction. The technique they use first detects when a given pixel is in shadow in every image of the sequence, i.e.\ if all the pixels at the same coordinates in every image of the sequence are in shadow. This first step is quite simple: if the intensity ratio between the maximum intensity and the lowest is less than 1.4, this pixel coordinate is treated to be always in shadow. For every other pixel, they compute the median value $m_\mathrm{min}$ of the $n$ smallest intensity values. A pixel $p$ is flagged as shadowed in image $i$ if its intensity $I_{i,p}$ is smaller than $K \cdot m_\mathrm{min}$. In their case, they chose $n = 10\%$ and $K = 1.5$.
+
+% PS iterative optim
+Now that all the selection and calibration done, the PS algorithm can be performed. This PS approach supposes two illumination sources. First, the sun is modeled as a point light source, meaning that the sun is taken as a distant point light. Secondly, a sky component is used to model everything not explainable by the sun, such as fog or clouds. This sky component is modeled as a spatially uniform light source. They initialize the sky term to be null and begin with only the sun direction estimated previously. They also initialize the surface to be purely Lambertian.
+
+Once the lighting and the material is initialized, they first solve a classical PS formulation. This gives an initial value for the surface normals. Then, they perform an iterative refinement, where they optimize the light intensity between the sky and the sun, the materials among different reflectance functions and the normals to fit the photometric cues. This kind of iterative refinement is common in the literature.
+
+There are some differences between this work and~\cite{abrams-eccv-12}. In the latter, they focus on the optimization formulation instead of a full PS pipeline. Also, they suppose a Lambertian surface instead of retrieving the material as~\cite{ackermann-cvpr-12}. In both work, their algorithm is performed independently for each channel of the images (red, green and blue).
+
+Interestingly, \cite{abrams-eccv-12} reported issues on the shadow detection method used by~\cite{ackermann-cvpr-12}. They report that over the span of a year, pixel intensities varies too drastically to have a single correct threshold throughout the sequence. For example, a shadowed pixel when the sun is highest in the sky can have the same intensity as a directly-lit pixel at the opposite time of the year. They thus modify the method to be adaptive over time, updating the threshold compared to the previous images analyzed.
+
+Since both techniques are not aware beforehand of the lighting intensities nor the surface albedo, they are subject to the GBR ambiguity. Both uses different techniques to overcome this issue. \cite{abrams-eccv-12} proposes to lift the ambiguity by fixing the exposures to 255 and scaling the rest of their optimization terms accordingly. On the other hand, \cite{ackermann-cvpr-12} proposes to instead cluster the pixels according to their albedo and normals using a machine-learning approach. They find 6 pixels of different normal orientation but similar albedos, which they use to solve the ambiguity.
+
+While these methods works pretty well, they need data that spans over 6 months, which can be quite cumbersome to acquire. In order to do it in a single day, some modifications to the approach will be needed.
+
+\subsection{Single day}
 % single day
 Recently, Shen~{\em et al.}~\cite{shen-pg-14} showed that, contrary to common belief, the sun path in the sky actually does not always lie within a perfect plane. Thus, PS reconstruction can sometimes be computed in a single day even with a point light source model. The main downside of this approach is that planarity of the sun path (\ie, conditioning of PS reconstruction) depends on the latitude and the time of year. More specifically, reconstruction becomes unstable at high latitudes near the winter solstice, and worldwide near the equinoxes.
 
 % richer lighting models
-To compensate for limited sun motion, a promising approach is to use richer models of illumination that account for additional atmospheric factors in the sky. Typically, more elaborate models of illumination is done by employing (hemi-)spherical high dynamic range (HDR) environment maps~\cite{debevec-siggraph-98,reinhard-book-05} as input to outdoor PS. Encouraging results have been reported in~\cite{yu-iccp-13} for outdoor images taken within an interval of just eight hours (in a single day). On one hand, full environment maps can be captured and used with calibrated PS algorithms~\cite{yu-iccp-13,shi-3dv-14,hung-wacv-15}. On the other hand, it is also possible to estimate part of the environment map without explicitly capturing it, by synthesizing a hemispherical model of the sky using physically-based models~\cite{inose-tcva-13,jung-cvpr-15}.
+To compensate for limited sun motion, a promising approach is to use richer models of illumination that account for additional atmospheric factors in the sky. Typically, more elaborate models of illumination is done by employing (hemi-)spherical high dynamic range (HDR) environment maps~\cite{debevec-siggraph-98,reinhard-book-05} as input to outdoor PS. Encouraging results have been reported in~\cite{yu-iccp-13} for outdoor images taken within an interval of just eight hours (in a single day). On one hand, full environment maps can be captured and used with calibrated PS algorithms~\cite{yu-iccp-13,shi-3dv-14,hung-wacv-15}.
+
+\todo{explain differences of shi \& hung.}
+
+It is also possible to estimate part of the environment map without explicitly capturing it, by synthesizing a hemispherical model of the sky using physically-based models~\cite{inose-tcva-13,jung-cvpr-15}.
+
+\cite{inose-tcva-13} employs iterative refinement over the two-source PS approach. Their lighting estimation is done using a white sphere from which they can estimate the parameters of a Preetham model~\cite{preetham-siggraph-99}. This works well, but requires that an object of known shape is already present in the scene. The rest of the method is taken from prior art explained earlier.
+
+% Jung
+% lighting components
+In \cite{jung-cvpr-15}, they propose to model the sky into two components: the sky and the sun. These two components are obtain by decomposing the Preetham sky model~\cite{preetham-siggraph-99} into a quadratic skylight and a gaussian sunlight, as shown in fig.~\ref{fig:jung-skysim}. Using this parametric sky model allows for a simple lighting estimation -- with only three variables per component -- and a simple image formation model. As such, a pixel intensity is explained by the superposition of both sky components.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\linewidth]{sota/jung_fig2.png}
+\caption{(a) World coordinate specifying the sun position and the viewing direction in the sky hemisphere. (b) A sky hemisphere is simulated using a sky model~\cite{preetham-siggraph-99} and it is parameterized into (c) a quadratic skylight distribution and (d) a Gaussian sunlight distribution. Figure and caption from~\cite{jung-cvpr-15}.}
+\label{fig:jung-skysim}
+\end{figure}
+
+% color profile and albedo estimation
+An interesting yet simple approach for albedo estimation is presented in their work. They report that the color ratio of a pixel throughout the image sequence ($\rho_r : \rho_g : \rho_b$) could be estimated by analyzing the linearity in the color profile. They call a color profile the point cloud of a pixel coordinates throughout the image sequence in the RGB cube. The first eigenvector of this point cloud is taken as the relative albedo estimation, which is the dominant direction of the point cloud. Projecting the intensities of the three color channels onto this line gives what they call the pixel profile.
+
+% surface normal sampling
+They then perform a coarse surface normal estimation. In order to do so, they sample 1000 points uniformly on a unit sphere and generate the incident irradiance for skylight and sunlight over the image sequence. Using these, they generate the sample profile, which is an estimated pixel intensity using a candidate normal from the sampled ones. Then, the most probable normal is found by taking the highest correlation between these sample profiles and the pixel profiles computed from the images.
+
+% MRF optimization
+Using the coarse lighting and normal estimation, the problem is then smoothed and interpolated for shadowed pixels using an MRF. This MRF allows a global optimization, solving for the normal that fits best the observations and while taking into considerations its neighbors. It is then possible to inject priors into this optimization. Their neighborhood prior is based on an interesting insight: they remark that pixels yielding similar pixel profiles should have normals close to one another, whereas pixels having different pixels should have mostly orthogonal normals. To formulate this, they use the Pearson correlation coefficient between two neighboring pixel profiles to define how close (or orthogonal) two normals should be.
+
+This algorithm is the state of the art uncalibrated outdoor single day PS-based approach. The problem is that the reported performance is very far from the performance reported in laboratory conditions. This is a big contrast where PS can be taken as ground truth is most laboratory experiments, this technique obtains between 30\% and 40\% of the recovered normals under 30\degree of error. This means that 60\% of the recovered normals are outside of a 60\degree cone around the ground truth normal. This amount lowers to 50\% for 4 months of data, which still means that half recovered normals are mostly wrong.
+
+
+
 
 % hold-geoffroy
 %The work presented below extends our initial analysis in~\cite{holdgeoffroy-iccp-15}. Rather than presenting a new reconstruction algorithm, in~\cite{holdgeoffroy-iccp-15} we conducted an empirical analysis of the same sky database to identify which days provide more favorable atmospheric conditions for outdoor PS. However, no consideration was given to the shortest time interval of data capture needed to obtain accurate reconstructions; all results were reported on at least 6 hours (a ``full day'') of captured data. Here, instead of comparing days, we focus on analyzing different time intervals within each day. We then show that 6 hours is actually more than necessary, and detail the relationship between the appearance of the sky hemisphere and the quality of PS reconstruction.

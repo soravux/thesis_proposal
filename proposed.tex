@@ -274,7 +274,7 @@ The improvements described in this section are all planned to be part of a singl
 % reconstruction, don't need lighting condition is a plus
 All the proposed work up until now supposes we know the full environment map that lit the scene we observe. After the development of the fully calibrated algorithm described, I plan to overcome the need for capturing the sky. Getting rid of the lighting capture is a big plus, allowing the technique to be easily brought on the field. A single camera would be required, simplifying the capture apparatus by a great deal.
 
-Uncalibrated PS reconstruction has an issue that its calibrated counterpart doesn't have: the Generalized Bas-Relief Ambiguity, called GBR ambiguity in the literature. Because the light intensity and direction as well as the surface albedo is not known beforehand, the reconstruction of the surface height is up to an unknown factor, impossible to determine without prior knowledge of the surface or constrains external to photometric cues.
+Uncalibrated PS reconstruction has an issue that its calibrated counterpart doesn't have: the Generalized Bas-Relief (GBR) ambiguity. Because the light intensity and direction as well as the surface albedo is not known beforehand, the reconstruction of the surface height is up to an unknown factor, impossible to determine without prior knowledge of the surface or constrains external to photometric cues.
 
 %~\cite{basri-ijcv-2007}
 Authors over the years have basically proposed two ideas to surmount the GBR ambiguity. Doing it manually (i.e., forcing a depth to an arbitrary value) seems to be a quite common way to deal with this issue. Most researchers, though, proposed a wide amount of priors and optimization schemes on the object material~\cite{tan-cvpr-07,alldrin-cvpr-08,abrams-eccv-12,queau-jmiv-14} to solve this problem.
@@ -285,7 +285,7 @@ In order to make PS work uncalibrated, I plan to use a data-driven approach. By 
 
 I suspect this lighting constraint to be enough to alleviate the GBR ambiguity issue. In the case this constraint is not enough, I plan to use an optimization method on the material albedo as proposed by the authors previously mentioned.
 
-Overall, the GBR ambiguity is a minor issue with many techniques to solve it available in the literature. What is left to do, though, is an uncalibrated outdoor single day PS algorithm that brings performances similar to the laboratory conditions. The current state-of-the-art technique~\cite{jung-cvpr-15} obtain between 30\% and 40\% of the recovered normals under 30\degree of error, which is far away from the impressive precision obtained using PS in laboratory conditions.
+Overall, the GBR ambiguity is a minor issue with many techniques to solve it available in the literature. What is left to do, though, is an uncalibrated outdoor single day PS algorithm that brings performances similar to the laboratory conditions. The current state-of-the-art technique~\cite{jung-cvpr-15} obtains between 30\% and 40\% of the recovered normals under 30\degree of error, which is far away from the impressive precision obtained using PS in laboratory conditions.
 
 In the following, I propose a succession of steps in order to take the calibrated algorithm proposed earlier and push it to a fully uncalibrated one.
 
