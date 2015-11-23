@@ -5,7 +5,7 @@
 
 Real world scanning of outdoors structures gained a lot of interest recently. The emergence of cheap and easy-to-use 3D sensors brought its share of new applications, enabling the digitization of the world by the masses. Most of common everyday 3D scanning devices are captive of the indoors, though. There is yet to find a way to give everyone the chance to scan building-scale objects, bridging the gap between indoor and outdoor scanning.
 
-This thesis proposes to do so simply by using cameras, and an existing reconstruction technique dubbed "Photometric Stereo" (PS). The idea is to point a camera towards a scene to be scanned, and to capture a time-lapse sequence over time. Variations in the illumination conditions can be used by PS to reconstruct the shape of the observed scene. PS has been known in computer vision for more than 35 years, and is still an active area of research.
+This thesis proposes to do so simply by using cameras, and an existing reconstruction technique dubbed ``Photometric Stereo'' (PS). The idea is to point a camera towards a scene to be scanned, and to capture a time-lapse sequence over time. Variations in the illumination conditions can be used by PS to reconstruct the shape of the observed scene. PS has been known in computer vision for more than 35 years, and is still an active area of research. It is an excellent choice for shape reconstruction given its great output density and stellar results in laboratory conditions.
 
 \section{Photometric Stereo}
 \label{sec:ps_ori}
@@ -18,11 +18,13 @@ The first definition of PS, made in 1979 by Woodham~\cite{Woodham1979}, made a l
     \item Lambertian;
     \item constant;
   \end{itemize} \vspace{-0.4em}
+  \item The object is rigid (normals are constant over time);
   \item Lighting is known;
   \item Lighting is a distant point light source;
   \item Sensors are noiseless;
   \item All the images are aligned.
 \end{itemize}
+In its essence, everything must be constant; only the illumination should vary over the sequence.
 
 Following these assumptions, the Lambertian image formation model for a single pixel is defined as
 \begin{equation}
@@ -95,12 +97,14 @@ To make PS work outdoor, the traditionally employed approximation models such as
 
 \section{Thesis proposal}
 
-The main goal of this project is to reconstruct the shape of large-scale outdoor scenes from short time intervals, without the need for capturing the lighting conditions.
+The main goal of this thesis is to understand how natural illumination impacts PS, effectively tying the reconstruction performance to the sky appearance. This leads to multiple applications, such as large-scale outdoor scenes reconstruction from short time intervals, without the need for capturing the lighting conditions.
 
 In this thesis, I propose to:
 \begin{enumerate}
   \item bring a deeper understanding of the way PS can work outdoors;
-  \item develop practical algorithms that allow precise shape recovery under unknown, uncontrolled outdoor lighting.
+  \item explain the expected reconstruction performance from a sky capture;
+  \item explain the lighting that can be estimated when there is no sky capture;
+  \item exploit these insights for large-scale reconstruction.
 \end{enumerate}
 These objectives can be attained by a better comprehension of natural illumination and its impact on shading. This knowledge can then be leveraged to improve existing reconstruction algorithms or make new ones that works with complex and uncontrolled lighting conditions.
 

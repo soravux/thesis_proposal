@@ -2,11 +2,6 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Proposed contributions}
-% Metho!
-
-
-% Clear that the community has an interest
-From the overwhelming positive reviews and great comments we received for our previous work, it seems clear to me that the community is interested in outdoors PS. Reviewers found the work ``refreshing'', praising its ``concrete actionable predictions that can be of interest for practitioners'' and the pertinence of this line of work. Based on this feedback from the community, I look forward to build upon the existing contributions.
 
 % Based on the work already done
 Previous contributions mainly focused on the analysis of the complex illumination conditions of outdoor scenes. This analysis brought us a good deal of knowledge that will enable the enhancement of existing reconstruction algorithms.
@@ -52,38 +47,38 @@ In the basis algorithm I plan to build upon, there are two important enhancement
 To remove the albedo $\rho$ from the original PS equation, the trick is to divide an image by another one. Mathematically, this pixelwise division of, let's say, image 1 by image 2, is represented as
 
 \begin{equation}
-\frac{b_{t,1}}{b_{t,2}} = \frac{\rho_t \mathbf{l}_1 \mathbf{n}_t}{\rho_t \mathbf{l}_2 \mathbf{n}_t} \quad,
+\frac{b_{p,1}}{b_{p,2}} = \frac{\rho_p \mathbf{l}_1 \mathbf{n}_t}{\rho_p \mathbf{l}_2 \mathbf{n}_p} \quad,
 \end{equation}
-for pixel $t$. The albedo $\rho_t$ cancels out, giving the relation
+for pixel $p$. The albedo $\rho_t$ cancels out, giving the relation
 \begin{equation}
 \label{eq:ratio_images}
-\left( b_{t,1} \mathbf{l}_2 - b_{t,2} \mathbf{l}_1 \right) \mathbf{n}_t = 0  \quad.
+\left( b_{p,1} \mathbf{l}_2 - b_{p,2} \mathbf{l}_1 \right) \mathbf{n}_t = 0  \quad.
 \end{equation}
 
 This relation was used before~\cite{yu-iccp-13,wu-pami-06}. These algorithm usually consist of taking a denominator image minimally affected by shadows and highlights and dividing all the other images of the sequence by this one. While this removes the constant albedo assumption, it leaves a smaller (by one) sequence of images to perform PS. Another possibility is to perform the division on all the possible permutations of images, giving a better robustness to the algorithm. The problem with this approach is that it makes the sequence grow quadratically (see appendix \ref{anx:permutations}), which quickly becomes problematic to solve in a reasonable time on computers having a finite amount of memory. Stochastically taking a predetermined amount can do the trick, but a more sound selection is discussed later on.
  
-Solving directly for the surface height instead of the normals can be done by analyzing the relation between both. Given pixel $t$ and its depth $z_t$, the normal of the surface patch seen by it $\mathbf{n}_t$ can be expressed as
+Solving directly for the surface height instead of the normals can be done by analyzing the relation between both. Given pixel $p$ and its depth $z_p$, the normal of the surface patch seen by it $\mathbf{n}_p$ can be expressed as
 \begin{equation}
-r_t = 
+\mathbf{r_p} = 
 \begin{bmatrix}
-\nabla z_{t,x} \\
-\nabla z_{t,y} \\
+\nabla z_{p,x} \\
+\nabla z_{p,y} \\
 -1
 \end{bmatrix}
 \end{equation}
 \begin{equation}
-\mathbf{n}_t =
-\frac{r_t}{\norm{r_t}} \quad.
+\mathbf{n}_p =
+\frac{\mathbf{r_p}}{\norm{\mathbf{r_p}}} \quad.
 \end{equation}
 This supposes that the surface is pointing toward $-1$, hence the camera is at $[0, 0, -1]$.
 
 When merged with the albedo removal technique (equation \eqref{eq:ratio_images}) and letting down the normalization, we obtain
 \begin{equation}
 \label{eq:pre-dlt}
-\left( b_{t,1} \mathbf{l}_2 - b_{t,2} \mathbf{l}_1 \right)
+\left( b_{p,1} \mathbf{l}_2 - b_{p,2} \mathbf{l}_1 \right)
 \begin{bmatrix}
-\nabla z_{t,x} \\
-\nabla z_{t,y} \\
+\nabla z_{p,x} \\
+\nabla z_{p,y} \\
 -1
 \end{bmatrix}
 = 0  \quad.
@@ -91,9 +86,11 @@ When merged with the albedo removal technique (equation \eqref{eq:ratio_images})
 
 This version of PS is the base upon which the proposed enhancements are planned. In order to make it easier to handle, a Direct Linear Tranform (DLT) method is applied to rewrite equation~\eqref{eq:pre-dlt} into an set of homogeneous linear equations.
 
-To do so, we must consider the left part of the equation, $\left( b_{t,1} \mathbf{l}_2 - b_{t,2} \mathbf{l}_1 \right)$, as being a vector of three scalars, let's say $\left[ i_t, j_t, k_t \right]$. When considering the division of an image $a$ by $a'$ as a whole instead of looking at each pixels separately, we get the vectors $\left[ \mathbf{i}_{aa'}, \mathbf{j}_{aa'}, \mathbf{k}_{aa'} \right]$. Equation \eqref{eq:pre-dlt} can now be rewritten as
+\todo{Define $M_x, M_y$ around here.}
+
+To do so, we must consider the left part of the equation, $\left( b_{p,1} \mathbf{l}_2 - b_{p,2} \mathbf{l}_1 \right)$, as being a vector of three scalars, let's say $\left[ i_p, j_p, k_p \right]$. When considering the division of an image $a$ by $a'$ as a whole instead of looking at each pixels separately, we get the vectors $\left[ \mathbf{i}_{aa'}, \mathbf{j}_{aa'}, \mathbf{k}_{aa'} \right]$. Equation \eqref{eq:pre-dlt} can now be rewritten as
 \begin{equation}
-\left[ \mathrm{diag}(\mathbf{i}_{aa'}) \; \mathrm{diag}(\mathbf{j}_{aa'}) \; \mathrm{diag}(\mathbf{k}_{aa'})\right]
+\left[ \mathrm{diag}(\mathbf{i}_{aa'}) \quad \mathrm{diag}(\mathbf{j}_{aa'}) \quad \mathbf{k}_{aa'}\right]
 \begin{bmatrix}
 \nabla \mathbf{z}_{x} \\
 \nabla \mathbf{z}_{y} \\
@@ -103,13 +100,15 @@ To do so, we must consider the left part of the equation, $\left( b_{t,1} \mathb
 \end{equation}
 which can be rewritten as
 \begin{equation}
-\left[ \mathrm{diag}(\mathbf{i}_{aa'}) \; \mathrm{diag}(\mathbf{j}_{aa'}) \right]
+\left[ \mathrm{diag}(\mathbf{i}_{aa'}) \quad \mathrm{diag}(\mathbf{j}_{aa'}) \right]
 \begin{bmatrix}
 \nabla \mathbf{z}_{x} \\
 \nabla \mathbf{z}_{y} \\
 \end{bmatrix}
 = \mathbf{k}_{aa'} \quad.
 \end{equation}
+
+\todo{Better develop link between eq \^{} and v. Also, explain z = vec(Z).}
 
 In order to convert this independent systems of linear equations into an homogeneous form, it is possible to arrange this matrix into a block diagonal matrix by taking each row and making $2x2$ blocks from them.
 This gives this new formulation:
@@ -119,7 +118,7 @@ This gives this new formulation:
 D_{ii} & D_{ij} \\
 D_{ij} & D_{jj} \\
 \end{bmatrix}_{a,a'}
-z =
+\mathbf{z} =
 \sum_{a,a'}
 \begin{bmatrix}
 D_i \mathbf{k} \\
@@ -135,7 +134,8 @@ where $D_i = \mathrm{diag}(\mathbf{i}_{aa'})$ and $ D_{ij} = \mathrm{diag}\left(
 % What's coming up next
 Four avenues will be discussed on how I plan to make this PS algorithm work for outdoors. First, using the observations we made in our analysis brought us some ideas on how to improve the reconstruction performance. Two of such ideas are discussed. Then, interesting elements found in other algorithms and their inclusion in the proposed algorithm will be explained.
 
-\subsection{Regularization}
+\subsection{Limiting uncertainty using anisotropic regularization}
+\label{subsec:reg}
 
 % One thing we noticed during our analysis is that not all pixels nor axis are equal.
 % Figure, axis uncertainty
@@ -169,7 +169,7 @@ In the case of two-source PS, the regularization must be performed along directi
 \end{equation}
 for the first order, and 
 \begin{equation}
-\beta \lvert \mathbf{u}^T H(z)\nabla z \rvert ^2
+\beta \lvert \mathbf{u}^T H(z) \mathbf{u} \rvert ^2
 \end{equation}
 for the second order, where $z$ is the height, $\alpha$ and $\beta$ are the regularization weights and $H(z)$ is the Hessian matrix of $z$ (its second-order derivatives). While the first order penalizes non-smooth the slopes, the second order penalizes non-smooth curvatures.
 
@@ -177,29 +177,33 @@ While the idea is similar, the problem of regularizing in function of the normal
 
 We can simplify $\mathbf{u}(x,y)$ to a set of two orthogonal vectors along both axes. Since the uncertainty is computed directly on the $x$ and $y$ axes, we can rewrite the regularization as a linear combination of these two vectors:
 \begin{equation}
-\alpha \lvert \mathbf{u}_x \nabla z + \mathbf{u}_y \nabla z\rvert ^2 +
-\beta \lvert \mathbf{u}_x H(z)\nabla z + \mathbf{u}_y H(z)\nabla z\rvert ^2
-\quad,
+\text{Exercice left as an exercice to the reader.}
+
+\text{Just kidding, this section is still in construction.}
+
+%\alpha \lvert \mathbf{u}_x \nabla z + \mathbf{u}_y \nabla z\rvert ^2 +
+%\beta \lvert \mathbf{u}_x H(z)\nabla z + \mathbf{u}_y H(z) \math\rvert ^2
+%\quad,
 \end{equation}
 where $\mathbf{u}_x$ and $\mathbf{u}_y$ are the perpendicular components of the uncertainty.
 
 This new formulation is still untested. As such, my plan is to incorporate it into the reconstruction algorithm and to monitor its performance improvements. Something that is not taken into account as of now are the edges. Two pixels having two completely different intensities over the image sequence indicate that their normals should be quite far apart and thus should not be strongly regularized for smoothness. Such a regularization is used in~\cite{jung-cvpr-15} and discussed later.
 
 
-\subsection{Selection and scaling}
+\subsection{Selecting the right images to better constrain the problem}
 % Discrepancy between simulation and real world captures. Investigate it. We witness: selecting some images of the sequence may improve or degrade dramatically reconstruction performance.
-While working on the previous contributions, we witnessed a strange behavior in the reconstruction performance. Two symptoms were noticed, which -- we believe -- come from the same root, and will be solved by a single solution.
+While working on the previous contributions, we witnessed a strange behavior in the reconstruction performance.
 
-First, simulations on cloudy and semi-cloudy lighting conditions reflected correctly the real captured data. But when the sun was directly visible by a surface patch, a drift in the intensity values was observed compared to the theory. Pixels seeing direct bright sunlight were typically dimmer than what the Lambertian equation predicted, as can be seen in fig.~\ref{fig:sel-scaling_error}. This situation is corroborated by the real data. In itself, this minor setback won't hinder the forecast work. It seems to suppose that our real objects does not exhibit perfectly Lambertian reflectances, which is not quite surprising, and is something that the physically-based renderer LuxRender also picks up. The important thing to keep in mind from this is that images lit by direct sunshine will impact negatively the performance of the PS algorithm.
+%First, simulations on cloudy and semi-cloudy lighting conditions reflected correctly the real captured data. But when the sun was directly visible by a surface patch, a drift in the intensity values was observed compared to the theory. Pixels seeing direct bright sunlight were typically dimmer than what the Lambertian equation predicted, as can be seen in fig.~\ref{fig:sel-scaling_error}. This situation is corroborated by the real data. In itself, this minor setback won't hinder the forecast work. It seems to suppose that our real objects does not exhibit perfectly Lambertian reflectances, which is not quite surprising, and is something that the physically-based renderer LuxRender also picks up. The important thing to keep in mind from this is that images lit by direct sunshine will impact negatively the performance of the PS algorithm.
 
-\begin{figure}
-\centering
-\includegraphics[height=8cm]{selection_scaling/intensity_sphere_lux_lin.png}
-\caption{Median intensity of rendered images. The physically-based renderer LuxRender ($y$-axis) is compared against the Lambertian equation ($x$-axis). The same material and light directions are used in both rendering methods. A linear best fit is shown in red. As it can be seen, the curve is not perfectly linear.}
-\label{fig:sel-scaling_error}
-\end{figure}
+%\begin{figure}
+%\centering
+%\includegraphics[height=8cm]{selection_scaling/intensity_sphere_lux_lin.png}
+%\caption{Median intensity of rendered images. The physically-based renderer LuxRender ($y$-axis) is compared against the Lambertian equation ($x$-axis). The same material and light directions are used in both rendering methods. A linear best fit is shown in red. As it can be seen, the curve is not perfectly linear.}
+%\label{fig:sel-scaling_error}
+%\end{figure}
 
-The second curious behavior detected can be easily deducted from the mathematical formulation. Sometimes, by adding images, the reconstruction uncertainty was increased, leading to worse results. At first, it may seem counter-intuitive: why would adding more (non-outlier) data be harmful to the algorithm? The answer lies in the stability of the PS technique. As shown in the previous contributions, reconstruction uncertainty depends on three things:
+This curious behavior detected can be easily deducted from the mathematical formulation. Sometimes, by adding images, the reconstruction uncertainty was increased, leading to worse results. At first, it may seem counter-intuitive: why would adding more (non-outlier) data be harmful to the algorithm? The answer lies in the stability of the PS technique. As shown in the previous contributions, reconstruction uncertainty depends on three things:
 \begin{enumerate}
   \item The sensor noise;
   \item The surface albedo;
@@ -216,6 +220,8 @@ Both of these issues touch two very important concepts:
 Not all data is equal, in that repetitive data is actually harmful for the algorithm. Then, which combination of input images should be kept? Which combination is optimal? What kind of preprocessing can we perform on the images to improve the result?
 
 Using the condition number as a stability measure of the $\bar{L}$ matrix, simply stacking images will sometimes increase or decrease the condition number, as can be seen in fig.~\ref{fig:sel-ordering}. But when ordering the input images by their contributions to define the singular vectors of the $\bar{L}$ matrix (ranked from the most important to the least important) as shown in fig.~\ref{fig:sel-ordering}, we see that there's a clear optimal quantity of images. Past this quantity, the reconstruction quality is degraded.
+
+\todo{Add a figure with a reconstruction with and without the selection as of now.}
 
 \begin{figure}
 \centering
@@ -243,7 +249,7 @@ This vector importance issue can be fixed by scaling the data by an arbitrary fa
 %3DV15 article with cool SD
 
 
-\subsection{Algorithmic improvements}
+\subsection{Algorithmic improvements: initialization refinement and merging with other techniques}
 
 % MRF, reference Jung's, tell our differences.
 When performing a calibrated PS algorithm on environment maps, a chicken-and-egg problem arise. The part of the environment map visible by a surface patch is defined by its normal, but the normal is what we want to find using the lighting information. To solve this problem, as explained in our previous contributions, we can sample normals uniformly over the sphere and compute their MLVs. Then, we can fit how well a pixel intensity in the image matches these MLVs.
@@ -290,7 +296,7 @@ Overall, the GBR ambiguity is a minor issue with many techniques to solve it ava
 In the following, I propose a succession of steps in order to take the calibrated algorithm proposed earlier and push it to a fully uncalibrated one.
 
 
-\subsection{Half-calibrated case}
+\subsection{Reconstructing the ground}
 % First, reconstruction of the ground only.
 A full environment map is hard to obtain. This means that a full sphere of irradiance must be captured. Usually, sky capture apparatus is composed of a wide angle lens pointing toward up (zenith), capturing only at best a small portion of the horizon. Building a full environment map is done by adding the ground, which requires the stitching of two captures.
 
@@ -299,7 +305,7 @@ The first enhancement to the system I propose is to get rid of the ground by est
 One thing that can be done is an 
 
 
-\subsection{Mostly uncalibrated}
+\subsection{Using only the sun position}
 % Then, estimation of the sky using the GPS coordinates and date & time. Then, without date and time.
 In order to move toward an uncalibrated algorithm, it feels a logical next step to remove the environment map altogether from the inputs of the method. To simplify a bit this big step, I propose to work with the GPS coordinates alongside with the date and time of image acquisition. This type of information is sometimes available (and sometimes right) in the EXIF data of pictures, making this kind of input not as farfetched as it may seem.
 
@@ -321,7 +327,7 @@ The last step is to provide a fully uncalibrated PS algorithm. Building on the p
 This proposed technique will be a major contribution that iterates over the previous state of the art by adding a richer data-driven sky illumination model at its core.
 
 
-\section{Looking farther than the sun}
+\section{When the sun is not around}
 
 % Up until now, we only considered the atmosphere during the day for reconstruction. The main problem, coplanar.
 All the previous proposed work only considered the atmosphere during the day. The main problem, which is the coplanarity of the sun trajectory over the course of a day, can be solved by richer and more complex sky models as explained in the previous sections. Another interesting avenue is to revert to a simpler model: the point light source. In this case, using solely the sun as a light source will, most of the time, give an underconstrained problem that will not perform well.
@@ -330,7 +336,7 @@ With this analysis, though, it is necessary to bring something else into play in
 %Another avenue is to manually modify the lighting, either by distorting the sun light or adding new light sources.
 
 
-\subsection{Day \& Night PS}
+%\subsection{Day \& Night PS}
 When seen during the day, the moon doesn't bring much lighting to a scene. But during the night, it can be strong enough to cast clearly visible and sharp shadows on the ground. But the main interesting thing about the moon is that it presents lighting from a plane different than the sun. Using this to our advantage could turn a data capture failure for PS (e.g., during a fully sunny day) into a successful reconstruction, by simplifying the illumination model and letting the capture continue overnight.
 
 Over the course of 24 hours, both sun and moon trajectories are mostly coplanar. Examples of such trajectories are shown in fig.~\ref{fig:DN-sunmoon-trajectories}. Both of them are parallel, which is not surprising because the earth, the sun and the moon are roughly on the same plane in the solar system. But the inclination of the earth makes both trajectories superposed in the sky during the equinoxes, which occurs around 81 days (spring) and 264 days (fall) after January 1st.

@@ -21,30 +21,28 @@ Since its inception, Photometric Stereo has received a lot of attention througho
 
 \section{Photometric Stereo}
 
-As previously stated, PS has been studied extensively for many decades. Researchers worked to make the method more general by removing, or at least alleviating, the assumptions initially made.
+%As previously stated, PS has been studied extensively for many decades. Researchers worked to make the method more general by removing, or at least alleviating, the assumptions initially made.
 
-\subsection{Surface reflectance}
+\subsection{Estimating more complex surface reflectance}
 % BRDF
 One thing they did is make PS work on other surfaces than perfectly Lambertian ones. At first, specular reflections \cite{Ikeuchi1981} were studied and incorporated to the PS framework. This also brought the idea of distributed light sources instead of point light sources to the field, an important idea discussed later on. Over the years, most of the reflectance assumptions were removed, allowing PS to work on surfaces yielding varying reflectance using either a parametric~\cite{hertzmann-pami-05,goldman-tpami-10} or a data-driven approach~\cite{alldrin-cvpr-08}.
 
-\subsection{Shape from Shading}
-% SfS
-A new technique called shape-from-shading~\cite{Horn1989} was born from Photometric stereo. In this technique, a bunch of priors is assumed to infer the structure from a single image instead of a sequence of images. Two interesting elements from this work are worth noting for general PS use: 1) the shadow detection and handling, and 2) uniform illumination (an ambient light source) is taken into account. This technique was further developed to take into account outdoor photometric cues on cloudy days~\cite{Langer1994}. This work recognized that cloudy days could be approximated as diffuse light sources and treated them differently than point light sources, a key insight that will be discussed in details in \ref{iccp15}. Lately, a framework to infer local shape based from shading cues was proposed~\cite{Xiong2013}, yielding interesting intuitions transferable to a PS algorithm. Even though work still continues on outdoors shape-from-shading~\cite{oxholm-eccv-12,johnson-cvpr-11,barron-pami-15}, it is of limited interest in the scope of this thesis. This is due to the fact that work on this technique has mainly focused on finding tight constraints, strong priors or semantic segmentation, which are interesting topics, but far from photometric and shading cues.
+The core of both techniques is the same iterative optimization. First, they find coarse estimates of the surface normals by making assumptions on the surface reflectance. Then, they fix the surface normal and optimize the surface reflectance. By repeating these two steps, sometimes intertwined with constraints such as integrability, they obtain the complex reflectance of the reconstructed object.
 
-\subsection{Reconstruction algorithm improvements}
+\subsection{Shape from Shading: using a single image}
+% SfS
+A new technique called shape-from-shading~\cite{Horn1989} was born from Photometric stereo. In this technique, a bunch of priors is assumed to infer the structure from a single image instead of a sequence of images. Two interesting elements from this work are worth noting for general PS use: 1) the shadow detection and handling, and 2) uniform illumination (an ambient light source) is taken into account. This technique was further developed to take into account outdoor photometric cues on cloudy days~\cite{Langer1994}. This work recognized that cloudy days could be approximated as diffuse light sources and treated them differently than point light sources, a key insight that will be discussed in details in \ref{iccp15}. Lately, a framework to infer local shape based from shading cues was proposed~\cite{Xiong2013}, yielding interesting intuitions transferable to a PS algorithm. Work still continues on outdoors shape-from-shading~\cite{oxholm-eccv-12,johnson-cvpr-11,barron-pami-15}, mainly focusing on finding tight constraints and strong priors to improve the information usable by photometric cues or semantic segmentation to enhance material estimation.
+
+\subsection{Merging with other techniques and adding robustness}
 % Fusion with MVS
 After the Shape from Shading spinoff, PS was also used in conjunction with other shape reconstruction techniques to enhance their performance. The main idea is to ally the strength of PS (usually its output density) with the strength of another technique. As an example, merging a Multi-View Stereo algorithm with PS was done with great success~\cite{HernandezEsteban2008}.
-[Should I talk more about this?]
 
 % Shadows and robustness
-More recently, work has been done to increase the stability of and robustness to shadows, highlights, image noise~\cite{BarskyPetrou-pami-2003,ikehata-cvpr-12,ikehata-cvpr-14}.
+More recently, work has been done to increase the stability of and robustness to shadows, highlights, image noise~\cite{BarskyPetrou-pami-2003,ikehata-cvpr-12,ikehata-cvpr-14}. \todo{detail more.}
 
-\subsection{Lighting}
+\subsection{Toward more complex and unknown lighting}
 % Light sources arbitrary motion & Bas-Relief Ambiguity
-The impact of illumination on PS has also been extensively studied. At first, still assuming point light sources, the case of unknown light directions was solved by using singular value decomposition along with a set of priors~\cite{Hayakawa1994}. This allowed to approximate the images lighting conditions and the surface normals jointly. It is worth of note that the reconstruction is always up to a bas-relief ambiguity in the case of unknown light sources~\cite{Belhumeur1999}. This means that every reconstruction with unknown light sources are up to a scaling factor that is impossible to determine theoretically.
-
-\todo{Merge with previous:}
-Since both techniques doesn't know what are the lighting intensities nor the surface albedo, they are subject to the Generalized Bas-Relief (GBR) ambiguity. This ambiguity rise because the problem is ill-posed. A normal could be the result of an infinity of lighting-reflectance ratios. As such, it is possible to obtain a surface normal up to a degree of freedom. This last degree of freedom cannot be constrained without external information such as known albedo for some pixels or precise light intensity.
+The impact of illumination on PS has also been extensively studied. At first, still assuming point light sources, the case of unknown light directions was solved by using singular value decomposition along with a set of priors~\cite{Hayakawa1994}. This allowed to approximate the images lighting conditions and the surface normals jointly. It is worth of note that the reconstruction is always up to a Generalized Bas-Relief (GBR) ambiguity in the case of unknown light sources and surface reflectance~\cite{Belhumeur1999}. This ambiguity arise because of the ill-posedness of the problem. A normal could be the result of an infinity of lighting-reflectan ratios. Having the light intensity doubled and the reflectance halved would result in the exact same pixel appearance. This means that every reconstruction with unknown light sources and surface reflectance are up to a scaling factor that is impossible to determine theoretically.
 
 % Optimal Illumination control
 All this work suppose that the controlled light spans ``enough'' the space, meaning that the experimenter should stop when he feels he has enough data to work with. This brought the question: ``is there an optimal placement for the lights to optimize the reconstruction performance of PS?'' Many researchers thought that the optimal light placement was a tradeoff between ideal incident illumination and shadow coverage. Mathematically, having orthogonal light sources is optimal for the reconstruction, but where is it optimal? It was found that the optimal light position is a slant angle of 54.74\degree from the camera at equal distance in circles around it~\cite{spence-iwtas-03,drbohlav-iccv-05}. [figure]
@@ -55,6 +53,8 @@ Contrarily to laboratory conditions, real world lighting is not purely direction
 % Arbitrary light sources
 Research on indoors illumination made a big leap when generic lighting conditions were estimated alongside traditional PS~\cite{basri-ijcv-2007}. This work considered the illumination as a complete sphere around the scene instead of a sum of discrete point light sources. The lighting conditions recovered are, however, limited to low-frequencies. While it can be quite enough for simple materials, it won't work for materials exhibiting specularities or yielding non-Lambertian reflectance.
 
+Pushing the idea of limited lighting directions to its limit gives the two-source PS problem~\cite{hernandez-pami-11}. In this case, a degree of freedom is missing for the normal recovery, giving a single direction where the normal gradient is null called the characteristic curve. More on this in sec.~\ref{subsec:reg}.
+
 %Covering the vast amount of work done on PS as a whole is beyond the scope of this thesis proposal. The rest of the document will focus more closely on work that have considered PS on outdoor conditions.
 
 
@@ -63,7 +63,7 @@ Research on indoors illumination made a big leap when generic lighting condition
 % webcams
 To tackle the new challenge that posed outdoor PS, a natural first strategy has been to experiment with Lambertian reflectance and to model the sun as a point light source, to match a well-studied lab condition. Unfortunately, approaches based on this model have practical limitations caused by the movement of the sun in the sky for a given day. Depending on the latitude and time of year, its trajectory may lie too close to a plane, yielding an under-constrained, two-source PS problem, which has been discussed previously.
 
-\subsection{Months of data}
+\subsection{Using months of data}
 The first method that was proposed to make outdoor PS work is to capture several months of data~\cite{ackermann-cvpr-12,abrams-eccv-12} to ensure a good conditioning of the problem, as is shown on fig.~\ref{fig:abrams-sunpath}. Both these work aim to take advantage of online image collections, more precisely webcam timelapses. There is a variety of such databases available (e.g., WILD~\cite{narasimhan-eccv-06} and AMOS~\cite{jacobs-cvpr-2007}).
 
 \begin{figure}
