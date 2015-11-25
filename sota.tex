@@ -64,6 +64,8 @@ Pushing the idea of limited lighting directions to its limit gives the two-sourc
 To tackle the new challenge that posed outdoor PS, a natural first strategy has been to experiment with Lambertian reflectance and to model the sun as a point light source, to match a well-studied lab condition. Unfortunately, approaches based on this model have practical limitations caused by the movement of the sun in the sky for a given day. Depending on the latitude and time of year, its trajectory may lie too close to a plane, yielding an under-constrained, two-source PS problem, which has been discussed previously.
 
 \subsection{Using months of data}
+\label{sota:ops-months}
+
 The first method that was proposed to make outdoor PS work is to capture several months of data~\cite{ackermann-cvpr-12,abrams-eccv-12} to ensure a good conditioning of the problem, as is shown on fig.~\ref{fig:abrams-sunpath}. Both these work aim to take advantage of online image collections, more precisely webcam timelapses. There is a variety of such databases available (e.g., WILD~\cite{narasimhan-eccv-06} and AMOS~\cite{jacobs-cvpr-2007}).
 
 \begin{figure}

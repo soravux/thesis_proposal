@@ -158,7 +158,7 @@ Although these MLVs were computed from environment maps captured in the Northern
 \caption{Globes representing the coordinate system of sky probes. Each normal (blue arrow) defines a shaded hemisphere in the environmental map that does not contribute light to the computed MLVs (dots). All MLVs in two particular partly cloudy days (columns) were computed from real environment maps~\cite{holdgeoffroy-iccp-15} for 3 example normal vectors (rows). Relative MLV intensities are shown in the color bar on the left. See also video in~\cite{webpageXhourPS}.}
 \label{fig:realShiftNormal}
 \vspace{-3mm}
-\end{figure}%
+\end{figure}
 % -----------------------------------------------------------------------------
 % -----------------------------------------------------------------------------
 \begin{figure}[!ht]
@@ -223,7 +223,7 @@ The ratios $r_\lambda$ were then computed for all normals, over all days in the 
     (a) 24-AUG-13 & (b) 06-NOV-13 & (c) Entire dataset
     \end{tabular}
     \vspace{.15em}
-    \caption[]{Distribution of noise gain ratio $r_\lambda(\tau)$ as a function of time interval duration: (a,b) two days in fig.~\ref{fig:events}; (c) across all the dataset. The~distributions of computed ratios are displayed vertically as ``box-percentile plots''~\cite{esty2003box}; the red horizontal bars indicate the median, while the bottom (top) blue bars are the 25th (75th) percentiles. }
+    \caption[]{Distribution of noise gain ratio $r_\lambda(\tau)$ as a function of time interval duration: (a,b) two days in fig.~\ref{fig:events}; (c) across all the dataset. The~distributions of computed ratios are displayed vertically as ``box-percentile plots''~\cite{esty-jss-03}; the red horizontal bars indicate the median, while the bottom (top) blue bars are the 25th (75th) percentiles. }
     % THIS IS CONFUSING, DOESN'T HELP MUCH:
     %Note that durations include all intervals within $\pm 30\text{m}$ of the value indicated. For example, a duration of 4h includes all time intervals in the range $[3\text{h}30, 4\text{h}30]$.
     \label{fig:ratios}
@@ -241,7 +241,7 @@ The ratios $r_\lambda$ were then computed for all normals, over all days in the 
 %\includegraphics[width=.49\linewidth]{./figures/relativePerf/all-cn-relativePerf.pdf} \\
 %(c) Entire dataset
 %\vspace{.25em}
-%\caption[]{Distribution of condition number ratio $r_t$ as a function of time interval duration, shown for (a,b) the same days as fig.~\ref{fig:events}, and (c) across the entire dataset. To display this ratio, we use ``box-percentile plots''~\cite{esty2003box}, which illustrate the distribution of ratios vertically. The red horizontal bars indicate the median, while the bottom (top) blue bars are the 25th (75th) percentiles. The outliers, illustrated by the long vertical tails above the 75th percentile, are due to normals pointing downwards, for which the expected uncertainty always remains high. Note that durations include all intervals withing $\pm 30\text{m}$ of the value indicated. For example, a duration of 4h includes all time intervals in the range $[3\text{h}30, 4\text{h}30]$. }
+%\caption[]{Distribution of condition number ratio $r_t$ as a function of time interval duration, shown for (a,b) the same days as fig.~\ref{fig:events}, and (c) across the entire dataset. To display this ratio, we use ``box-percentile plots''~\cite{esty-jss-03}, which illustrate the distribution of ratios vertically. The red horizontal bars indicate the median, while the bottom (top) blue bars are the 25th (75th) percentiles. The outliers, illustrated by the long vertical tails above the 75th percentile, are due to normals pointing downwards, for which the expected uncertainty always remains high. Note that durations include all intervals withing $\pm 30\text{m}$ of the value indicated. For example, a duration of 4h includes all time intervals in the range $[3\text{h}30, 4\text{h}30]$. }
 %\label{fig:ratios}
 %\end{figure}
 
@@ -301,7 +301,7 @@ We ran calibrated outdoor PS on all time intervals starting at 12:00 or 13:30 fo
 \vspace{-3mm}
 \paragraph{Real data}%
 %
-Another similar experiment considered real photos of a real owl statuette. To capture this data, we set up two cameras on the roof of a tall building as shown in fig.~\ref{fig:real-data-setup}. The first camera, dubbed ``sky camera'', captures omnidirectional photos of the sky using the approach proposed by Stumpfel \etal~\cite{stumpfel-afrigraph-04}. The second, ``object'' camera is equipped with a telephoto zoom lens and captures photos of the statuette. Both cameras capture exposure-bracketed HDR photos simultaneously, once every two minutes\footnote{Data and source code are available on our project webpage~\cite{webpageXhourPS}.}. Ground truth surface normals were obtained by aligning a 3D model of the object (obtained with a 3D scanner) to the image using POSIT~\cite{dementhon1995model}. 
+Another similar experiment considered real photos of a real owl statuette. To capture this data, we set up two cameras on the roof of a tall building as shown in fig.~\ref{fig:real-data-setup}. The first camera, dubbed ``sky camera'', captures omnidirectional photos of the sky using the approach proposed by Stumpfel \etal~\cite{stumpfel-afrigraph-04}. The second, ``object'' camera is equipped with a telephoto zoom lens and captures photos of the statuette. Both cameras capture exposure-bracketed HDR photos simultaneously, once every two minutes\footnote{Data and source code are available on our project webpage~\cite{webpageXhourPS}.}. Ground truth surface normals were obtained by aligning a 3D model of the object (obtained with a 3D scanner) to the image using POSIT~\cite{dementhon-ijcv-95}. 
 
 The validation results with real data are shown in fig.~\ref{fig:real-results}. As predicted by the noise gain values of fig.~\ref{fig:real-results}~(left), similar reconstruction performance is obtained from three different time intervals shown in the top three rows of fig.~\ref{fig:real-results}~(right). Once again, the performances of 1-hour (15:30--16:30) and 3.5-hour (13:00--16:30) outdoor PS are indeed quite close to that of ``full-day'' outdoor PS (10:30--16:30). However, not all one-hour intervals are equally good, as shown for the interval 12:00--13:00 at the bottom of fig.~\ref{fig:real-results}.
 
