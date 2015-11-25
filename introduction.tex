@@ -60,7 +60,7 @@ giving birth to the Photometric Stereo technique.
 
 $\mathbf{n}$ provides the structure of the scene visible in the image sequence, giving a single normal for each pixel of the image. This output is called a normal map, because it maps a surface normal to each surface patch visible by a pixel. Integrating this normal map results in an height map (also called depth map), which represents the height of the surface at each sample point. To summarize, PS outputs a normal map, the gradient of the height map.
 
-A concrete example of PS can be seen in fig.~\ref{fig:PS_example}, where a sequence of images and its lighting directions are set as inputs of eq.~\eqref{eq:original_form} to give a normal map in output and its integrated surface.
+A concrete example of PS can be seen in fig.~\ref{fig:PS_example}, where a sequence of images and its lighting directions are set as inputs of eq.~\eqref{eq:original_form} to give a normal map in output and its integrated surface, shown in fig.~\ref{fig:PS_example_res}.
 
 The great strength of this technique is its output density: 3D information will be generated for every pixel of one input image. This means that a sequence of 5 megapixels images, as can be found on many current off-the-shelf cameras and cellphones, will generate an output of 5 million 3D points using PS. This quantity of information is impressive given the cost of point and shoot cameras and the ubiquity of cellphones.
 
@@ -71,22 +71,34 @@ Even with all the assumption we made, one issue remains: the lighting directions
 %\end{equation}
 
 \begin{figure}
-\begin{tabular}{cccccc|ccc}
-\includegraphics[width=.08\linewidth]{PS/cat_0.png} &
-\includegraphics[width=.08\linewidth]{PS/cat_3.png} &
-\includegraphics[width=.08\linewidth]{PS/cat_4.png} &
-\includegraphics[width=.08\linewidth]{PS/cat_5.png} &
-\includegraphics[width=.08\linewidth]{PS/cat_10.png} &
-\includegraphics[width=.08\linewidth]{PS/cat_11.png} &
-\includegraphics[width=.08\linewidth]{PS/cat_normal_map.png} &
-\includegraphics[width=.04\linewidth]{PS/sphere_nm.png} &
-\includegraphics[width=.18\linewidth]{PS/3d.png} \\
-a) & b) & c) & d) & e) & f) & g) & h) & i)
-\end{tabular}
-\caption{a-f) Examples of inputs lit from different directions, g) normal map obtained from the original form of the Photometric Stereo algorithm, h) sphere normal map showed as example, i) reconstructed surface from 3 viewpoints.\newline
+\centering
+%\begin{tabular}{cccccc|ccc}
+\includegraphics[width=.15\linewidth]{PS/cat_0.png}
+\includegraphics[width=.15\linewidth]{PS/cat_3.png}
+\includegraphics[width=.15\linewidth]{PS/cat_4.png}
+\includegraphics[width=.15\linewidth]{PS/cat_5.png}
+\includegraphics[width=.15\linewidth]{PS/cat_10.png}
+\includegraphics[width=.15\linewidth]{PS/cat_11.png}
+%\includegraphics[width=.08\linewidth]{PS/cat_normal_map.png}
+%\includegraphics[width=.04\linewidth]{PS/sphere_nm.png}
+%\includegraphics[width=.18\linewidth]{PS/3d.png}
+%a) & b) & c) & d) & e) & f) & g) & h) & i)
+%\end{tabular}
+\caption{Examples of inputs lit from different directions, g) normal map obtained from the original form of the Photometric Stereo algorithm, h) sphere normal map showed as example, i) reconstructed surface from 3 viewpoints.\newline
 {\small input images from CSE 455, 2010 by Neel Joshi, Ira Kemelmacher and Ian Simon}
 }
 \label{fig:PS_example}
+\end{figure}
+
+\begin{figure}
+\begin{tabular}{ccc}
+\includegraphics[height=3.8cm]{PS/cat_normal_map.png} &
+\includegraphics[width=.15\linewidth]{PS/sphere_nm.png} &
+\includegraphics[height=3.8cm]{PS/3d.png} \\
+(a) & (b) & (c)
+\end{tabular}
+\caption{Results from the inputs in \ref{fig:PS_example}. (a) normal map obtained from the original form of the Photometric Stereo algorithm, (b)) sphere normal map showed as example, (c)) reconstructed surface from 3 viewpoints.}
+\label{fig:PS_example_res}
 \end{figure}
 
 \section{Outdoor Photometric Stereo}
