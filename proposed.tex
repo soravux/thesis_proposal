@@ -288,7 +288,7 @@ The improvements described in this section are all planned to be part of a singl
 % reconstruction, don't need lighting condition is a plus
 All the proposed work up until now supposes we know the full environment map that lit the scene we observe. After the development of the fully calibrated algorithm described, I plan to overcome the need for capturing the sky. Getting rid of the lighting capture is a big plus, allowing the technique to be more widely applicable. A single camera would be required, simplifying the capture apparatus by a great deal.
 
-Uncalibrated PS reconstruction has an issue that its calibrated counterpart doesn't have: the Generalized Bas-Relief (GBR) ambiguity \todo{Add figure}. Because the light intensity and direction as well as the surface albedo is not known beforehand, the reconstruction of the surface height is up to an unknown factor, impossible to determine without prior knowledge of the surface or constrains external to photometric cues.
+Uncalibrated PS reconstruction has an issue that its calibrated counterpart doesn't have: the Generalized Bas-Relief (GBR) ambiguity. Because the light intensity and direction as well as the surface albedo is not known beforehand, the reconstruction of the surface height is up to an unknown factor, impossible to determine without prior knowledge of the surface or constrains external to photometric cues.
 
 %~\cite{basri-ijcv-2007}
 Authors over the years have proposed two main ideas to surmount the GBR ambiguity. Doing it manually (i.e., forcing a depth to an arbitrary value) seems to be a quite common way to deal with this issue. Most researchers, though, proposed a wide amount of priors and optimization schemes on the surface albedo~\cite{tan-cvpr-07,alldrin-cvpr-08,abrams-eccv-12,queau-jmiv-14} to solve this problem.
@@ -355,8 +355,8 @@ Over the course of 24 hours, both sun and moon trajectories are mostly coplanar.
 \begin{figure}
 \centering
 \begin{tabular}{cc}
-\includegraphics[height=0.49\linewidth]{DayNight/20150225_lat47.png} &
-\includegraphics[height=0.49\linewidth]{DayNight/20150225_lat75.png} \\
+\includegraphics[height=0.43\linewidth]{DayNight/20150225_lat47.png} &
+\includegraphics[height=0.43\linewidth]{DayNight/20150225_lat75.png} \\
 (a) & (b)
 \end{tabular}
 \caption{Example of the trajectories of the sun and the moon for 2015-02-25 at latitude (a) 47 and (b) 75. Two things are interesting to note: First, the moon trajectory suddenly stops because the sun rises at this moment. The moon is then not considered as a dominant light source anymore. Secondly, as the latitude gets higher, the trajectories becomes more and more parallel to the horizon.}
