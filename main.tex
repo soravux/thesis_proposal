@@ -93,18 +93,36 @@ $\circ$                             & $=$ & Elementwise (Hadamard) product \\
 
 %The problems will be explored in increasing order of complexity according to the following schedule. First, the hardware required to gather the sky illumination database will be setup on a tall roof nearby, and the data acquisition process will be continued over a period of several months to build a rich dataset. Second, experiments with existing PS techniques to reconstruct shape with known illumination will be conducted. Leaning on these experiments, the algorithms will then be adapted to require knowledge only of the sun direction, obtained from the capture timestamps. Finally we will experiment with images where the lighting conditions are unknown.
 
-The proposed schedule is presented in the Gantt chart in fig.~\ref{fig:schedule-gantt}. This per-session estimate plans the realization of all the proposed work before 2018, and I plan to defend my thesis by the end of the winter session of 2018.
+
+The proposed schedule is presented in the Gantt chart in fig.~\ref{fig:schedule-gantt}. This per-session estimate plans the realization of all the proposed contributions before 2018, and I plan to defend my thesis by the end of the winter session of 2018.
 
 \begin{figure}
 \centering
 \includegraphics[width=\linewidth]{schedule.png}
-\caption{Schedule of the planned contributions.}
+\caption{Gantt chart of the planned contributions.}
 \label{fig:schedule-gantt}
 \end{figure}
 
-The two first conference paper planned are the calibrated and uncalibrated algorithms, each respectively are to be submitted at WACV on June 25th, 2016, and ICCV on April 22th, 2016. Then, a paper using the moon in conjunction with the sun is planned at ICCP on December 9th 2017. Pertinent conferences for all three papers include WACV, ICCP, 3DV and CVPR.
+% ECCV March 14th 2016 (aux deux ans)
+% WACV June 25th
+% ICCV April 22th
+% CVPR November 9th
 
-A journal paper extending the analysis performed in the previous contributions over more datasets is planned to be submitted at the end of 2016. At the beginning of 2018, wrapping and extending the calibrated and uncalibrated planned contributions to new datasets is forecast. The IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI) and the Machine Vision and Applications (MVA) journals are the targets for those contributions.
+First, working on the regularization (sec.~\ref{subsec:reg}), image selection (sec.~\ref{subsec:selection}) and the object database (sec.~\ref{sec:dbobj}) during the winter will allow me to prepare all the experimental setup before capturing the data during the summer. Then, a submission to the TPAMI journal is forecast at the end of the summer of 2016, extending the work done in sec.~\ref{iccp15} and sec.~\ref{3dv15} with more data and with insights about both enhancements.
+
+From the end of spring 2016 through fall 2016, I plan working on the calibrated PS reconstruction algorithm (sec.~\ref{subsec:calibrated}), also integrating the previous work. This work is intertwined with an internship at Disney Research during the summer, and the data capture. I plan to submit a conference paper about this PS algorithm at CVPR on November 14th 2016.
+
+As data have been gathered throughout the summer, realizing the day and night PS project (sec.~\ref{sec:nightandday}) is a logical continuation. This day and night submission is forecast for ICCV on April 22th.
+
+The last and main contribution of this work is the uncalibrated PS algorithm, planned to be realized from winter 2017 to until November. The work is split in two, first by supposing the sun position is known (sec.~\ref{subsec:knowingsunposition}) for the first half, and then the fully uncalibrated version (sec.~\ref{subsec:fullyuncalibrated}), ready for CVPR submission on November 14th 2017.
+
+After these contributions, I plan the writing of my thesis in order to defend at the end of the winter session of 2018. Meanwhile, a submission regrouping the reconstruction algorithms on enhanced dataset is planned during this time at TPAMI.
+
+Pertinent conferences for all the papers include WACV, 3DV, ICCP, ICCV and CVPR. The IEEE Transactions on Pattern Analysis and Machine Intelligence (TPAMI) and the International Journal of Computer Vision (IJCV) journals are the targets for the journal contributions.
+
+Capture sessions were planned during the summer, as it is the most suitable moment for outdoors image capture in Quebec. Late fall and winter temperature at Laval University is outside the operating specifications of our cameras, making full day or night captures mostly impossible. During these summers, I plan on having interns helping me performing the capture, mostly handling the apparatus. Work included in the capture task include HDR merging and image alignment.
+
+Most deadline dates given are tentative, as conferences haven't disclosed their dates yet.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -113,7 +131,7 @@ A journal paper extending the analysis performed in the previous contributions o
 % Clear that the community has an interest
 From the generally positive reviews and comments we received for our previous work, it seems clear to me that the community is interested in outdoors PS. Continuing the work already begun toward the proposed contributions will bring a new level of understanding of the impact of natural illumination on PS. This will enable the development of practical outdoor PS algorithms, extending the capabilities of cheap and common cameras to 3D scanning.
 
-The need in 3D scanning is greatly increasing these last few years. This is especially true for outdoor objects, where architectural monuments are needed for use in video games, preservation of cultural heritage, special effects in the movie industry and many more. Bringing PS to the outdoor light will empower the masses to perform this world digitization. As such, I firmly believe that the proposed contributions will have a remarkable impact on 3D shape scanning altogether.
+The need for 3D scanning has greatly increased these last few years. This is especially true for outdoor objects, where architectural monuments are needed for use in video games, preservation of cultural heritage, special effects in the movie industry and many more applications. Bringing PS outdoors will empower the masses to perform this world digitization. As such, I firmly believe that the proposed contributions will have a remarkable impact on 3D shape scanning altogether.
 
 
 %\chapter*{Acknowledgments}

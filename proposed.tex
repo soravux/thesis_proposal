@@ -12,6 +12,7 @@ Then, using this database, I propose to modify existing PS algorithms to work fo
 
 
 \section{Database of objects}
+\label{sec:dbobj}
 
 As explained in \ref{sec:hdrdb}, we've built a publicly available database of unsaturated HDR sky captures. This database filled a need for a publicly available unsaturated HDR natural illumination conditions, enabling physically-based renderings and sky analysis. There is now a need for a complementary dataset: images of objects usually lit by the sky. Objects such as statues, architectural monuments and buildings. This database would allow researchers to analyze the shading of surfaces in conjunction with their illumination conditions. The goal is to obtain and share pictures of objects synchronized with the sky captures. These images will give a direct link between the aspect of a sky and the appearance of objects lit by it, effectively tying natural illumination with its shading.
 
@@ -207,6 +208,7 @@ This new formulation is still untested. As such, my plan is to incorporate it in
 
 
 \subsection{Selecting the right images to better constrain the problem}
+\label{subsec:selection}
 % Discrepancy between simulation and real world captures. Investigate it. We witness: selecting some images of the sequence may improve or degrade dramatically reconstruction performance.
 
 %First, simulations on cloudy and semi-cloudy lighting conditions reflected correctly the real captured data. But when the sun was directly visible by a surface patch, a drift in the intensity values was observed compared to the theory. Pixels seeing direct bright sunlight were typically dimmer than what the Lambertian equation predicted, as can be seen in fig.~\ref{fig:sel-scaling_error}. This situation is corroborated by the real data. In itself, this minor setback won't hinder the forecast work. It seems to suppose that our real objects does not exhibit perfectly Lambertian reflectances, which is not quite surprising, and is something that the physically-based renderer LuxRender also picks up. The important thing to keep in mind from this is that images lit by direct sunshine will impact negatively the performance of the PS algorithm.
@@ -219,7 +221,9 @@ This new formulation is still untested. As such, my plan is to incorporate it in
 %\end{figure}
 While working on the previous contributions, we witnessed a curious behavior in the reconstruction performance. Sometimes, by adding images, the reconstruction uncertainty was increased, leading to worse results. At first, it may seem counter-intuitive: why would adding more (non-outlier) data be harmful to the algorithm? This curious behavior can however be deducted from the stability of the PS mathematical formulation. As shown in sec.~\ref{iccp15:ifm}, reconstruction uncertainty depends on three things: the sensor noise, the surface albedo and the stability of the lighting matrix.
 
-Over different images of the same Lambertian object taken with the same photo camera, the sensor noise and the surface albedo does not change. The stability of the lighting matrix $\bar{\mathbf{L}}$---the sequence of MLVs seen for a given surface---will change, though. This means that the uncertainty will also change, since it is based on the singular values of the $\bar{\mathbf{L}}$ matrix. Adding repetitive or coplanar data to this matrix will increase the difference between the maximum and the minimum singular value. \todo{explain this}. This has the effect of degrading the conditioning of the matrix, meaning that the stability will be impacted negatively. It translates in an increase of the uncertainty of the overall PS reconstruction. Conceptually, this means that the reconstruction algorithm will have a stability bias toward the direction most present in $\bar{\mathbf{L}}$.
+Over different images of the same Lambertian object taken with the same photo camera, the sensor noise and the surface albedo does not change. The stability of the lighting matrix $\bar{\mathbf{L}}$---the sequence of MLVs seen for a given surface---will change, though. This means that the uncertainty will also change, since it is based on the singular values of the $\bar{\mathbf{L}}$ matrix. Adding repetitive or coplanar data to this matrix will increase the difference between the maximum and the minimum singular value. This relationship can be deduced by the Gramian matrix of $\bar{\mathbf{L}}$, chiefly $\mathbf{G} = \bar{\mathbf{L}}^T\bar{\mathbf{L}}$. This Gramian matrix is now square, but its singular values are the squared singular values as the original matrix, $\sqrt{\sigma_i(\mathbf{G})} = \sigma_i(\bar{\mathbf{L}})$. By computing this Gramian matrix, the repeated vector multiplied (or projected) multiples times the other vectors, thus having an higher importance in the Gramian matrix, We could say that the Gramian matrix was steered toward this vector. As such, an higher component 
+
+This has the effect of degrading the conditioning of the matrix, as $\kappa(\bar{\mathbf{L}}) = \frac{\sigma_{\max}(\bar{\mathbf{L}}) }{ \sigma_{\min}(\bar{\mathbf{L}}) }$, meaning that the stability will be impacted negatively. It translates in an increase of the uncertainty of the overall PS reconstruction. Conceptually, this means that the reconstruction algorithm will have a stability bias toward the direction most present in $\bar{\mathbf{L}}$.
 
 Both of these issues touch a very important concept: which images among the whole dataset are important. Not all data is equal, in that repetitive data is actually harmful for the algorithm. Then, which input images should be kept? Which combination is optimal?
 
@@ -254,6 +258,7 @@ This vector importance issue can be fixed by scaling the data by an arbitrary fa
 
 
 \subsection{Algorithmic improvements: initialization refinement and merging with other techniques}
+\label{subsec:calibrated}
 
 % MRF, reference Jung's, tell our differences.
 When performing a calibrated PS algorithm on environment maps, a chicken-and-egg problem arise. The part of the environment map visible by a surface patch is defined by its normal, but the normal is what we want to find using the lighting information. To solve this problem, we can sample normals uniformly over the sphere and compute their MLVs (see sec.~\ref{iccp-computingstability}. Then, we can find how well a pixel intensity in the image matches these MLVs.
@@ -315,6 +320,7 @@ In the following, I propose a succession of steps in order to take the calibrate
 
 
 \subsection{Using only the sun position}
+\label{subsec:knowingsunposition}
 
 \todo{reorganise: 1) Knowing the sun posibition w.r.t. camera. 2) knowing sun position in the sky, but not the camera orientation.}
 % Then, estimation of the sky using the GPS coordinates and date & time. Then, without date and time.
@@ -332,6 +338,7 @@ As an intermediate step, it is possible to remove knowledge of the camera orient
 
 
 \subsection{Fully uncalibrated}
+\label{subsec:fullyuncalibrated}
 % Lastly fully uncalibrated
 The last step is to provide a fully uncalibrated PS algorithm. Building on the previously proposed technique, it is possible to remove the GPS coordinates and the date from the technique. It is expected that at least some captures over the sequence will be sunlit, yielding a high overall image intensity and giving a clear principal light direction using the maximum light direction scheme explained earlier. It is thus possible to find the sun arc in the sky, enabling self-calibration. By fitting these principal light directions to environment maps available in the database, it will be possible not only to obtain the scene structure but to estimate the lighting that made the photo.
 
@@ -339,6 +346,7 @@ This proposed technique will be a major contribution that iterates over the prev
 
 
 \section{Night and Day Photometric Stereo}
+\label{sec:nightandday}
 
 % Up until now, we only considered the atmosphere during the day for reconstruction. The main problem, coplanar.
 All the previous proposed work only considered daytime lighting conditions. The main problem, which is the coplanarity of the sun trajectory over the course of a day, can be solved by richer and more complex sky models as explained in the previous sections. Another interesting avenue is to revert to a simpler model: the point light source, which yields an underconstrained problem as explained in sec.~\ref{sec:ps_ori}.
