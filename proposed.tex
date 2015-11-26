@@ -284,18 +284,18 @@ Both of these issues touch a very important concept: which images among the whol
 
 Using the condition number as a stability measure of the $\bar{L}$ matrix, simply stacking images will sometimes increase or decrease the condition number, as can be seen in fig.~\ref{fig:sel-ordering}. But when ordering the input images by their contributions to define the singular vectors of the $\bar{L}$ matrix (ranked from the most important to the least important) as shown in fig.~\ref{fig:sel-ordering}, we see that there's a clear optimal quantity of images. Past this quantity, the reconstruction quality is degraded.
 
-\todo{Add a figure with a reconstruction with and without the selection as of now.}
+%\todo{Add a figure with a reconstruction with and without the selection as of now.}
 
 \begin{figure}
 \centering
 \begin{tabular}{ccc}
 
 \includegraphics[width=0.32\linewidth]{selection_scaling/example_MLV.png} &
-\includegraphics[width=0.32\linewidth]{selection_scaling/unordered.png} &
-\includegraphics[width=0.32\linewidth]{selection_scaling/ordered.png} \\
+\includegraphics[width=0.32\linewidth]{selection_scaling/bytime.pdf} &
+\includegraphics[width=0.32\linewidth]{selection_scaling/byspan.pdf} \\
 (a) & (b) & (c)
 \end{tabular}
-\caption{\textbf{(a)} Evolution of Mean Light Vectors (MLV) over a day. \textbf{(b)} Condition number of the $\bar{L}$ matrix when taking the images ordered by time. The $x$-axis represents the number of images taken. \textbf{(c)} Same, but with images ordered by their importance, i.e., how their MLV span the space. Note how taking the whole sequence gives the same condition number, but the sequence in which they are presented can increase the condition number up to twice the maximum value obtained when ordered by acquisition time. \todo{Remake figures}}
+\caption{\textbf{(a)} Evolution of Mean Light Vectors (MLV) over a day. \textbf{(b)} Condition number of the $\bar{L}$ matrix when taking the images ordered by time. The $x$-axis represents the number of images taken. \textbf{(c)} Same, but with images ordered by their importance, i.e., how their MLV span the space. Note how taking the whole sequence gives the same condition number, but the sequence in which they are presented can increase the condition number up to twice the maximum value obtained when ordered by acquisition time.
 \label{fig:sel-ordering}
 \end{figure}
 

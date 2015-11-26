@@ -36,7 +36,7 @@
 % to control spacing in item lists
 \usepackage[titletoc]{appendix}
 \usepackage{enumitem}
-\usepackage[pagebackref=false,breaklinks=true,colorlinks,bookmarks=true]{hyperref}
+\usepackage[pagebackref=false,breaklinks=true,colorlinks=true,linkcolor=black,bookmarks=true]{hyperref}
 \usepackage{defs}
 
 \linespread{1.5}
@@ -50,6 +50,8 @@
 %\pagetitreonlyone                     % production des pages de titre
 
 \tableofcontents
+
+\hypersetup{colorlinks=true,linkcolor=blue}
 
 % Commands
 \newcommand{\boldomega}{\boldsymbol \omega} % bold omega
