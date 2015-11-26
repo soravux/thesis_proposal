@@ -33,12 +33,12 @@ To solve this issue, PS considers as input a sequence of images, all from the sa
 \quad
 \in \mathbb{R}^{m \times 3} \quad,
 \end{equation}
-which can be used to define the appearance of all pixels over all the images of the sequence, as such:
+which can be used to define the appearance of a pixel $p$ over all the images of the sequence, as such:
 \begin{equation}
 \label{eq:lamb_refl}
-\mathbf{b} =  \rho \mathbf{L} \mathbf{n}_p \quad {\bf b} \in \mathbb{R}^{m \times 1} \quad.
+\mathbf{b}_p =  \rho \mathbf{L} \mathbf{n}_p \quad, {\bf b}_p \in \mathbb{R}^{m \times 1} \quad.
 \end{equation}
-This definition needs the pixels intensities from the image sequence to be vectorized, meaning that every image must be reshaped to be $\mathbb{R}^{1 \times k}$
+%This definition needs the pixels intensities from the image sequence to be vectorized, meaning that every image must be reshaped to be $\mathbb{R}^{1 \times k}$.
 
 Solving eq.~\eqref{eq:lamb_refl} for a particular surface normal $\mathbf{n}_p$ (corresponding pixel coordinates in all images) gives the relation
 \begin{equation}
@@ -86,7 +86,7 @@ In order to work, PS requires the lighting directions to be known (either by con
 \includegraphics[height=3.8cm]{PS/3d.png} \\
 (a) & (b) & (c)
 \end{tabular}
-\caption{Results from the inputs in \ref{fig:PS_example}. (a) normal map obtained from the original form of the Photometric Stereo algorithm, (b)) sphere normal map showed as example, (c)) reconstructed surface from 3 viewpoints.}
+\caption{Results of a PS algorithm using images from \ref{fig:PS_example} as input. (a) normal map obtained from the original form of the Photometric Stereo algorithm, (b)) sphere normal map showed as example, (c)) reconstructed surface from 3 viewpoints.}
 \label{fig:PS_example_res}
 \end{figure}
 

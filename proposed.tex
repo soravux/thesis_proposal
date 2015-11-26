@@ -4,26 +4,32 @@
 \chapter{Proposed contributions}
 
 % Based on the work already done
-Previous contributions mainly focused on the analysis of the complex illumination conditions of outdoor scenes. This analysis brought us a good deal of knowledge that will enable the enhancement of existing reconstruction algorithms.
+Previous contributions mainly focused on the analysis of PS performance under complex illumination conditions. This analysis brought us a good deal of knowledge that will enable the enhancement of existing reconstruction algorithms.
 
-But first, something is missing among the community to continue experiments with outdoor PS: a database of diverse objects publicly available. Just as the sky database we built, I propose to capture and share unsaturated HDR images of objects under various natural illumination conditions.
+But first, something is missing among the community to continue experiments with outdoor PS: a common, publicly available database of different objects observed outdoors. This database would allow the performance evaluation and comparison of new PS methods, which would ultimately push forward the state of the art. Just as the sky database we built, I propose in sec.~\ref{sec:dbobj} to capture and share unsaturated HDR images of objects under various natural illumination conditions.
 
-Then, using this database, I propose to modify existing PS algorithms to work for outdoor conditions. This work will be split in steps: first, I will tackle the case when the illumination is known. Second, I will focus on gradually moving toward the uncalibrated, that is the case where only some object images are required. This includes merging ideas from other 3D reconstruction techniques to simplify the problem or correct some issues that PS is not able to fix in the general case. Third, after having improved existing PS reconstruction algorithms using knowledge from the day lit sky, I will propose to use the moon as another light source to better constrain the problem when a day is fully cloudy or sunny.
+Then, using this database, I propose to design enhanced algorithms for outdoor PS. This work will be split in steps:
+\begin{enumerate}
+\item Tackle the case when the illumination is known (sec.~\ref{sec:calib}).
+\item Focus on gradually moving toward the uncalibrated case, where a collection of object images is available but the corresponding illumination conditions for each image (calibration) is partially or completely missing (sec.~\ref{sec:uncalib}).
+\item Use the moon as another light source to better constrain the problem when a day is fully cloudy or sunny (sec.~\ref{sec:nightandday}).
+\end{enumerate}
+These goals are described in detail in the following sections.
 
 
 \section{Database of objects}
 \label{sec:dbobj}
 
-As explained in \ref{sec:hdrdb}, we've built a publicly available database of unsaturated HDR sky captures. This database filled a need for a publicly available unsaturated HDR natural illumination conditions, enabling physically-based renderings and sky analysis. There is now a need for a complementary dataset: images of objects usually lit by the sky. Objects such as statues, architectural monuments and buildings. This database would allow researchers to analyze the shading of surfaces in conjunction with their illumination conditions. The goal is to obtain and share pictures of objects synchronized with the sky captures. These images will give a direct link between the aspect of a sky and the appearance of objects lit by it, effectively tying natural illumination with its shading.
+As explained in \ref{sec:hdrdb}, we've built a publicly available database of unsaturated HDR sky captures. This database filled a need for a publicly available unsaturated HDR natural illumination conditions, enabling physically-based renderings and sky analysis. There is now a need for a complementary dataset: images of objects lit by the sky, such as statues, architectural monuments and buildings. This database would allow researchers to analyze the shading of surfaces in conjunction with their illumination conditions. The goal is to obtain and share pictures of objects synchronized with their corresponding sky illumination, captured by a light probe. These images will give a direct link between the aspect of a sky and the appearance of objects lit by it, effectively tying natural illumination with its shading.
 
 % Cite AMOS http://amos.cse.wustl.edu/
-Databases of outdoor scenes already exist in the community (e.g., AMOS~\cite{jacobs-cvpr-2007}, Yahoo!'s databases~\cite{thomee-arxiv-15}), leading one to believe that this kind of data is wanted and appreciated by the researchers. Data available yields a lot of different content and objects with various reflectances. The issue of this data, for this thesis, is the lack of information about lighting conditions. A full HDR capture of the sky synchronized with the images is not available. Furthermore, it is often difficult to estimate what the illumination looked like. Images may, or may not, have GPS coordinates, sometimes with the wrong information. Date and time in the EXIF data of the images are often wrong or skewed. Camera orientation (such as azimuth) is mostly never provided with these databases. As such, it is then hard to guess the position of the sun in the sky. These databases are really interesting to test an uncalibrated reconstruction technique, but sky environment maps synchronized to the scenes captures are missing for its development.
+Databases of outdoor scenes already exist in the community (e.g., AMOS~\cite{jacobs-cvpr-2007}, Yahoo!'s databases~\cite{thomee-arxiv-15}), as experience has demonstrated the value of these databases in fostering the development of a variety of computational techniques. Existing databases provide images of a variety of objects, some of them outdoors, but lack information on the corresponding lighting condition. Furthermore, they do not provide a systematic sampling of the same object under different, natural illumination conditions. On the other hand, our current database depicts the variability of natural outdoor illumination but lacks images of real objects observed under such conditions. Furthermore, it is often difficult to estimate what the illumination looked like. Images may, or may not, have GPS coordinates, sometimes with the wrong information. Date and time in the EXIF data of the images are often wrong or skewed. Camera orientation (such as azimuth) is mostly never provided with these databases. As such, it is then hard to guess the position of the sun in the sky. These databases are really interesting to test an uncalibrated reconstruction technique, but sky environment maps synchronized to the scenes captures are missing for its development.
 
 % small & big
 The idea of the database would be to gather images of various objects. Simple matte, Lambertian surfaces will be the focus since all the light from the hemisphere of visibility is treated equally, making them simpler to work with. Relatively big objects such as buildings and statues are the main subjects of this database, as they are usually sitting outside, lit by natural illumination. No other technique than PS allows their scanning while being inexpensive. But for the development of an algorithm, the ground truth of the captured objects are necessary. Scanning building-scale with an handheld 3D scanner to obtain its ground truth is pretty impracticable and tedious, though. As such, capturing small objects such as little statuettes or trinkets is the first thing to do, because it is possible to easily obtain a ground truth mesh from them using a handheld 3D scanner. Having the data ready to perform the rest of the project is a logical step in the right direction. This database is the answer to this need.
 
 % Build on existing infrastructure
-A lot of effort is required to build and share a new dataset. This is why I plan on reusing the infrastructure we already have for the sky database. The capture system is already available, there is only one thing left to do: taking the captures. The goal is to be as efficient as possible and focus on the objects to be captured.
+A lot of effort is required to build and share a new dataset. This is why I plan on reusing the infrastructure we already have for the sky database, as shown on fig.~\ref{fig:proposed-real-data-setup}. The capture system is already available, there is only one thing left to do: taking the captures. The goal is to be as efficient as possible and focus on the objects to be captured.
 
 \begin{figure}
     \centering
@@ -34,7 +40,8 @@ A lot of effort is required to build and share a new dataset. This is why I plan
 
 
 % Technical side
-On the technical side, a Canon 5D mark III camera will be used in addition to the system already in place for the sky capture described in \ref{sec:hdrdb}. This additional camera will perform 5 burst captures of the object, in order to gather all the information needed to build an unsaturated HDR photo. A small chrome sphere is inserted in this camera's field of view to allow calibration with the sky camera. Hence, it is possible to compute the precise rotation between both cameras by projecting the image . A system based on ROS developed by interns\footnote{Available publicly at \url{https://github.com/lvsn/CameraNetwork}} orchestrates the camera network and synchronizes the captures among cameras. Fig.~\ref{fig:proposed-real-data-setup} presents the whole system in action.
+On the technical side, a Canon 5D mark III camera will be used in addition to the system already in place for the sky capture described in \ref{sec:hdrdb}. This additional camera will perform 5 burst captures of the object, in order to gather all the information needed to build an unsaturated HDR photo. A small chrome sphere is inserted in this camera's field of view to allow calibration with the sky camera. Hence, it is possible to compute the precise rotation between both cameras by projecting the image . A system based on ROS developed by interns\footnote{Available publicly at \url{https://github.com/lvsn/CameraNetwork}} orchestrates the camera network and synchronizes the captures among cameras.
+% Fig.~\ref{fig:proposed-real-data-setup} presents the whole system in action.
 
 
 \section{Calibrated outdoor reconstruction}
@@ -49,14 +56,9 @@ Here is the list of assumptions made in order to build a calibrated outdoor PS r
 The images of the sequence must all be aligned. Image alignment or registration is another field of study which is solved for the case useful for PS. This is discussed in~\cite{ackermann-cvpr-12}, as explained in \ref{sota:ops-months}. I will suppose the images were already aligned using such technique in the proposed algorithm.
 
 % Explain the DLT
-In the basis algorithm I plan to build upon, there are two important enhancements from the original PS algorithm as defined in \ref{sec:ps_ori}. First, it is possible to remove the albedo $\rho$ from the equation to cancel the effect of the surface reflectance, making the algorithm robust to albedo variability. Second, instead of solving for the normals, it is possible to solve for the surface height directly. 
+In the basis algorithm I plan to build upon, there are two important enhancements from the original PS algorithm as defined in \ref{sec:ps_ori}. First, it is possible to remove the albedo $\rho$ from the equation to cancel the effect of the surface reflectance, providing linear equations on the unknown surface depth map (for fixed MLVs $\mathbf{l}_t$). Second, instead of solving for the normals, it is possible to solve for the surface height directly. 
 
-To remove the albedo $\rho$ from the original PS equation, the trick is to divide an image by another one. Mathematically, this pixelwise division of, say, image 1 by image 2, is represented as
-
-\begin{equation}
-\frac{b_{p,1}}{b_{p,2}} = \frac{\rho_p \mathbf{l}_1^T \mathbf{n}_p}{\rho_p \mathbf{l}_2^T \mathbf{n}_p} \quad,
-\end{equation}
-for pixel $p$. The albedo $\rho_t$ cancels out, giving the relation
+To remove the albedo $\rho$ from the original PS equation, the trick is to divide an image by another one, say, image 1 by image 2, giving the relation
 \begin{equation}
 \label{eq:ratio_images}
 \left( b_{p,1} \mathbf{l}_2 - b_{p,2} \mathbf{l}_1 \right)^T \mathbf{n}_p = 0  \quad.
@@ -64,7 +66,7 @@ for pixel $p$. The albedo $\rho_t$ cancels out, giving the relation
 
 This relation was used before~\cite{yu-iccp-13,wu-pami-06}. This kind of algorithm usually consists of taking a denominator image minimally affected by shadows and highlights and dividing all the other images of the sequence by this one. While this removes the constant albedo assumption, it leaves a smaller (by one) sequence of images to perform PS. Another possibility is to perform the division on all the possible permutations of images, giving a better robustness to the algorithm. The problem with this approach is that it makes the sequence grow quadratically, which quickly becomes problematic to solve in a reasonable time on computers having a finite amount of memory. Stochastically taking a predetermined amount can do the trick, but optimizing the conditioning of the stacked incident light vectors matrix $\mathbf{L}$, as defined in \eqref{eq:Ldef}.
  
-Solving directly for the surface height instead of the normals can be done by analyzing the relation between both. Given pixel $p$ and its surface gradient $z_p$, the normal of the surface patch $\mathbf{n}_p$ can be expressed as
+Solving directly for the surface height instead of the normals can be done by analyzing the relation between both. Given pixel $p$ and its surface gradient $\nabla z_p$, the normal of the surface patch $\mathbf{n}_p$ can be expressed as
 \begin{equation}
 \hat{\mathbf{n}}_p = 
 \begin{bmatrix}
@@ -93,7 +95,7 @@ z_{p,y} \\
 
 This ``ratio-image'' derivation of PS is the base upon which the proposed enhancements are planned. %In order to make it easier to handle, a Direct Linear Tranform (DLT) method is applied to rewrite equation~\eqref{eq:pre-dlt} into an set of homogeneous linear equations.
 
-To do so, we must consider the left part of the equation, $\left( b_{p,1} \mathbf{l}_2 - b_{p,2} \mathbf{l}_1 \right)$, as being a vector of three scalars, let's say $\left[ i_p, j_p, k_p \right]$. When considering the division of an image $a$ by $a'$ of $r$ pixels as a whole instead of looking at each pixels separately, we get the vectors $\mathbf{i}_{aa'}, \mathbf{j}_{aa'}, \mathbf{k}_{aa'}, \in \mathbb{R}^{ r \times 1 }$. Equation \eqref{eq:pre-dlt} can now be rewritten as
+To do so, we must consider the left part of the equation, $\left( b_{p,1} \mathbf{l}_2 - b_{p,2} \mathbf{l}_1 \right)$, as being a vector of three scalars, let's say $\left[ i_p, j_p, k_p \right]$. When considering the division of an image $a$ by $a'$ of $r$ pixels as a whole instead of looking at each pixels separately, we get the vectors $\mathbf{i}_{aa'}, \mathbf{j}_{aa'}, \mathbf{k}_{aa'} \in \mathbb{R}^{ r \times 1 }$. Equation \eqref{eq:pre-dlt} can now be rewritten as
 \begin{equation}
 \left[ \mathrm{diag}(\mathbf{i}_{aa'}) \quad \mathrm{diag}(\mathbf{j}_{aa'}) \quad \mathbf{k}_{aa'}\right]
 \begin{bmatrix}
@@ -134,7 +136,7 @@ By multiplying both sides of \eqref{eq:diagdlt} by $\begin{bmatrix}\mathrm{diag}
 \end{equation}
 where $\odot$ denotes the pairwise (Hadamard) product.
 
-A derivative operator $\mathbf{M}$ is then needed to integrate the estimated gradients $z_p$ into a surface $\mathbf{z}$. This $\mathbf{M}$ is constant, very sparse and known beforehand, as it couples the independent, per-patch equations in \eqref{eq:normaleqs}, removing the simple diagonal structure of the normal equations. is split into two components, $\mathbf{M}_x$ and $\mathbf{M}_y$, representing the neighboring relationship, or the derivatives, on the $x$-axis and $y$-axis, respectively:
+A derivative operator $\mathbf{M}$ is then needed to integrate the estimated gradients $\nabla \mathbf{z}$ (namely $\mathbf{z}_x$ and $\mathbf{z}_y$) into a surface $\mathbf{z}$. This $\mathbf{M}$ is constant, very sparse and known beforehand, as it couples the independent, per-patch equations in \eqref{eq:normaleqs}, removing the simple diagonal structure of the normal equations. It is split into two components, $\mathbf{M}_x$ and $\mathbf{M}_y$, representing the neighboring relationship, or the derivatives, on the $x$-axis and $y$-axis, respectively:
 \begin{equation}
 \label{eq:M}
 \mathbf{M}_x = 
@@ -206,15 +208,15 @@ In order to deal with this undesired extra degree of freedom, they choose to per
 \label{fig:reg-her2}
 \end{figure}
 
-In the case of two-source PS, the regularization must be performed along directions that are perpendicular to the characteristic curves, let's call them $\mathbf{u}$. Hence, the regularization they use is of the form
+In the case of two-source PS, the regularization must be performed along directions that are perpendicular to the characteristic curves, let's denote this perpendicular direction $\mathbf{u}$. If a single photometric equation~\eqref{eq:pre-dlt} is available for a certain surface patch $p$, we need ton constrain the gradient $\nabla \mathbf{z}_p$ along the (nullspace) direction $\mathbf{u} = \begin{bmatrix} -\mathbf{j}_p & \mathbf{i}_p \end{bmatrix}$ of~\eqref{eq:pre-dlt}. Note that this nullspace is defined only when a single photometric equation is available. Hence, the regularization they complements the system of PS equations with the following linear penalty terms (which must be minimized),
 \begin{equation}
-\alpha \lvert \mathbf{u}^T \mathbf{z} \rvert ^2
+\alpha \lvert \mathbf{u}^T \nabla \mathbf{z} \rvert ^2
 \end{equation}
 for the first order, and 
 \begin{equation}
 \beta \lvert \mathbf{u}^T \mathbf{H_z} \; \mathbf{u} \rvert ^2
 \end{equation}
-for the second order, where $\mathbf{z}$ is the gradient of the surface height $\iint_S\mathbf{z} \: dS$. $\alpha$ and $\beta$ are the regularization weights and $\mathbf{H_z}$ is the Hessian matrix of the surface height (its second-order derivatives). While the first order regularization penalizes non-smooth the slopes, the second order penalizes non-smooth curvatures.
+for the second order, where $\alpha$ and $\beta$ are the regularization weights, $\nabla \mathbf{z}$ is the gradient of the surface height $\mathbf{z}$, and $\mathbf{H_z}$ is the Hessian matrix of the surface height (its second-order derivatives). While the first order regularization penalizes non-smooth the slopes, the second order penalizes non-smooth curvatures.
 
 While the idea is similar, the problem of regularizing as a function of the normal uncertainty as we propose to do here is a bit different. When the pixel normal uncertainty is inferred directly from the lighting, it won't be in a purely single direction as in the case of \cite{hernandez-pami-11}. The uncertainty may be any combination of two orthogonal vectors, and may even end up having an isotropic behavior (i.e., the uncertainty is equal in both directions). As such, there are now both vectors $\mathbf{u}_1$ and $\mathbf{u}_2$, representing two different directions on which regularization is performed.
 %\begin{equation}
@@ -278,15 +280,15 @@ While this anisotropic regularization was derived and used by others~\cite{herna
 %\caption{Median intensity of rendered images. The physically-based renderer LuxRender ($y$-axis) is compared against the Lambertian equation ($x$-axis). The same material and light directions are used in both rendering methods. A linear best fit is shown in red. As it can be seen, the curve is not perfectly linear.}
 %\label{fig:sel-scaling_error}
 %\end{figure}
-While working on the previous contributions, we witnessed a curious behavior in the reconstruction performance. Sometimes, by adding images, the reconstruction uncertainty was increased, leading to worse results. At first, it may seem counter-intuitive: why would adding more (non-outlier) data be harmful to the algorithm? This curious behavior can however be deducted from the stability of the PS mathematical formulation. As shown in sec.~\ref{iccp15:ifm}, reconstruction uncertainty depends on three things: the sensor noise, the surface albedo and the stability of the lighting matrix.
+While working on the previous contributions, we witnessed a curious behavior in the reconstruction performance. Sometimes, by adding images, the reconstruction uncertainty was increased, leading to worse results. At first, it may seem counter-intuitive: why would adding more (non-outlier) data be harmful to the algorithm? This curious behavior can however be deducted from the conditioning of the PS mathematical formulation. As shown in sec.~\ref{iccp15:ifm}, reconstruction uncertainty depends on three things: the sensor noise, the surface albedo and the conditioning of the lighting matrix.
 
-Over different images of the same Lambertian object taken with the same photo camera, the sensor noise and the surface albedo does not change. The stability of the lighting matrix $\bar{\mathbf{L}}$---the sequence of MLVs seen for a given surface---will change, though. This means that the uncertainty will also change, since it is based on the singular values of the $\bar{\mathbf{L}}$ matrix. Adding repetitive or coplanar data to this matrix will increase the difference between the maximum and the minimum singular value. This relationship can be deduced by the Gramian matrix of $\bar{\mathbf{L}}$, chiefly $\mathbf{G} = \bar{\mathbf{L}}^T\bar{\mathbf{L}}$. This Gramian matrix is now square, but its singular values are the squared singular values as the original matrix, $\sqrt{\sigma_i(\mathbf{G})} = \sigma_i(\bar{\mathbf{L}})$. By computing this Gramian matrix, the repeated vector multiplied (or projected) multiples times the other vectors, thus having an higher importance in the Gramian matrix, We could say that the Gramian matrix was steered toward this vector. As such, an higher component 
+Over different images of the same Lambertian object taken with the same photo camera, the surface albedo and the sensor noise does not change (its signal-to-noise (SNR) ratio change with the illumination, though). The conditioning of the lighting matrix $\bar{\mathbf{L}}$---the sequence of MLVs seen for a given surface---will change, though. This means that the uncertainty will also change, since it is based on the singular values of the $\bar{\mathbf{L}}$ matrix. Adding repetitive, coplanar or badly scaled data to this matrix will increase the difference between the maximum and the minimum singular value. This relationship can be deduced by the Gramian matrix of $\bar{\mathbf{L}}$, chiefly $\mathbf{G} = \bar{\mathbf{L}}^T\bar{\mathbf{L}}$. This Gramian matrix is now square, but its singular values are the squared singular values as the original matrix, $\sqrt{\sigma_i(\mathbf{G})} = \sigma_i(\bar{\mathbf{L}})$. By computing this Gramian matrix, the repeated vector multiplied (or projected) multiples times the other vectors, thus having an higher importance in the Gramian matrix, We could say that the Gramian matrix was steered toward this vector. As such, an higher component is devoted to explain the repeated or longer vectors, diminishing the importance of the small (badly scaled) or non-repeated vectors, which may be be crucial to consider for PS reconstruction.
 
-This has the effect of degrading the conditioning of the matrix, as $\kappa(\bar{\mathbf{L}}) = \frac{\sigma_{\max}(\bar{\mathbf{L}}) }{ \sigma_{\min}(\bar{\mathbf{L}}) }$, meaning that the stability will be impacted negatively. It translates in an increase of the uncertainty of the overall PS reconstruction. Conceptually, this means that the reconstruction algorithm will have a stability bias toward the direction most present in $\bar{\mathbf{L}}$.
+This has the effect of degrading the conditioning of the matrix, as $\kappa(\bar{\mathbf{L}}) = \frac{\sigma_{\max}(\bar{\mathbf{L}}) }{ \sigma_{\min}(\bar{\mathbf{L}}) }$, meaning that the conditioning will be impacted negatively. It translates in an increase of the uncertainty of the overall PS reconstruction. Conceptually, this means that the reconstruction algorithm will have a conditioning bias toward the direction most present in $\bar{\mathbf{L}}$.
 
 Both of these issues touch a very important concept: which images among the whole dataset are important. Not all data is equal, in that repetitive data is actually harmful for the algorithm. Then, which input images should be kept? Which combination is optimal?
 
-Using the condition number as a stability measure of the $\bar{L}$ matrix, simply stacking images will sometimes increase or decrease the condition number, as can be seen in fig.~\ref{fig:sel-ordering}. But when ordering the input images by their contributions to define the singular vectors of the $\bar{L}$ matrix (ranked from the most important to the least important) as shown in fig.~\ref{fig:sel-ordering}, we see that there's a clear optimal quantity of images. Past this quantity, the reconstruction quality is degraded.
+Using the condition number as a performance measure of the $\bar{L}$ matrix, simply stacking images will sometimes increase or decrease the condition number, as can be seen in fig.~\ref{fig:sel-ordering}. But when ordering the input images by their contributions to define the singular vectors of the $\bar{L}$ matrix (ranked from the most important to the least important) as shown in fig.~\ref{fig:sel-ordering}, we see that there's a clear optimal quantity of images. Past this quantity, the reconstruction quality is degraded.
 
 %\todo{Add a figure with a reconstruction with and without the selection as of now.}
 
@@ -315,11 +317,13 @@ This vector importance issue can be fixed by scaling the data by an arbitrary fa
 %3DV15 article with cool SD
 
 
-\subsection{Algorithmic improvements: initialization refinement and merging with other techniques}
+\subsection{Algorithmic improvements: initialization refinement}
 \label{subsec:calibrated}
 
 % MRF, reference Jung's, tell our differences.
-When performing a calibrated PS algorithm on environment maps, a chicken-and-egg problem arise. The part of the environment map visible by a surface patch is defined by its normal, but the normal is what we want to find using the lighting information. To solve this problem, we can sample normals uniformly over the sphere and compute their MLVs (see sec.~\ref{iccp-computingstability}. Then, we can find how well a pixel intensity in the image matches these MLVs.
+When performing a calibrated PS algorithm on environment maps, a chicken-and-egg problem arise. The part of the environment map visible by a surface patch is defined by its normal, but the normal is what we want to find using the lighting information. This yields a nonlinear problem, as the calibration and the MLVs depend on the normal, which is a priori unknown. We cannot have a closed form solution (i.e.\ linear least squares) anymore. The only choice is to perform an iterative, nonlinear optimization. In such context, initialization is an important step not to overlook.
+
+To solve this problem, we can sample normals uniformly over the sphere and compute their MLVs (see sec.~\ref{iccp-computingstability}). Then, we can find how well a pixel intensity in the image matches these MLVs.
 
 This scheme may work pretty well, but lacks a fundamental element: spatial coherence, that is, how objects are usually smooth over their surface. It is safe to assume that if a given surface patch $p$ has a normal $n_p$, its neighbor $p+1$ has a similar normal: $ n_p = n_{p+1} + \epsilon $ , where $\epsilon$ is a small angle. As a way to enforce this, I propose to insert a new step to initialize the normals. To coarsely initialize the surface normals, the problem can be formalized as a Markov Random Field (MRF) by doing the hypothesis that a pixel normal is in some way related to its neighbors. An MRF can be defined as
 \begin{equation}

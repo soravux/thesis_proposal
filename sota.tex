@@ -16,7 +16,8 @@
 %   \end{itemize}
 % \end{itemize}
 
-Photometric Stereo has received a lot of attention throughout the years. Since its inception, researchers tried to alleviate the restrictive assumptions of the original method, such as Lambertian reflectance, noiseless sensors and known lighting. This chapter will first relate briefly the major improvements made on PS over the years, and then focus on the efforts made to bring it outside the laboratory.
+
+Photometric Stereo has received a lot of attention throughout the years. Since its inception, researchers tried to alleviate the restrictive assumptions of the original method, such as Lambertian reflectance and known lighting. Despite the progress made in laboratory conditions, outdoor PS remain a challenging problem even under simplifying assumptions. This chapter will first relate briefly the major improvements made on PS over the years, and then focus on the efforts made to bring it outside the laboratory.
 
 
 \section{Photometric Stereo}
@@ -140,9 +141,22 @@ Recently, Shen~{\em et al.}~\cite{shen-pg-14} showed that, contrary to common be
 % richer lighting models
 To compensate for limited sun motion, a promising approach is to use richer models of illumination that account for additional atmospheric factors in the sky. Typically, more elaborate models of illumination is done by employing (hemi-)spherical high dynamic range (HDR) environment maps~\cite{debevec-siggraph-98,reinhard-book-05} as input to outdoor PS. Encouraging results have been reported in~\cite{yu-iccp-13} for outdoor images taken within an interval of just eight hours (in a single day). Full environment maps can be captured alongside the object captures and used with calibrated PS algorithms~\cite{yu-iccp-13,shi-3dv-14,hung-wacv-15}.
 
-\todo{Add Yu.}
+An interesting idea is used by~\cite{yu-iccp-13} to make its algorithm more robust to surface reflectance. They remove the albedo $\rho$ from the original PS equation by dividing an image by another one. First, they find what they call a ``denominator image'', an image yielding as little highlights and shadows as possible. Then, they perform a pixelwise division of every image in the sequence by this denominator image, is represented as
+\begin{equation}
+\frac{b_{p,1}}{b_{p,2}} = \frac{\rho_p \mathbf{l}_1^T \mathbf{n}_p}{\rho_p \mathbf{l}_2^T \mathbf{n}_p} \quad,
+\end{equation}
+for pixel $p$. The albedo $\rho_t$ cancels out, giving the relation
+\begin{equation}
+\label{eq:ratio_images}
+\left( b_{p,1} \mathbf{l}_2 - b_{p,2} \mathbf{l}_1 \right)^T \mathbf{n}_p = 0  \quad.
+\end{equation}
+When using this method, though, we are left with a sequence of 1 image less than to begin with, as dividing an image by itself won't give useful information.
 
-It is also possible to estimate part of the environment map without explicitly capturing it, by synthesizing a hemispherical model of the sky using physically-based models~\cite{inose-tcva-13,jung-cvpr-15}.
+An important note is also made by the authors of~\cite{yu-iccp-13}. When an initial normal map is found, each of these normals defines a new hemisphere of visibility, giving slightly different lighting directions than that was used to compute the initial normal map. It is then possible to perform the normal computation using these new lighting directions.
+
+Two algorithm details are worth noting from this paper: the preprocessing and the regularization. First, they preprocess the images to remove most highlights and shadows. They do so by computing a low-rank matrix minimization. Because of noise, specularities, shadows and other outliers, the rank of the matrix is higher than 3. By minimizing the rank of the matrix toward 3, they eliminate most of these outliers. At the end of the algorithm, they propose to perform a $L_1$-norm regularization called total variation (TV) to increase the accuracy of the reconstruction. This type of regularization promotes sparsity, meaning that few sharp edges should explain better the surface than a low of small normal variations.
+
+While~\cite{yu-iccp-13} dealt with the explicit capture of the environment map, it is also possible to estimate part of the environment map without capturing it, by synthesizing a hemispherical model of the sky using physically-based models~\cite{inose-tcva-13,jung-cvpr-15}.
 
 \cite{inose-tcva-13} employs iterative refinement over the two-source PS approach. Their lighting estimation is done using a white sphere from which they can estimate the parameters of a Preetham model~\cite{preetham-siggraph-99}. While yielding promising results, it requires an object of known shape to be already present in the scene, making it impossible to use with online webcam timelapses. The rest of the method is taken from prior art already explained.
 
