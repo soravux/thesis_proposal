@@ -354,9 +354,9 @@ Authors over the years have proposed two main ideas to surmount the GBR ambiguit
 
 % Data-driven approach, what can the DB tell us on the image.
 %Bas-Relief Amb.
-In order to make PS work uncalibrated, I plan to use a data-driven approach. By taking advantage of the sky database we already have, we can lead an algorithm to learn what a physically plausible sky looks like, constraining greatly the problem. The quantity of real world skies that can explain well enough the illumination on a scene is quite small, if we take the similar skies as one. \todo{Not clear how this is going to help with the GBR}
+In order to make PS work uncalibrated, I plan to use a data-driven approach. By taking advantage of the sky database we already have, we can lead an algorithm to learn what a physically plausible sky looks like, constraining greatly the problem. The quantity of real world skies that can explain well enough the illumination on a scene is quite small, if we take the similar skies as one.
 
-I suspect this lighting constraint to be enough to alleviate the GBR ambiguity issue. In the case this constraint is not enough, I plan to use an optimization method on the material albedo as proposed by the authors previously mentioned.
+The GBR ambiguity is due to an unknown factor affecting both the surface albedo and the lighting. I suspect the lighting obtained using a data-driven model to be quite constrained, maybe enough to alleviate the GBR ambiguity issue. In the case this constraint is not enough, I plan to use an optimization method on the material albedo as proposed by the authors previously mentioned.
 
 Overall, the GBR ambiguity is a minor issue with many techniques to solve it available in the literature. What is left to do, though, is an uncalibrated outdoor single day PS algorithm that brings performances similar to the laboratory conditions. The current state-of-the-art technique~\cite{jung-cvpr-15} obtains between 30\% and 40\% of the recovered normals under 30\degree of error, which is far away from the impressive precision obtained using PS in laboratory conditions.
 

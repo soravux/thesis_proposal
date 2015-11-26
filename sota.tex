@@ -98,9 +98,9 @@ The first method that was proposed to make outdoor PS work is to capture several
 % Explain Ackermann
 A quick overview of the full PS pipeline of~\cite{ackermann-cvpr-12} is now presented. They propose a PS reconstruction algorithm working on webcam timelapses. Their algorithm is divided in three major steps: 
 \begin{enumerate}
-  \item Selection: \todo{explain};
-  \item Calibration: \todo{explain};
-  \item PS iterative optimization: \todo{explain}.
+  \item Selection: choosing the images that should be kept to perform PS, discarding outliers and bad images;
+  \item Calibration: performing image subpixel alignment;
+  \item PS iterative optimization: optimizing the surface normals and the surface reflectance alternatively.
 \end{enumerate}% Selection
 First, a selection is made from all the images of the sequence spanning many months. In their analysis, they considered intervals of 6 months or more of data, amounting to a large quantity of images. The selection work is twofold, as they must detect and remove the outliers amongst the images, and then select the best images among the remaining ones. First, they remove images having more than 10\% of their pixels in highlights and mostly dark images, taking care of the outliers. They found that input images with low contrast were harmful for their PS algorithm. As such, to select the best images, they define a contrast measure using the gradient of the object and the portion of the sky visible in the image separately. When strong gradients are found on the object, this means that a strong directional light illuminates the scene, giving a typically interesting input image. They also measure some characteristics of the sky, such as its color, to infer the lighting quality of the image. They suppose that if the visible sky in the image is mostly blue, there is a high risk of the sun shining directly on the object to be reconstructed. These images are good, because a strong directional lighting is what makes PS work. They then blend these two measures together for each image, allowing them to select the best to perform PS on.
 

@@ -51,7 +51,7 @@ The great strength of this technique is its output density: 3D information will 
 
 Dense stereo matching techniques also provides a depth per pixel, rivaling with PS in terms of information density. But to work, these techniques requires regularization, which smooths the surface, whereas PS directly recovers normals (surface gradients), providing surface detail.
 
-In order to work, PS requires the lighting directions to be known (either by controlling the illumination in the laboratory~\cite{Woodham1979,Ikeuchi1981} or capturing a mirror sphere~\cite{inose-tcva-13,hung-wacv-15,ikehata-cvpr-14,oxholm-eccv-12,ikehata-cvpr-12,Ackermann2012a,Lu2012,shi-cvpr-10,yu-iccp-13,shi-3dv-14}) Even with all the assumption we made, one issue remains: the lighting directions over the sequence must not be coplanar. If they are coplanar, $\mathbf{L}$ is rank-2 and singular, meaning the $\mathbf{L}^{-1}$ does not exist in eq.~\ref{eq:original_form}. This led Woodham to believe that PS ``does not apply to outdoor images taken at different times during the same day [...] since the sun's path across the sky is planar''~\cite{Woodham1979}.
+In order to work, PS requires the lighting directions to be known (either by controlling the illumination in the laboratory~\cite{Woodham1979,Ikeuchi1981} or capturing a mirror sphere~\cite{inose-tcva-13,hung-wacv-15,ikehata-cvpr-14,oxholm-eccv-12,ikehata-cvpr-12,shi-cvpr-10,yu-iccp-13,shi-3dv-14}) Even with all the assumption we made, one issue remains: the lighting directions over the sequence must not be coplanar. If they are coplanar, $\mathbf{L}$ is rank-2 and singular, meaning the $\mathbf{L}^{-1}$ does not exist in eq.~\ref{eq:original_form}. This led Woodham to believe that PS ``does not apply to outdoor images taken at different times during the same day [...] since the sun's path across the sky is planar''~\cite{Woodham1979}.
 
 %\begin{equation}
 %\mathbf{b} = \rho L(\mathbf{\boldomega}) \langle \boldomega, {\bf n} \rangle \,,
@@ -94,7 +94,7 @@ A lot of work have been done on PS since its original definition. Contrary to wh
 
 \begin{figure}
 \centering
-\includegraphics[width=0.5\linewidth]{./figures/database/20130824_140002.jpg}
+\includegraphics[width=0.5\linewidth]{./figures/database/example.jpg}
 \caption{Example environment map shown using the Sky Angular projection. On this projection, the horizon is located on the circumference of the image and the zenith (up) is located in the center.}
 \label{fig:envmap_example}
 \end{figure}
