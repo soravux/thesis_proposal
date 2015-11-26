@@ -64,18 +64,18 @@ for pixel $p$. The albedo $\rho_t$ cancels out, giving the relation
 
 This relation was used before~\cite{yu-iccp-13,wu-pami-06}. This kind of algorithm usually consists of taking a denominator image minimally affected by shadows and highlights and dividing all the other images of the sequence by this one. While this removes the constant albedo assumption, it leaves a smaller (by one) sequence of images to perform PS. Another possibility is to perform the division on all the possible permutations of images, giving a better robustness to the algorithm. The problem with this approach is that it makes the sequence grow quadratically, which quickly becomes problematic to solve in a reasonable time on computers having a finite amount of memory. Stochastically taking a predetermined amount can do the trick, but optimizing the conditioning of the $\bar{L}$ matrix .
  
-Solving directly for the surface height instead of the normals can be done by analyzing the relation between both. Given pixel $p$ and its depth $z_p$, the normal of the surface patch $\mathbf{n}_p$ can be expressed as
+Solving directly for the surface height instead of the normals can be done by analyzing the relation between both. Given pixel $p$ and its surface gradient $z_p$, the normal of the surface patch $\mathbf{n}_p$ can be expressed as
 \begin{equation}
-\mathbf{r}_p = 
+\hat{\mathbf{r}}_p = 
 \begin{bmatrix}
-\nabla z_{p,x} \\
-\nabla z_{p,y} \\
+z_{p,x} \\
+z_{p,y} \\
 -1
 \end{bmatrix}
 \end{equation}
 \begin{equation}
 \mathbf{n}_p =
-\frac{\mathbf{r}_p}{\norm{\mathbf{r}_p}} \quad.
+\frac{\hat{\mathbf{r}}_p}{\norm{\hat{\mathbf{r}}_p}} \quad.
 \end{equation}
 This supposes that the surface is pointing toward $-1$, hence the camera is orthographic and on the axis $[0, 0, -1]$.
 
@@ -84,24 +84,12 @@ When merged with the albedo removal technique (equation \eqref{eq:ratio_images})
 \label{eq:pre-dlt}
 \left( b_{p,1} \mathbf{l}_2 - b_{p,2} \mathbf{l}_1 \right)
 \begin{bmatrix}
-\nabla z_{p,x} \\
-\nabla z_{p,y} \\
+z_{p,x} \\
+z_{p,y} \\
 -1
 \end{bmatrix}
 = 0  \quad.
 \end{equation}
-
-While this formulation works on a single pixel of the image, a variable $\mathbf{M}$ is needed to integrate the estimated gradients $\nabla z_p$ into a surface $\mathbf{z}$. This $\mathbf{M}$ variable is split into two components, $\mathbf{M}_x$ and $\mathbf{M}_y$, representing the neighboring relationship, or the derivatives, on the $x$-axis and $y$-axis, respectively.
-\begin{equation}
-\mathbf{M}_x = 
-\begin{bmatrix}
-\ddots &    & \ddots &   &        \\
-       & -1 &        & 1 &        \\
-       &    & \ddots &   & \ddots
-\end{bmatrix}
-\mathrm{vec}(\mathbf{Z}) = \mathbf{M}_x\mathbf{z}  \quad.
-\end{equation}
-For a boundary pixel, one can simply consider that its $x$-derivative is equal to that of its neighbor, thus enforcing a planarity constraint at the surface boundary. The definition of $\mathbf{M}_y$ is analogous to $\mathbf{M}_x$.
 
 This version of PS is the base upon which the proposed enhancements are planned. In order to make it easier to handle, a Direct Linear Tranform (DLT) method is applied to rewrite equation~\eqref{eq:pre-dlt} into an set of homogeneous linear equations.
 
@@ -109,23 +97,55 @@ To do so, we must consider the left part of the equation, $\left( b_{p,1} \mathb
 \begin{equation}
 \left[ \mathrm{diag}(\mathbf{i}_{aa'}) \quad \mathrm{diag}(\mathbf{j}_{aa'}) \quad \mathbf{k}_{aa'}\right]
 \begin{bmatrix}
-\nabla \mathbf{z}_{x} \\
-\nabla \mathbf{z}_{y} \\
+\mathbf{z}_{x} \\
+\mathbf{z}_{y} \\
 -1
 \end{bmatrix}
 = 0 \quad,
 \end{equation}
 which can be rewritten as
 \begin{equation}
+\label{eq:diagdlt}
 \left[ \mathrm{diag}(\mathbf{i}_{aa'}) \quad \mathrm{diag}(\mathbf{j}_{aa'}) \right]
 \begin{bmatrix}
-\nabla \mathbf{z}_{x} \\
-\nabla \mathbf{z}_{y} \\
+\mathbf{z}_{x} \\
+\mathbf{z}_{y} \\
 \end{bmatrix}
 = \mathbf{k}_{aa'} \quad.
 \end{equation}
 
-\todo{Better develop link between eq \^{} and v.}
+By multiplying both sides of \eqref{eq:diagdlt} by $\begin{bmatrix}\mathrm{diag}(\mathbf{i}) & \mathrm{diag}(\mathbf{j}) \end{bmatrix}^T$, we obtain the normal equations
+\begin{equation}
+\begin{bmatrix}
+    \mathrm{diag}(\mathbf{i} \circ \mathbf{i}) && \mathrm{diag}(\mathbf{i} \circ \mathbf{j}) \\
+    \mathrm{diag}(\mathbf{i} \circ \mathbf{j}) && \mathrm{diag}(\mathbf{j} \circ \mathbf{j}) \\
+\end{bmatrix}
+\begin{bmatrix}
+\mathbf{z}_{x} \\
+\mathbf{z}_{y} \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+\mathrm{diag}(\mathbf{i} \circ \mathbf{k}) \\
+\mathrm{diag}(\mathbf{j} \circ \mathbf{k}) \\
+\end{bmatrix} \quad ,
+\end{equation}
+where $\circ$ denotes the pairwise (Hadamard) product.
+
+A variable $\mathbf{M}$ is then needed to integrate the estimated gradients $z_p$ into a surface $\mathbf{z}$. This $\mathbf{M}$ variable is split into two components, $\mathbf{M}_x$ and $\mathbf{M}_y$, representing the neighboring relationship, or the derivatives, on the $x$-axis and $y$-axis, respectively:
+\begin{equation}
+\label{eq:M}
+\mathbf{M}_x = 
+\begin{bmatrix}
+\ddots &    & \ddots &   &        \\
+       & -1 &        & 1 &        \\
+       &    & \ddots &   & \ddots
+\end{bmatrix}
+\mathbf{z} = \mathbf{M}_x\mathbf{z}  \quad.
+\end{equation}
+Note that, to simplify the notation, $\mathbf{z} = \mathrm{vec}(\mathbf{Z})$.
+
+For a boundary pixel, one can simply consider that its $x$-derivative is equal to that of its neighbor, thus enforcing a planarity constraint at the surface boundary. The definition of $\mathbf{M}_y$ is analogous to $\mathbf{M}_x$.
 
 In order to convert this independent systems of linear equations into an homogeneous form, it is possible to arrange this matrix into a block diagonal matrix by taking each row and making $2 \times 2$ blocks from them.
 This gives this new formulation:
@@ -139,7 +159,7 @@ This gives this new formulation:
     \mathbf{M}_x \\
     \mathbf{M}_y \\
 \end{bmatrix}
-\mathrm{vec}(\mathbf{Z}) =
+\mathbf{z} =
 \sum_{a,a'}
 \begin{bmatrix}
 D_i \mathbf{k} \\
@@ -186,25 +206,60 @@ In order to deal with this undesired extra degree of freedom, they choose to per
 
 In the case of two-source PS, the regularization must be performed along directions that are perpendicular to the characteristic curves, let's call them $\mathbf{u}$. Hence, the regularization they use is of the form
 \begin{equation}
-\alpha \lvert \mathbf{u}^T \nabla z \rvert ^2
+\alpha \lvert \mathbf{u}^T \mathbf{z} \rvert ^2
 \end{equation}
 for the first order, and 
 \begin{equation}
-\beta \lvert \mathbf{u}^T H(z) \mathbf{u} \rvert ^2
+\beta \lvert \mathbf{u}^T \nabla \mathbf{z} \; \mathbf{u} \rvert ^2
 \end{equation}
-for the second order, where $z$ is the height, $\alpha$ and $\beta$ are the regularization weights and $H(z)$ is the Hessian matrix of $z$ (its second-order derivatives). While the first order penalizes non-smooth the slopes, the second order penalizes non-smooth curvatures.
+for the second order, where $\mathbf{z}$ is the gradient of the surface height $\iint_S\mathbf{z} \: dS$. $\alpha$ and $\beta$ are the regularization weights and $\nabla \mathbf{z}$ is the Hessian matrix of the surface height (its second-order derivatives). While the first order regularization penalizes non-smooth the slopes, the second order penalizes non-smooth curvatures.
 
-While the idea is similar, the problem of regularizing as a function of the normal uncertainty as we propose to do here is a bit different. When the pixel normal uncertainty is inferred directly from the lighting, it won't be in a purely single direction as in the case of \cite{hernandez-pami-11}. The uncertainty may be any combination of two orthogonal vectors, and may even end up having an isotropic behavior (i.e., the uncertainty is equal in both directions). As such, the $\mathbf{u}$ vector must be changed to $\mathbf{u}(x,y)$, with $x$ and $y$ being the coordinates in pixel-space.
+While the idea is similar, the problem of regularizing as a function of the normal uncertainty as we propose to do here is a bit different. When the pixel normal uncertainty is inferred directly from the lighting, it won't be in a purely single direction as in the case of \cite{hernandez-pami-11}. The uncertainty may be any combination of two orthogonal vectors, and may even end up having an isotropic behavior (i.e., the uncertainty is equal in both directions). As such, there are now both vectors $\mathbf{u}_1$ and $\mathbf{u}_2$, representing two different directions on which regularization is performed.
+%\begin{equation}
+%\mathbf{U} = 
+%\begin{bmatrix}
+%    \mathbf{u}_1 \\
+%    \mathbf{u}_2 \\
+%\end{bmatrix} \quad ,
+%\end{equation}
 
-We can simplify $\mathbf{u}(x,y)$ to a set of two orthogonal vectors along both axes. Since the uncertainty is computed directly on the $x$ and $y$ axes, we can rewrite the regularization as a linear combination of these two vectors:
+Rewriting $\mathbf{u}_1 = \begin{bmatrix} u_1 & v_1\end{bmatrix}$, it is possible to derive both first-order and second order regularization as
 \begin{equation}
-\alpha \lvert \mathbf{u}_x \nabla z + \mathbf{u}_y \nabla z\rvert ^2 +
-\beta \lvert \mathbf{u}_x H(z)\nabla z + \mathbf{u}_y H(z) \mathbf{u}\rvert ^2
+\alpha \left\lvert \begin{bmatrix} u_1 & v_1 \end{bmatrix} \begin{bmatrix} z_x \\ z_y \end{bmatrix} \right\rvert ^2 + 
+\beta \left\lvert \begin{bmatrix} u_1 & v_1 \end{bmatrix} \begin{bmatrix} z_{xx} & z_{xy} \\ z_{xy} & z_{yy} \end{bmatrix} \begin{bmatrix} u_1 \\ v_1 \end{bmatrix} \right\rvert ^2 \approx 0
 \quad,
 \end{equation}
-where $\mathbf{u}_x$ and $\mathbf{u}_y$ are the perpendicular components of the uncertainty.
+from which we obtain, after the matrix multiplications, 
+\begin{equation}
+\alpha \left\lvert u_1\cdot{}z_x + v_1\cdot{}z_y  \right\rvert ^2 + 
+\beta \left\lvert  u_1^2\cdot{}z_{xx} + 2u_1v_1\cdot{}z_{xy} + v_1^2\cdot{}z_{yy} \right\rvert ^2
+\approx 0
+\quad.
+\end{equation}
+Given the regularization directions for the whole image $\mathbf{U} = \begin{bmatrix}\bar{\mathbf{u}} & \bar{\mathbf{v}} \end{bmatrix}$, with $\bar{\mathbf{u}}$ and $\bar{\mathbf{v}}$ being respectively column vectors of all the $x$-axis and $y$-axis regularization directions for each pixel, and using the notation developed in \eqref{eq:M}, we obtain
+\begin{equation}
+\alpha \left\lvert
+\begin{bmatrix} \mathrm{diag}(\bar{\mathbf{u}}) & \mathrm{diag}(\bar{\mathbf{v}}) \end{bmatrix}
+\begin{bmatrix}
+M_x \\
+M_y
+\end{bmatrix}
+\mathbf{z}
+\right\rvert ^2 + 
+\beta \left\lvert
+\begin{bmatrix} \mathrm{diag}(\bar{\mathbf{u}} \circ \bar{\mathbf{u}}) &  2\cdot{}\mathrm{diag}(\bar{\mathbf{u}} \circ \bar{\mathbf{v}}) & \mathrm{diag}(\bar{\mathbf{v}} \circ \bar{\mathbf{v}})
+\end{bmatrix}
+\begin{bmatrix} M_{xx} \\ M_{xy} \\ M_{yy} \end{bmatrix}
+\mathbf{z}
+\right\rvert ^2
+\approx 0
+\quad.
+\end{equation}
+This equation gives the regularization penalty, a non-smoothness measure along directions $\mathbf{U}$ (one row per pixel) of the solution. Performing this equation a second time using another regularization matrix $\mathbf{U}_2 = \begin{bmatrix}\bar{\mathbf{u}}_2 & \bar{\mathbf{v}}_2 \end{bmatrix}$ gives the penalty along these new vectors. Summing the result gives the regularization for both vectors.
 
-This new formulation is still untested. As such, my plan is to incorporate it into the reconstruction algorithm and to monitor its performance improvements. Something that is not taken into account as of now are the edges. Two pixels having two completely different intensities over the image sequence indicate that their normals should be quite far apart and thus should not be strongly regularized for smoothness, as noticed by~\cite{jung-cvpr-15}.
+This anisotropic regularization is interesting because it offers a per-pixel regularization over multiple different directions. The strength over any direction can be set independently for every pixel of the image to reconstruct.
+
+This new formulation is untested in a PS reconstruction algorithm. As such, my plan is to incorporate it into the reconstruction algorithm and to monitor its performance improvements. Something that is not taken into account as of now are the edges. Two pixels having two completely different intensities over the image sequence indicate that their normals should be quite far apart and thus should not be strongly regularized for smoothness, as noticed by~\cite{jung-cvpr-15}.
 
 
 \subsection{Selecting the right images to better constrain the problem}
@@ -373,7 +428,6 @@ Over the course of 24 hours, both sun and moon trajectories are mostly coplanar.
 
 We can use the same measure as in sec.~\ref{3dv15} to analyze the PS reconstruction quality, that is, the maximum gain. This maximum gain is the factor that multiplies, or amplifies, the sensor noise. The higher it is, the more uncertain (or wrong) the reconstruction will be. So the lower is the maximum gain, the better will be the reconstruction performance.
 
-%and fig.~\ref{fig:DN-maximum_gain_latitude} \todo{for most of earth latitudes}
 Such an analysis for year 2015 is found in fig.~\ref{fig:DN-maximum_gain} for the location of Laval University. The two major peaks around days 81 and 264 are due to the spring and fall equinoxes, respectively. The sun rises exactly east and sets exactly west at both equinoxes, making the lighting vectors plane all coplanar. As predicted by \cite{shen-pg-14}, all lighting vectors lie on the same plane as the center of the sphere at these moments, whereas at the solstice, the lighting vectors are farther from a single plane.
 
 Another interesting thing to notice is the small sinusoid with a 13.66 days period present over the whole year. This is linked to the sidereal period of the moon, namely the time it takes to make a full orbit. This small sinusoid takes exactly half the sidereal period of the moon, 27.32 days, as shown in fig.~\ref{fig:DN-maximum_gain}. The moments when the gain is high coincides with the moon equinoxes, when the moon rises exactly east and sets west, happening twice per period. This means that all the MLVs throughout the night are lying on the same plane, conditioning the problem badly.
