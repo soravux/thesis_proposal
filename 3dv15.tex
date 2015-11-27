@@ -1,7 +1,7 @@
 % !TEX root = main.tex
 
 
-\subsection{Outdoor PS conditioning}
+%\subsection{Outdoor PS conditioning}
 \label{sec:sensitivity-analysis}
 
 %In the following, we consider a small planar surface patch with normal vector ${\bf n}$ and Lambertian reflectance with albedo~$\rho$. As discussed in~\cite{holdgeoffroy-iccp-15,hung-wacv-15}, the lighting contribution of an environment map to a Lambertian surface patch can be formulated as in an equivalent problem with a single point light source $\bar{\mathbf{l}} \in \mathbb{R}^3$. This vector is the mean of the light vectors computed over the hemisphere of incoming light directions defined by ${\bf n}$. This virtual point light source $\bar{\mathbf{l}}$ is henceforth referred to as the {\em mean light vector} (MLV). It is important to note that, as opposed to the traditional PS scenario where point light sources are fixed and thus independent of ${\bf n}$, here the {\em per-pixel} MLV is a function of $\mathbf{n}$. Thus, patches with different orientations define different sets of MLVs (as discussed later and shown in fig.~\ref{fig:realShiftNormal}).
@@ -45,7 +45,7 @@
 
 % In the analysis below, we often take the estimate ${\bf \hat n}$ to be the ground truth normal ${\bf n}$ of a simulated (synthetic) surface patch; this corresponds to the result of an ideal algorithm. We then evaluate the confidence interval for this normal using a set of real, outdoor environment maps with associated stability parameters $\lambda_k$ as in~\eqref{eqn:confidence-xyz}. The result is a measure of the uncertainty in the reconstruction that an actual outdoor PS algorithm would provide on that particular set of illumination conditions, and surface orientation. As in~\cite{holdgeoffroy-iccp-15}, our simulations below consider synthetic surface patches with albedo $\rho = 1$ and a small, non-negligible noise level $\sigma$ at $1\%$ of the maximum pixel value.
 
-In this paper, we push the analysis of sec.~\ref{iccp15} to the limit to see what is the minimum capture interval required by PS to work. We do so by tying what is happening in the sky to reconstruction performance. The analysis is done, as before, only images that were captured during a continuous 6 hour time interval on each of these days, from 10:30 until 16:30.
+In this paper, we push the analysis of sec.~\ref{iccp15} to the limit to see what is the minimum capture interval required by PS to work. We do so by tying what is happening in the sky to reconstruction performance. The analysis is done, as before, only images that were captured during a continuous 6 hour time interval on each of these days, from 10:30 until 16:30.\footnote{Companion video showing data samples available at \url{http://vision.gel.ulaval.ca/~jflalonde/projects/xHourPS/}.}
 
 From the 95\% confidence interval \eqref{eqn:confidence-xyz}, we can deduce that the only light-dependent stability factor in the confidence interval $\bolddelta$ is $\lambda_k$; the other two factors are related to the camera ($\sigma$), and surface reflectance~($\rho$). In this paper, we analyze the maximum uncertainty \mbox{$\lambda_\text{max} = \max_k(\lambda_k)$}, as a conservative performance measure that is independent of albedo and sensor noise; $\lambda_\text{max}$ is a {\em maximum noise gain} factor, \ie, the intensity of noise amplification in the solution. Here, we are interested in 1) investigating how the noise gain $\lambda_\text{max}$ is influenced by the duration of outdoor data capture, and in 2) identifying specific changes, or {\em events}, in outdoor lighting that are associated with more stable PS solutions (smaller $\lambda_\text{max}$).
 
@@ -63,7 +63,7 @@ This section provides the first answers to the questions raised above by looking
 % -----------------------------------------------------------------------------
 \begin{figure}[t]
 \centering
-\includegraphics[width=.5\columnwidth]{diagram_MLVshift3}
+\includegraphics[width=.33\columnwidth]{diagram_MLVshift3}
 \caption{Impact of cloud coverage on the numerical conditioning of outdoor PS: clear (a) and overcast (b) days present MLVs with stronger coplanarity; in partly cloudy days (c) the sun is often obscured by clouds, which may lead to out-of-plane shifts of MLVs.}
 \label{fig:MLVshift}
 \end{figure}
@@ -272,7 +272,7 @@ The ratios $r_\lambda$ were then computed for all normals, over all days in the 
 
 \begin{figure*}[t]
     \centering
-    \includegraphics[width=0.52\linewidth]{./figures/realData/realData4.pdf}
+    \includegraphics[width=0.92\linewidth]{./figures/realData/realData4.pdf}
     \caption{Validation on real data, captured on 11-OCT-14 (partly cloudy). Four distinct time intervals are analyzed and, for each one, the following information is displayed, from left to right: ($i$) log sun intensity; ($ii$) noise gain $\lambda_\text{max}$ as a function of start time and duration of the interval, as in fig.~\ref{fig:events}; ($iii$) example input images; ($iv$) normals recovered by calibrated outdoor PS; ($v$) normal estimation error at each pixel; and ($vi$) the error distribution, in degrees. For reference, ground truth normals are given on the rightmost plots.}
     \label{fig:real-results}
     \vspace{-2mm}

@@ -1,6 +1,6 @@
 % !TEX root = main.tex
 
-In this paper, we present a systematic analysis of the expected performance of photometric stereo algorithms in outdoor settings. To explore the influence of these effects, we exploit the database of outdoor HDR environment maps detailed in the last section, which provides a rich sampling of the variability in outdoor illumination. To ensure the data is properly aligned temporally, only images that were captured during a continuous 6 hour time interval on each of these days, from 10:30 until 16:30, are considered. Through a theoretical analysis (inspired by \cite{sun-ivc-07}) and supported by an extensive empirical evaluation as well as a preliminary quantitative validation, we derive confidence intervals that allow us to predict when surface normals can be reconstructed more accurately and solely from the photometric cue. Instead of focusing exclusively on sun position~\cite{shen-pg-14}, our analysis incorporates the influence of all components of natural lighting: sun, sky, clouds, etc., as well as noise and surface albedo.
+In this paper, we present a systematic analysis of the expected performance of photometric stereo algorithms in outdoor settings. To explore the influence of these effects, we exploit the database of outdoor HDR environment maps detailed in the last section, which provides a rich sampling of the variability in outdoor illumination. To ensure the data is properly aligned temporally, only images that were captured during a continuous 6 hour time interval on each of these days, from 10:30 until 16:30, are considered.\footnote{Companion video with sample images is available at \url{http://vision.gel.ulaval.ca/~jflalonde/projects/outdoorPS/}.} Through a theoretical analysis (inspired by \cite{sun-ivc-07}) and supported by an extensive empirical evaluation as well as a preliminary quantitative validation, we derive confidence intervals that allow us to predict when surface normals can be reconstructed more accurately and solely from the photometric cue. Instead of focusing exclusively on sun position~\cite{shen-pg-14}, our analysis incorporates the influence of all components of natural lighting: sun, sky, clouds, etc., as well as noise and surface albedo.
 
 This paper does \emph{not} introduce a novel photometric stereo algorithm. Rather, we explore the conditions in which PS may or may not work, when faced with the challenging case of uncontrollable outdoor illumination. Our main goal is to provide guidance for future research by assessing the \emph{reconstructibility} of surface patches as a function of their orientation and the illumination conditions, given a set of HDR environment maps captured throughout a single day.
 
@@ -265,7 +265,7 @@ The analysis performed on our dataset indicates that surface patches may be bett
 \begin{figure*}[!ht]
     \centering
     \setlength{\tabcolsep}{0pt}
-    \newcommand{\customwidth}{.08\linewidth}
+    \newcommand{\customwidth}{.077\linewidth}
     \begin{tabular}{@{}rcccccccccccc@{}}
     &
     \begin{minipage}{\customwidth}\centering\scriptsize 10:30 \end{minipage} &
@@ -325,6 +325,7 @@ Results from this quantitative evaluation are given in fig.~\ref{fig:reconstruct
 
 \begin{figure}[t]
     \centering
+    \begin{minipage}{0.5\linewidth}
     \newcommand{\customwidthres}{0.45\linewidth}
     \begin{tabular}{cc}
         \scriptsize Angular differences to ground truth & \scriptsize Predicted 95\% confidence intervals \\
@@ -336,6 +337,7 @@ Results from this quantitative evaluation are given in fig.~\ref{fig:reconstruct
         \end{picture}
     \end{tabular}
     \includegraphics[width=1.01\linewidth]{./figures/reconstruction/colorbar.png}
+    \end{minipage}
     \caption{Quantitative validation on images of a real object. Evenly distributed patches of the owl images were used to perform a simple calibrated outdoor PS algorithm. Error estimates of the surface normals are reported on the left using the reference surface orientation in the laser scan. The predicted 95\% confidence intervals $\mathcal{C}_\mathbf{n}$ from \eqref{eqn:confidence-degrees} are shown on the right. A few large estimation errors on the left image may be caused by imperfect alignment between the scanned model and the images. Insets in the lower right corner show the recovered normals mapped to the south hemisphere. Normals in dark blue means no data available.}
     \label{fig:reconstruction:results}
 \end{figure}
