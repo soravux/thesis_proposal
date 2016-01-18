@@ -182,7 +182,13 @@ In the discrete case, just like the environment map $\B{L}$, these functions can
 \end{equation}
 for an environment map $\B{L}$ of width $w$ and height $h$. The solid angle subtended by pixel $u,v$, called $\omega_{u,v}$ is required to weight accordingly each pixel of both maps. Because of the latitude-longitude representation, each pixel covers a different surface area over the sphere. Without this solid angle weighting, pixels near the top and bottom edge of the environment map are more important, resulting in a brighter  [...].
 
-\todo{Do an example.}
+\begin{figure}[hb]
+  \centering
+  \includegraphics[width=0.45\linewidth]{q8_a_pyramid_real.png}
+  \includegraphics[width=0.45\linewidth]{q8_a_pyramid_imag.png}
+  \caption[Sample Spherical Harmonics]
+   {Basis of degrees 0-3 of Spherical Harmonics}
+\end{figure}
 
 %Just like the Fourier transform, Spherical Harmonics is a transform using a principal root of unity as its kernel. Having a kernel based on a principal root of unity over the function's domain confers a plethora of interesting attributes. One of which is that the functions generated form an orthonormal basis spanning the whole domain, called a complete orthonormal system.
 
