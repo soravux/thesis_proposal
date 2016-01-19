@@ -121,6 +121,55 @@ E(r) = \frac{M}{2\pi} \left( \arctan(\frac{w}{q}) + \arctan(\frac{h}{q}) + \arct
 
 \section{Question 3}
 
+Setup: Graphique
+
+For this setup, each light generate a row $\B{l}$ in the lighting matrix $\B{L}$ as such:
+\begin{equation}
+\B{l} =
+\left[\begin{array}{c} \cos\!\left(\theta\right)\, \sin\!\left(r\right) \\ \sin\!\left(r\right)\, \sin\!\left(\theta\right) \\ \sqrt{ - {\cos\!\left(\theta\right)}^2\, {\sin\!\left(r\right)}^2 - {\sin\!\left(r\right)}^2\, {\sin\!\left(\theta\right)}^2 + 1} \end{array}\right]^T
+\quad .
+\end{equation}
+
+In the current setup, the lights are $120\degree$ apart on the $xy$-plane, so $\theta = \left[ 0\degree, 120\degree, 240\degree \right]$. This translates in the following lighting matrix:
+\begin{equation}
+\B{L} =
+\left[\begin{array}{ccc} \sin\!\left(r\right) & 0 & \sqrt{1 - {\sin\!\left(r\right)}^2}\\ -\frac{\sin\!\left(r\right)}{2} & \frac{\sqrt{3}\, \sin\!\left(r\right)}{2} & \sqrt{1 - {\sin\!\left(r\right)}^2}\\ -\frac{\sin\!\left(r\right)}{2} & -\frac{\sqrt{3}\, \sin\!\left(r\right)}{2} & \sqrt{1 - {\sin\!\left(r\right)}^2} \end{array}\right]
+\quad .
+\end{equation}
+
+Given the simple lambertian reflectance equation, we can compute the pixel intensity of a camera pointed directly to a surface with normal $\B{n}$:
+\begin{equation}
+b = \B{L}\B{n}
+\quad.
+\end{equation}
+
+Photometric Stereo finds the normals $\B{n} = \left[ n_x \; n_y \; n_z\right]^T$ back from the lighting matrix $\B{L}$ and the pixel intensity $b$. This can be done by inverting the light matrix $\B{L}$, hence performing a least squares fit to the problem, as such:
+\begin{equation}
+\B{L}^{-1}\B{b} = \B{n} = 
+\begin{bmatrix}
+n_x \\
+n_y \\
+n_z 
+\end{bmatrix}
+\quad.
+\end{equation}
+We can see that, unless matrix $\B{L}$ is singular and exempt of noise, we retrieve the three components of the normal $\B{n}$ directly.
+
+But, instead of solving the usual equation, we have a systematic error $\epsilon_r$ in the measurement of $r$, making the noisy lighting matrix $\B{L}_\epsilon$ a bit different that the original matrix:
+\begin{equation}
+\B{L}_\epsilon = \left[\begin{array}{ccc} \sin\!\left(\epsilon_r + r\right) & 0 & \sqrt{1 - {\sin\!\left(\epsilon_r + r\right)}^2}\\ -\frac{\sin\!\left(\epsilon_r + r\right)}{2} & \frac{\sqrt{3}\, \sin\!\left(\epsilon_r + r\right)}{2} & \sqrt{1 - {\sin\!\left(\epsilon_r + r\right)}^2}\\ -\frac{\sin\!\left(\epsilon_r + r\right)}{2} & -\frac{\sqrt{3}\, \sin\!\left(\epsilon_r + r\right)}{2} & \sqrt{1 - {\sin\!\left(\epsilon_r + r\right)}^2} \end{array}\right]
+\quad.
+\end{equation}
+Solving this problem gives us:
+\begin{equation}
+\B{L}_\epsilon^{-1}\B{b} = \B{n}_\epsilon = 
+\left[\begin{array}{c} n_x \cdot \frac{\sin\!\left(r\right)}{\sin\!\left(\epsilon_r + r\right)}\\ n_y \cdot \frac{\sin\!\left(r\right)}{\sin\!\left(\epsilon_r + r\right)}\\ n_z \cdot \frac{\sqrt{1 - {\sin\!\left(r\right)}^2}}{\sqrt{1 - {\sin\!\left(\epsilon_r + r\right)}^2}} \end{array}\right]
+\quad,
+\end{equation}
+where the normal components $n_x$, $n_y$ and $n_z$ are all multiplied by a non-unit factor due to the measurement error $\epsilon_r$.
+
+``Inversion error, condition number and approximate inverses of uncertain matrices, eq 1.1''
+
 \section{Question 4}
 
 \chapter{Questions by Paulo Gotardo}
