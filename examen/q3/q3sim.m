@@ -1,4 +1,4 @@
-function [angle, rc] = sim(r, N, e)
+function [angle, rc] = q3sim(r, N, e)
 %% Perform render
 
 theta = 0:2*pi/3:2*pi;
@@ -20,7 +20,12 @@ ze = sqrt(1 - xe.^2 - ye.^2);
 Le = [xe, ye, ze];
 
 rc = rcond(Le);
-angle = acosd(normc((Le\b)')*N);
+if rc < eps
+    angle = NaN;
+else
+    angle = acosd(min(1, normc(Le\b)'*N));
+end
+%angle = acosd((Le\b)'*N);
 % This supposes the albedo is known to be unit
-
+assert(isreal(angle));
 end

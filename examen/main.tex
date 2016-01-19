@@ -121,29 +121,39 @@ E(r) = \frac{M}{2\pi} \left( \arctan(\frac{w}{q}) + \arctan(\frac{h}{q}) + \arct
 
 \section{Question 3}
 
-Setup: Graphique
+\textbf{Impact of estimated light source error vs. estimated normal error (bias).}
 
-For this setup, each light generate a row $\B{l}$ in the lighting matrix $\B{L}$ as such:
+The setup for this experiment is shown in fig.~\ref{q3:setup}. Three light sources forms an triangular pyramid with an equilateral triangle as its base. The problem states that its edge central angle is $r$.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\linewidth]{q3_setup.png}
+  \caption[Experiment setup]
+   {Experiment setup.}
+  \label{q3:setup}
+\end{figure}
+
+On this setup, each light, when lit, generate a row $\B{l}$ in the lighting matrix $\B{L}$ as such:
 \begin{equation}
 \B{l} =
 \left[\begin{array}{c} \cos\!\left(\theta\right)\, \sin\!\left(r\right) \\ \sin\!\left(r\right)\, \sin\!\left(\theta\right) \\ \sqrt{ - {\cos\!\left(\theta\right)}^2\, {\sin\!\left(r\right)}^2 - {\sin\!\left(r\right)}^2\, {\sin\!\left(\theta\right)}^2 + 1} \end{array}\right]^T
 \quad .
 \end{equation}
+The $x$ and $y$ components are directly the position on the plane, while the $z$ component is specified to make the light unit, so they are all the same intensity.
 
-In the current setup, the lights are $120\degree$ apart on the $xy$-plane, so $\theta = \left[ 0\degree, 120\degree, 240\degree \right]$. This translates in the following lighting matrix:
+In the current setup, since the lights are on the vertex of an equilateral triangle, they are $120\degree$ apart on the $xy$-plane, so $\theta = \left[ 0\degree, 120\degree, 240\degree \right]$. This translates in the following lighting matrix:
 \begin{equation}
 \B{L} =
 \left[\begin{array}{ccc} \sin\!\left(r\right) & 0 & \sqrt{1 - {\sin\!\left(r\right)}^2}\\ -\frac{\sin\!\left(r\right)}{2} & \frac{\sqrt{3}\, \sin\!\left(r\right)}{2} & \sqrt{1 - {\sin\!\left(r\right)}^2}\\ -\frac{\sin\!\left(r\right)}{2} & -\frac{\sqrt{3}\, \sin\!\left(r\right)}{2} & \sqrt{1 - {\sin\!\left(r\right)}^2} \end{array}\right]
 \quad .
 \end{equation}
 
-Given the simple lambertian reflectance equation, we can compute the pixel intensity of a camera pointed directly to a surface with normal $\B{n}$:
+Given the simple lambertian reflectance equation (supposing unit albedo), we can compute the pixel intensity of a camera pointed directly to a surface with normal $\B{n}$:
 \begin{equation}
 b = \B{L}\B{n}
 \quad.
 \end{equation}
-
-Photometric Stereo finds the normals $\B{n} = \left[ n_x \; n_y \; n_z\right]^T$ back from the lighting matrix $\B{L}$ and the pixel intensity $b$. This can be done by inverting the light matrix $\B{L}$, hence performing a least squares fit to the problem, as such:
+Photometric Stereo is the inverse process, where the normals $\B{n} = \left[ n_x \; n_y \; n_z\right]^T$ are deduced from the lighting matrix $\B{L}$ and the pixel intensity $b$. This can be done by inverting the light matrix $\B{L}$, hence performing a least squares fit to the problem, as such:
 \begin{equation}
 \B{L}^{-1}\B{b} = \B{n} = 
 \begin{bmatrix}
@@ -153,9 +163,9 @@ n_z
 \end{bmatrix}
 \quad.
 \end{equation}
-We can see that, unless matrix $\B{L}$ is singular and exempt of noise, we retrieve the three components of the normal $\B{n}$ directly.
+We can see that, unless matrix $\B{L}$ is singular or affected by noise, we retrieve the three components of the normal $\B{n}$ directly.
 
-But, instead of solving the usual equation, we have a systematic error $\epsilon_r$ in the measurement of $r$, making the noisy lighting matrix $\B{L}_\epsilon$ a bit different that the original matrix:
+But, instead of solving the usual equation, the problem suppose we have a systematic error $\epsilon_r$ in the measurement of $r$, making the noisy lighting matrix $\B{L}_\epsilon$ a bit different that the original matrix:
 \begin{equation}
 \B{L}_\epsilon = \left[\begin{array}{ccc} \sin\!\left(\epsilon_r + r\right) & 0 & \sqrt{1 - {\sin\!\left(\epsilon_r + r\right)}^2}\\ -\frac{\sin\!\left(\epsilon_r + r\right)}{2} & \frac{\sqrt{3}\, \sin\!\left(\epsilon_r + r\right)}{2} & \sqrt{1 - {\sin\!\left(\epsilon_r + r\right)}^2}\\ -\frac{\sin\!\left(\epsilon_r + r\right)}{2} & -\frac{\sqrt{3}\, \sin\!\left(\epsilon_r + r\right)}{2} & \sqrt{1 - {\sin\!\left(\epsilon_r + r\right)}^2} \end{array}\right]
 \quad.
@@ -166,9 +176,58 @@ Solving this problem gives us:
 \left[\begin{array}{c} n_x \cdot \frac{\sin\!\left(r\right)}{\sin\!\left(\epsilon_r + r\right)}\\ n_y \cdot \frac{\sin\!\left(r\right)}{\sin\!\left(\epsilon_r + r\right)}\\ n_z \cdot \frac{\sqrt{1 - {\sin\!\left(r\right)}^2}}{\sqrt{1 - {\sin\!\left(\epsilon_r + r\right)}^2}} \end{array}\right]
 \quad,
 \end{equation}
-where the normal components $n_x$, $n_y$ and $n_z$ are all multiplied by a non-unit factor due to the measurement error $\epsilon_r$.
+where the normal components $n_x$, $n_y$ and $n_z$ are all multiplied by a non-unit factor due to the measurement error $\epsilon_r$. These factors are shown in fig.~\ref{q3:analytical}.
 
-``Inversion error, condition number and approximate inverses of uncertain matrices, eq 1.1''
+\begin{figure}
+  \centering
+  \begin{tabular}{cc}
+  \includegraphics[width=0.45\linewidth]{q3_analytic_nx_ny.pdf} &
+  \includegraphics[width=0.45\linewidth]{q3_analytic_nz.pdf} \\
+  (a) & (b)
+  \end{tabular}
+  \caption[Analytical normal component coefficients]
+   {The theoretical factor $\Delta_\epsilon$ that multiplies each normal component (a) $n_x$, $n_y$ and (b) $n_z$ in the presence of a measure error $\epsilon_r$. When the factor is 1, no error is made on this component during the reconstruction (as it is the case when $\epsilon = 0$). A value less than 1 means the reconstructed normal component is smaller than the ground truth, while a value over 1 means a bigger component than the ground truth.}
+  \label{q3:analytical}
+\end{figure}
+
+Until now, the noise impact was given analytically. If we try to actually perform a reconstruction on simulated data, there is something important to take into account. The conditioning of the matrix $\B{L}$ is very important, as it bounds the stability of the least-squares solution. This is even more related to this particular question because of the definition of the conditioning of the matrix $\kappa \left(\B{L}\right)$, as related by~\cite{ElGhaoui2002}:
+\begin{equation}
+\frac{ \| \B{L}_\epsilon ^{-1} - \B{L}^{-1} \| }{ \| \B{L}^{-1} \| }
+\le \kappa\left(\B{L} \right) \frac{ \| \B{L}_\epsilon - \B{L}  \| }{ \| \B{L} \| }
+\quad,
+\end{equation}
+where $\kappa \left(\B{L}\right) = \|\B{L}\| \cdot \|\B{L}^{-1}\|$. As~\cite{ElGhaoui2002} explains, ``the classical condition number $\kappa \left(\B{L}\right)$ is a measure of (relative) errors in the inverse of A when the latter is perturbed by an arbitrary, infinitesimally small matrix.''.
+
+Two experiments are presented: first, in fig.~\ref{q3:exp1}, a surface normal $\B{n}$ is fixed while the lighting angle $r$ and measurement error $\epsilon_r$ varies. In the second experiment shown in fig~\ref{q3:exp2} and \ref{q3:exp2a}, a given lighting angle $r$ is fixed, while the surface normal $\B{n}$ and the measurement error $\epsilon_r$ varies. In both experiments, the angular error and reciprocal condition number $\frac{1}{\kappa\left(L\right)}$ are shown.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.45\linewidth]{q3_experiment_1_view_1.pdf}
+  \includegraphics[width=0.45\linewidth]{q3_experiment_1_view_2.pdf}
+  \caption[Experiment 1]
+   {Angular error in degrees (z-axis) and reciprocal condition number (color) in function of $r \in \left[0, 70\right]$ (y-axis) and $\epsilon_r \in \left[-30, 30\right]$ (x-axis). The surface ground truth was set to 40\degree. \todo{make from normal/camera, not sphere} Both figures are two different point of views of the same function. Note how the region around $r = 30$ and $\epsilon = 10$ have a relatively good conditioning, but the result is much worse than regions with a lower measurement error $\epsilon$.}
+  \label{q3:exp1}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.45\linewidth]{q3_experiment_2_view_1.pdf}
+  \includegraphics[width=0.45\linewidth]{q3_experiment_2_view_2.pdf}
+  \caption[Experiment 2]
+   {Angular error in degrees (z-axis) and reciprocal condition number (color) in function of $\theta_{\mathrm{azimuth}} \in \left[0, 180\right]$ (y-axis) and $r \in \left[0, 70\right]$ (x-axis). Both figures are two different point of views of the same function. Note how the region around $r = 30$ and $\epsilon = 10$ have a relatively good conditioning, but the result is much worse than regions with a lower measurement error $\epsilon$.}
+  \label{q3:exp2}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.45\linewidth]{q3_experiment_2a_view_1.pdf}
+  \includegraphics[width=0.45\linewidth]{q3_experiment_2a_view_2.pdf}
+  \caption[Experiment 2 on extreme values]
+   {Experiment setup.}
+  \label{q3:exp2a}
+\end{figure}
+
+It is interesting to note [...].
 
 \section{Question 4}
 
@@ -204,6 +263,9 @@ where $\B{\Sigma}^\dagger$ is the pseudoinverse of $\B{\Sigma}$. This $\B{\Sigma
 This relation will provide as many eigenvectors as there are linearly independent vectors of $\B{AA}^T$. Since $m \gg n$, this means that at most $n$ eigenvectors of $\B{AA}^T$ will be found. The rest of the resulting matrix will contain only zeros. The vectors that are missing compose the null space of $\B{A}^T$ (and $\B{AA}^T$).
 
 \subsection{(b)}
+
+
+
 \subsection{(c)}
 \section{Question 6}
 ``Take a look at this paper (if you haven't done that already). The intro makes a very good point: color variation in natural illumination is a form of (single-image) photometric stereo.
