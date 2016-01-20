@@ -269,43 +269,43 @@ This relation will provide as many eigenvectors as there are linearly independen
 \subsection{(c)}
 \section{Question 6}
 
-Temporally-multiplexed Photometric Stereo employs captures at different times yielding different lighting directions. This means that each row of the lighting matrix $\B{L}$ are taken at a different time, when the scene's lighting condition changed. Contrarily, as \cite{Fyffe2011} puts it, ``In Spectrally-multiplexed photometric stereo, a scene is illuminated by multiple spectrally distinct light sources, and photographed by a camera system configured to capture multiple spectrally distinct color channels.'' In this work, they propose to divide the light spectrum in two using the Dolby\textsuperscript{\textregistered} dichroic filters, both having some non-overlapping red, green, and blue in their response spectrum.
+Temporally-multiplexed Photometric Stereo employs captures at different times yielding different lighting directions. This means that each row of the lighting matrix $\B{L}$ are taken at a different time, when the scene's lighting condition changed. Contrarily, as \cite{Fyffe2011} puts it, ``In Spectrally-multiplexed photometric stereo, a scene is illuminated by multiple spectrally distinct light sources, and photographed by a camera system configured to capture multiple spectrally distinct color channels.'' In their work, they propose to divide the light spectrum in two using the Dolby\textsuperscript{\textregistered} dichroic filters, both having some non-overlapping red, green, and blue in their response spectrum.
 
-Typically, PS is performed on pixel intensities, also called luminance $y_i$. This luminance can be expressed as a weighted sum of each pixel components, red $r_i$, green $g_i$ and blue $b_i$. The coefficients of the weighted sum depends on the colorspace used and on the measure (e.g.\ energy or perception). The two main luminance coefficients are based on the CIE 1931 colorspace, $y_i = 0.2126r_i + 0.7152g_i + 0.0722b_i$ and its perceptually based counterpart, $y_i = 0.299r_i + 0.587g_i + 0.114b_i$. This conversion to luminance can be problematic when analyzing natural illumination, though. Most of the energy in natural illumination, aside from the sun, is contained in the blue channel (as the sky is blue). However, this particular channel gets weighted down the most, as the blue channel coefficient is the lowest ($0.0722$ or $0.114$ in the earlier examples), making its impact on luminance much less than the other channels. To mitigate this issue, sophisticated channel fusion techniques have been proposed (e.g.\ \cite{jung-cvpr-15}), but this approach is clearly not a panacea to the problem.
+Typically, PS is performed on pixel intensities, also called the luminance $y_i$ of a pixel $i$. This luminance can be expressed as a weighted sum of each pixel components, red $r_i$, green $g_i$ and blue $b_i$. The coefficients of the weighted sum depends on the colorspace used and on the measure (e.g.\ energy or perception). The two main luminance coefficients are based on the CIE 1931 colorspace, $y_i = 0.2126r_i + 0.7152g_i + 0.0722b_i$ and its perceptually based counterpart, $y_i = 0.299r_i + 0.587g_i + 0.114b_i$. This conversion to luminance can be problematic when analyzing natural illumination, though. Most of the energy in natural illumination, aside from the sun, is contained in the blue channel (as the sky is blue). However, this particular channel gets weighted down the most, as the blue channel coefficient is the lowest ($0.0722$ or $0.114$ in the earlier examples), making its impact on luminance much less than the other channels. To mitigate this issue, sophisticated channel fusion techniques have been proposed (e.g.\ \cite{jung-cvpr-15}), but this approach is clearly not a panacea to the problem.
 
-This is where temporally-multiplexed outdoor photometric stereo can benefit from the color spectrum. To prevent the loss of information of merging the color channels together, \cite{johnson-cvpr-11} propose to take each color channel as a different light sources. They argue that the information contained in every color channel of an image lit by natural illumination is enough in most cases to bring new constraints to the PS problem, helping the reconstruction. Hence, every picture taken could fill 3 lines of the $\B{L}$ matrix, one per channel. This works because natural illumination is complex and may yield sensibly different vectors for each channel. Cloud occlusion could notably shift the color of the sun \todo{untested}.
+This is where temporally-multiplexed outdoor photometric stereo can benefit from the color spectrum. To prevent the loss of information of merging the color channels together, \cite{johnson-cvpr-11} propose to take each color channel as different captures, yielding different light sources. They argue that the information contained in every color channel of an image lit by natural illumination is enough in most cases to bring new constraints to the PS problem, helping the reconstruction. Hence, every picture taken could fill 3 rows of the $\B{L}$ matrix, one row per channel. This works because natural illumination is complex and may yield sensibly different lighting vectors for each channel. Cloud occlusion could notably shift the color of the sun \todo{untested}.
 
-There is a reason why \cite{Fyffe2011} employed such a complex apparatus using dichroic filters, though, instead of simply using the three channels of a common camera. If the albedo of the target object is mostly red, for example, it will have an almost null pixel intensity in the green and blue channels, potentially boosting the noise of the latter channels. Considering purely red, green or blue lights sometimes becomes a two-sources problem if a source a particular channel is in shadow. Furthermore, the algorithm provided by \cite{johnson-cvpr-11} suppose a constant albedo over the whole surface.
+There is a reason why \cite{Fyffe2011} employed such a complex apparatus using dichroic filters, though, instead of simply using the three channels of a common camera. If the albedo of the target object is mostly red, for example, it will have an almost null pixel intensity in the green and blue channels, potentially boosting the noise of the latter channels. \todo{bad example} Considering purely red, green or blue lights sometimes becomes a two-sources problem if a source a particular channel is in shadow. Furthermore, the algorithm provided by \cite{johnson-cvpr-11} suppose a constant albedo over the whole surface.
 %\cite{MacDonald-2007}.
 
 It is nevertheless an interesting idea worth exploring when performing further analysis on photometric stereo.
 
 \section{Question 7}
 
-Such an algorithm is presented in~\cite{Granados2010a}. The goal is to find the weights to fusion the images together in order to estimate as best as possible the irradiance of each pixel. Basically, this algorithm is as follows:
+Such an algorithm is presented in~\cite{Granados2010a}. The goal is to estimate, as best as possible, the irradiance $X_i$ of each pixel $i$. This is done by merging images of different exposure $j$ together. Basically, this algorithm is as follows:
 \begin{enumerate}
-  \item{Acquire dark frames for all exposures values $e_i$;}
-  \item{Assume constant variances $\hat{\sigma}_{X_i}^2{}^{(0)}$}
-  \item{Compute the maximum likelihood estimate $\hat{\mu}_X^{(i)}$ for each pixel irradiance taking into account $\hat{\sigma}_{X_i}^2{}^{(i-1)}$;}
-  \item{Estimate the pixel variances $\hat{\sigma}_{X_i}^2{}^{(i)}$ taking into account $\hat{\mu}^{(i-1)}$;}
+  \item{Acquire dark frames for all exposures values $e_j$;}
+  \item{Assume constant variances $\hat{\sigma}_{X_j}^2{}^{(0)}$}
+  \item{Compute the maximum likelihood estimate $\hat{\mu}_X^{(j)}$ for each pixel irradiance taking into account $\hat{\sigma}_{X_j}^2{}^{(j-1)}$;}
+  \item{Estimate the pixel variances $\hat{\sigma}_{X_j}^2{}^{(j)}$ taking into account $\hat{\mu}^{(j-1)}$;}
   \item{Repeat the two previous steps until convergence;}
-  \item{Smooth the final maximum likelihood estimate $\hat{\mu}_X$ according to the pixel variances $\hat{\sigma}_{X_i}^2$}
+  \item{Smooth the final maximum likelihood estimate $\hat{\mu}_X$ according to the pixel variances $\hat{\sigma}_{X_j}^2$}
 \end{enumerate}
 
-The optimal weighting function $w_{\mathrm{opt}}\left(v_i\right)$ of every pixel $v_i$ is the reciprocal of the pixel variances $\frac{1}{\hat{\sigma}_{X_i}^2}$.
+The optimal weighting function $w_{\mathrm{opt}}\left(v_j\right)$ of every pixel $v_j$ is the reciprocal of the pixel variances $\frac{1}{\hat{\sigma}_{X_j}^2}$.
 
-This algorithm is based on the idea that an image of given exposure $i$ has an irradiance $X_i$ related to the according to the image taken $V_i$ dark frame $B_i$, the exposure time $t_i$ and the camera gains $g$ (global) and $a$ (non-uniform, pixel-dependent) as such:
+This algorithm is based on the idea that the pixel $i$ on an image of given exposure $j$ has an irradiance $X_{ij}$ related to the according to the image taken $V_j$ dark frame $B_j$, the exposure time $t_j$ and the camera gains $g$ (global) and $a$ (non-uniform, pixel-dependent) as such:
 \begin{equation}
 \label{q7:eqirr}
-X_i \approx \frac{V_i - B_i}{t_i \cdot g \cdot a}
+X_{ij} \approx \frac{V_{ij} - B_{ij}}{t_j \cdot g \cdot a}
 \quad.
 \end{equation}
 
-Two types of noise is taken into account in this analysis: the thermal noise and spatial noise. In the first category fall the Photon Shot Noise, accounting the uncertainty of photons arrival and amounting to $\sqrt{\frac{X}{t_i}}$, the Dark Current Shot Noise, accounting for electron movement not caused by incoming photons, and the readout noise, explaining the noise and imprecision in the electronic circuit producing the output digital values. The second category, spatial noise, regroup Photo-Response Non-Uniformity, accounting for variability in gain over the various pixels, and the Dark Current Non-Uniformity, accounting for dark current variability across the sensor surface due to temperature differences.
+Two types of noise is taken into account in this analysis: the thermal noise and spatial noise. In the first category fall the Photon Shot Noise, accounting the uncertainty of photons arrival and amounting to $\sqrt{\frac{X}{t_j}}$, the Dark Current Shot Noise, accounting for electron movement not caused by incoming photons, and the readout noise, explaining the noise and imprecision in the electronic circuit producing the output digital values. The second category, spatial noise, regroup Photo-Response Non-Uniformity, accounting for variability in gain over the various pixels, and the Dark Current Non-Uniformity, accounting for dark current variability across the sensor surface due to temperature differences.
 
-The output digital value $V$ of a pixel $j$ on image $i$ is related to the irradiance it received $X_j$ by the exposure time $t_i$, the dark current $D_j$, the readout noise $N_R$ and sensor gains $g$ and $a_j$ as such:
+The output digital value $V$ of a pixel $i$ on image $j$ is related to the irradiance it received $X_{ij}$ by the exposure time $t_j$, the dark current $D_i$, the readout noise $N_R$ and sensor gains $g$ and $a_i$ as such:
 \begin{equation}
-V_{ij} = \left[ g \cdot \left( t_i \left( a_j X_j + D_j \right ) + N_R\right) \right] \quad,
+V_{ij} = \left[ g \cdot \left( t_j \left( a_i X_i + D_i \right ) + N_R\right) \right] \quad,
 \end{equation}
 where $\left[ \cdot \right]$ is the rounding operator. The variance of this pixel output value is
 \begin{equation}
@@ -317,14 +317,14 @@ where $\sigma_{E_{ij}}^2$ is the Photon Shot Noise and Dark Current Shot Noise c
 
 Plugging the variance of pixel output values~\eqref{q7:noisevariance} into the irradiance equation \eqref{q7:eqirr}, we get:
 \begin{equation}
-\sigma_{X_{ij}}^2 = \frac{\sigma_{V_{ij}}^2 + \sigma_{B_{ij}}^2}{t_i^2 g^2 a_j^2} \quad.
+\sigma_{X_{ij}}^2 = \frac{\sigma_{V_{ij}}^2 + \sigma_{B_{ij}}^2}{t_j^2 g^2 a_i^2} \quad.
 \end{equation}
 
 This analyze takes into account a single image. When merging the images together to form a HDR restoration, the variance due to noise becomes:
 \begin{equation}
-\sigma_{\mu_{X_j}}^2 = \frac{1}{\sum_{i \in S_j} \frac{t_i^2 g^2 a_j^2}{g^2 t_i \left( a_j \mu_{X_j} + 2 \mu_{D_j} \right) + 2 \sigma_R^2}} \quad,
+\sigma_{\mu_{X_{ij}}}^2 = \frac{1}{\sum_{j \in S_i} \frac{t_j^2 g^2 a_i^2}{g^2 t_j \left( a_i \mu_{X_i} + 2 \mu_{D_i} \right) + 2 \sigma_R^2}} \quad,
 \end{equation}
-when taking into account the set of images $S_j$ at pixel $j$.
+when taking into account the set of images $S_i$ at pixel $i$.
 
 \chapter{Questions by Jean-François Lalonde}
 
