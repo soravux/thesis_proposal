@@ -44,9 +44,11 @@
 \titleformat{\chapter}[display]
   {\normalfont\sffamily\huge\bfseries}
   %{\chaptertitlename\ \thechapter}{20pt}{\Huge}
-  {\vspace{-5.5em}}{0pt}{\Large}
+  {}{0pt}{\Large}
+
+\titlespacing\chapter{0pt}{12pt plus 4pt minus 2pt}{8pt plus 2pt minus 2pt}
 \titleformat{\section}
-  {\vspace{-3em}\normalfont\sffamily\large\bfseries}
+  {\normalfont\sffamily\large\bfseries}
   {\large\thesection}{1em}{}
 
 \linespread{1.5}
@@ -290,17 +292,17 @@ It is nevertheless an interesting idea worth exploring when performing further a
 
 \section{Question 7}
 
-Such an algorithm is presented in~\cite{Granados2010a}. The goal is to estimate, as best as possible, the irradiance $X_i$ of each pixel $i$. This is done by merging images of different exposure $j$ together. Basically, this algorithm is as follows:
+Such an algorithm is presented in~\cite{Granados2010a}. The goal is to estimate, as best as possible, the irradiance $X_i$ of each pixel $i$. This is done by merging images of different exposures $j$ together. Basically, the proposed algorithm is as follows:
 \begin{enumerate}
   \item{Acquire dark frames for all exposures values $e_j$;}
   \item{Assume constant variances $\hat{\sigma}_{X_j}^2{}^{(0)}$}
   \item{Compute the maximum likelihood estimate $\hat{\mu}_X^{(j)}$ for each pixel irradiance taking into account $\hat{\sigma}_{X_j}^2{}^{(j-1)}$;}
   \item{Estimate the pixel variances $\hat{\sigma}_{X_j}^2{}^{(j)}$ taking into account $\hat{\mu}^{(j-1)}$;}
   \item{Repeat the two previous steps until convergence;}
-  \item{Smooth the final maximum likelihood estimate $\hat{\mu}_X$ according to the pixel variances $\hat{\sigma}_{X_j}^2$}
+  \item{Smooth the final maximum likelihood estimate $\hat{\mu}_X$ according to the pixel variances $\hat{\sigma}_{X_j}^2$}.
 \end{enumerate}
 
-The optimal weighting function $w_{\mathrm{opt}}\left(v_j\right)$ of every pixel $v_j$ is the reciprocal of the pixel variances $\frac{1}{\hat{\sigma}_{X_j}^2}$.
+The optimal weighting function $w_{\mathrm{opt}}\left(v_j\right)$ of every pixel intensity $v_j$ is the reciprocal of the pixel variances $\frac{1}{\hat{\sigma}_{X_j}^2}$.
 
 This algorithm is based on the idea that the pixel $i$ on an image of given exposure $j$ has an irradiance $X_{ij}$ related to the according to the image taken $V_j$ dark frame $B_j$, the exposure time $t_j$ and the camera gains $g$ (global) and $a$ (non-uniform, pixel-dependent) as such:
 \begin{equation}
@@ -362,7 +364,7 @@ s_3^2 = \sum \underbrace{\begin{minipage}{84pt}\includegraphics[height=42pt,widt
 \cdot
 \left(
 \underbrace{\begin{minipage}{84pt}\includegraphics[height=42pt,width=84pt]{q8_solidangle.png}\end{minipage}}_{\text{Solid Angle}}
-\right)^3
+\right)^2
 \quad.
 \end{equation}
 
@@ -401,7 +403,7 @@ That being said, as~\cite{Sloan2008} \todo{others?} relate, the amount of negati
   \item{Performing the projection using an optimization with regularization to enforce positive light.}
 \end{enumerate}
 
-The first involves convolving the input signal with a window such as Hanning or Lanczos to limit the ringing effect of projecting onto a base-a major cause of negative reconstruction values-, called the Gibbs phenomenon. By the convolution theorem, performing an element-wise multiplication in the frequency domain after the projection would produce an identical result in a less expensive way, in terms of computational effort. This technique works by removing the higher frequencies of a signal before projecting it, mitigating some of the impact of sharp variations on the projection. This is analogous to the low-pass filter applied to an image before downscaling it\todo{?}.
+The first involves convolving the input signal with a window such as Hanning or Lanczos to limit the ringing effect of projecting onto a base---a major cause of negative reconstruction values---, called the Gibbs phenomenon. By the convolution theorem, performing an element-wise multiplication in the frequency domain after the projection would produce an identical result in a less expensive way, in terms of computational effort. This technique works by removing the higher frequencies of a signal before projecting it, mitigating some of the impact of sharp variations on the projection. This is analogous to the low-pass filter applied to an image before downscaling it\todo{?}.
 
 The second option changes the projection step to add a regularization:
 \begin{equation}
@@ -409,7 +411,18 @@ The second option changes the projection step to add a regularization:
 \end{equation}
 
 \subsection{(c)}
-HH paper
+
+We use the Fourier transform, Spherical Harmonics, the Z-Transform, etc. because of their useful properties, mainly the convolution theorem---element-wise multiplication in the spectral domain is a convolution in the spatial domain---, which derive from the orthogonality of their kernel. For example, the Fourier transform basis are all orthogonal w.r.t. each other in $\mathrm{L}^1$ space over the interval $\left[-\pi, \pi\right]$. As Spherical Harmonics are defined over a surface, its bases must be orthogonal w.r.t. each other in $\mathrm{L}^2$ space. Such set of functions were first described by Legendre, the eponymous associated polynomials $P_n^m(x)$. These associated Legendre polynomials $P_n^m(x)$ define an orthogonal basis in $\mathrm{L}^2$ over the interval $\left[ -1, 1 \right]$. To use them in spherical harmonics, this interval must be shifted to $\left[ 0, \pi \right]$ to cover a full azimuth side of the unit sphere (the equator of an half sphere). This can be done by taking the $\cos$ of the input value, giving the new bases $P_n^m\left(\cos(\theta)\right)$. Each base is multiplied by a second variable, the elevation $\phi$ on the interval $\left[ 0, 2\pi \right]$, to get a complete sphere surface.
+%For the Fourier transform, any pair of functions $\in e^{\frac{2\pi i}{N}kn}$ are orthogonal over the domain $\left[ 0, 2\pi \right]$, as $\int_{n=0}^{N}$
+
+To define the Spherical Harmonics on hemispheres instead of whole spheres, one must shift the interval of orthogonality of the basis from $\left[ 0, \pi \right]$ to $\left[ 0, \frac{\pi}{2} \right]$. Just as the Spherical Harmonics use the $\cos$ of the input values, it is possible to define the function $2\cos(\theta)-1$, which defines an hemisphere over the interval $\left[ 0, \frac{\pi}{2} \right]$. All the rest is the same as the Spherical Harmonics transform, aside from the normalization which should be done over half an hemisphere (over $2\pi$) instead of a full sphere (over $4\pi$).
+
+Many different definitions are available for Hemispherical Harmonics. The particular definition I just presented is available in \cite{Gautron2004}. Many more definitions use different orthogonal polynomials at their core, such as the Jacobi~\cite{Makhotkin1996} or the Zernike~\cite{Koenderink1996} polynomials. While having the same properties (e.g.\ compatible with the convolution and shift theorem), each have its own advantages and disadvantages. The definition based on the Legendre polynomials is probably the most easily comparable to standard Spherical Harmonics, though. In fact, they are similar in most points: the same basis polynomial, as well as efficient rotation and evaluation. They are, however, not orthogonal to one another, so multiplying their coefficients won't perform a surface integral.
+
+The main use of Hemispherical Harmonics is to represent BRDFs, though using it for sky hemisphere is a quite interesting idea. This model would, however, systematically suppose that zero energy comes from the nadir hemisphere. This could be corrected by approximating the ground BRDF (supposing we're outside) by another hemispherical harmonics transform, lighting it efficiently using the sky hemispherical harmonics and then lighting a surface element with both sky and ground combined.
+
+Another interesting difference is that, contrarily to spherical harmonics, there exist a simple formulation for hemispherical harmonics reconstruction that ensures non-negative results, as described by~\cite{Elhabian2011}.
+
 \subsection{(d)}
 Stupid SH tricks
 \section{Question 9}
