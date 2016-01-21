@@ -69,7 +69,7 @@
 
 \chapter{Questions by Denis Laudenreau}
 
-\section*{Question 1}
+\section{Question 1}
 
 \subsection{(a)}
 
@@ -344,9 +344,20 @@ s_n^m = \sum_{v=0}^{h} \sum_{u=0}^{w} \B{L}_{u,v} Y_n^m\left(u, v\right) \omega_
 \end{equation}
 for an environment map $\B{L}$ of width $w$ and height $h$. The solid angle subtended by pixel $u,v$, called $\omega_{u,v}$, is required to weight accordingly each pixel of both maps. Because of the latitude-longitude representation, each pixel covers a different surface area over the sphere. Without this solid angle weighting, pixels near the top and bottom edge of the environment map are more important, resulting in a brighter  [...].
 
+
 \begin{equation}
-s_n^m = \sum \includegraphics[height=1.6ex]{symbol} \includegraphics[height=1.6ex]{symbol} + [...]
+s_3^2 = \sum \underbrace{\begin{minipage}{84pt}\includegraphics[height=42pt,width=84pt]{q8_envmap.png}\end{minipage}}_{\text{Environment map}} \cdot
+\left(
+\underbrace{\begin{minipage}{84pt}\includegraphics[height=42pt,width=84pt]{q8_basis_3_2_real.png}\end{minipage}}_{\mathrm{Re}(Y_3^2)} + 
+\underbrace{\begin{minipage}{84pt}\includegraphics[height=42pt,width=84pt]{q8_basis_3_2_imag.png}\end{minipage} \; i}_{\mathrm{Im}(Y_3^2)}
+\right)
+\cdot
+\left(
+\underbrace{\begin{minipage}{84pt}\includegraphics[height=42pt,width=84pt]{q8_solidangle.png}\end{minipage}}_{\text{Solid Angle}}
+\right)^3
+\quad.
 \end{equation}
+
 
 \begin{figure}[hb]
   \centering
