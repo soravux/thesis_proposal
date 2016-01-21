@@ -40,6 +40,14 @@
 \usepackage[pagebackref=false,breaklinks=true,colorlinks=true,linkcolor=black,bookmarks=true]{hyperref}
 \usepackage{defs}
 \usepackage{amsmath,esint}
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\sffamily\huge\bfseries}
+  %{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+  {\vspace{-5.5em}}{0pt}{\Large}
+\titleformat{\section}
+  {\vspace{-3em}\normalfont\sffamily\large\bfseries}
+  {\large\thesection}{1em}{}
 
 \linespread{1.5}
 
