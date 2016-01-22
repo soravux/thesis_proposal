@@ -241,12 +241,39 @@ It is interesting to note [...].
 
 \section{Question 4}
 
-This setup is perfect to use Photometric Stereo.
-Supposing that YHG666 has no atmosphere, captures performed whole day.
-Object surface toward south / north (inclinaison de la trajectoire)
-moments when normal does not see the sun are discarded
+This setup is perfect for Photometric Stereo, I will assume this is the technique to be analyzing. I will ssuppose that YHG666 has no atmosphere and that the captures are performed whenever the sun-like star is shining over the monolith surface (nighttime comprised). I will also assume that the black hole does not curve the light rays coming from the sun-like star and that its gamma rays are always perturbing the sensor equally (even if the black hole is not in direct line of sight with the CCD sensor).
+
+I will suppose that YHG666 has no inclination, so the planar trajectory $\phi$ of the binary system (sun-like and black hole) is $90 -$ latitude of the immobile probe. If the planet had an inclination, the planar trajectory $\phi$ would be a combination of the latitude of the probe and the position of YHG666 with respect to the binary system (the season it's in).
+
+I will further suppose the monolith to be predominantly vertical. If the immobile probe is located in the northern hemisphere of the planet, the orientation of the flat surface to be reconstructed should be toward south. This ensures that the sun-like star shines upon the surface from dusk to dawn. For the same reason, if the probe landed in the southern hemisphere, the flat surface should be toward north. This setup is shown in fig.~\ref{q4:setup}. Given this setup, some of the possible trajectories of the binary system in the sky are shown in fig.~\ref{q4:trajectories}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.25\linewidth]{q4_setup.eps}
+  \caption[Setup of the experiment]
+   {Experiment setup, assuming the immobile probe landed in the northern hemisphere.}
+  \label{q4:setup}
+\end{figure}
 
 
+\begin{figure}
+  \centering
+  %\begin{tabular}{cc}
+  \includegraphics[width=0.45\linewidth]{q4_trajectory_el45_dev10.png}
+  %\begin{minipage}[b][][b]{0.33\linewidth}
+  \includegraphics[width=0.45\linewidth]{q4_trajectory_el20_dev10.png} \\ \vspace{1em}
+  \includegraphics[width=0.45\linewidth]{q4_trajectory_el45_dev35.png}
+  \includegraphics[width=0.45\linewidth]{q4_trajectory_el45_dev35.png}
+  %\end{minipage}
+  %$\phi = 20\degree$, $c = 10\degree$ &
+  %$\phi = 45\degree$, $c = 10\degree$ &
+  %$\phi = 45\degree$, $c = 35\degree$ &
+  %$\phi = 75\degree$, $c = 20\degree$
+  %\end{tabular}
+  \caption[Example trajectories]
+   {Example trajectories with various planar elevation $\phi$. Notice how the sun get visible again during nighttime when the angular deviation $c$ is high relatively to $\phi$.}
+  \label{q4:trajectories}
+\end{figure}
 
 least squares ->
 \begin{equation}
