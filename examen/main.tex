@@ -241,6 +241,23 @@ It is interesting to note [...].
 
 \section{Question 4}
 
+This setup is perfect to use Photometric Stereo.
+Supposing that YHG666 has no atmosphere, captures performed whole day.
+Object surface toward south / north (inclinaison de la trajectoire)
+moments when normal does not see the sun are discarded
+
+
+
+least squares ->
+\begin{equation}
+\hat{\B{x}} \pm \B{\delta} , \quad \text{with} \delta_k = 1.96\frac{\sigma}{\rho}\lambda_k
+\quad,
+\end{equation}
+where $\sigma$ is the image noise ($\sigma_\text{CCD}$ in the question), $\rho$ is the albedo of the surface and $\lambda_k$ is the square root of the $k$-th element on the diagonal of $\left(\B{L}^T\B{L}\right)^{-1}$~\cite{Hastie-09},
+Maximum uncertainty noise gain factor, \cite{holdgeoffroy-3dv-15}
+
+[$\sigma_\text{CCD}$ is directly a multiplier for the uncertainty b]
+
 \chapter{Questions by Paulo Gotardo}
 
 \section{Question 5}
@@ -342,7 +359,7 @@ when taking into account the set of images $S_i$ at pixel $i$.
 \subsection{(a)}
 \textbf{Given a known lighting environment map $\B{L}$ (e.g.\ in latitude-longitude representation), explain how SH coefficients $s$ can be estimated from $\B{L}$.}
 
-Each SH coefficients $s$ is linked to a basis function of order $n$ and mode $m$ defined over the sphere. Because these basis functions are orthogonal, the coefficients are computed by projecting the environment map $\B{L}$ on the according basis function, called $Y_n^m$:
+Each SH coefficients $s$ is linked to a basis function of degree $n$ and order $m$ defined over the sphere. Because these basis functions are orthogonal, the coefficients are computed by projecting the environment map $\B{L}$ on the according basis function, called $Y_n^m$:
 \begin{equation}
 s_n^m = \oiint\limits_{\Omega} \B{L}\left(\B{\omega} \right) Y_n^m \left( \B{\omega} \right) \mathrm{d} \B{\omega}   \quad.
 \end{equation}
@@ -386,7 +403,7 @@ f \cdot g=\int_{-p}^p f(x)g(x)\,dx\ \quad,
 explaining why discrete transforms in general (SH, Fourier, Z, etc.) work using a single per-element multiplication.
 \todo{least squares?}
 
-%Computing a coefficient $s$ of a given order $n$ and mode $m$ of spherical harmonic is be done by projecting the base $Y_n^m$ on the environment map $\B{L}$. Given a latitude-longitude representation,
+%Computing a coefficient $s$ of a given degree $n$ and order $m$ of spherical harmonic is be done by projecting the base $Y_n^m$ on the environment map $\B{L}$. Given a latitude-longitude representation,
 
 \subsection{(b)}
 
@@ -424,8 +441,37 @@ The main use of Hemispherical Harmonics is to represent BRDFs, though using it f
 Another interesting difference is that, contrarily to spherical harmonics, there exist a simple formulation for hemispherical harmonics reconstruction that ensures non-negative results, as described by~\cite{Elhabian2011}.
 
 \subsection{(d)}
-Stupid SH tricks
+As related by~\cite{Sloan2008,jarosz-08}, the convolution $f*g$ of two spherical signals $f$ an $g$ can be represented on the sphere if the basis functions are circularly symmetric (symmetric on the sphere azimuth). This means that, by the convolution theorem, a convolution in the spectral domain is the weighted multiplication of the coefficients. Each new coefficient can be computed by performing
+\begin{equation}
+\left(f * g\right)_n^m = \sqrt{\frac{4\pi}{2n+1}} h_n^0 f_n^m
+\quad,
+\end{equation}
+for each degree $n$ and order $m$. This equation provides an efficient computation of the convolution, as it represents a normalized dot product.
+
+This property can be used for rendering lambertian materials efficiently, as demonstrated by~\cite{Ramamoorthi2001a}. Suppose you have computed the spherical harmonics transform on an environment map $\hat{\B{L}}$ and a lambertian reflectance function $\hat{f}$ of a given surface normal. To compute the irradiance $\B{E}$ of this surface, it is possible to perform the convolution---a dot product in the frequency domain---between the environment map and the reflectance function as follows:
+\begin{align}
+\B{E} &= \underbrace{\begin{minipage}{42pt}\includegraphics[width=42pt]{q8_foreshortening_sphere.png}\end{minipage}}_{f}
+*
+\underbrace{\begin{minipage}{42pt}\includegraphics[width=42pt]{q8_envmap_sphere.png}\end{minipage}}_{\B{L}} \\
+\B{E} &= \sum_{n,m} \sqrt{\frac{4\pi}{2n + 1}} \hat{f}_n^m \cdot \hat{\B{L}}_n^m
+\qquad,
+\end{align}
+for all the computed degrees $n$ and orders $m$.
+
+% This is about rotation, not convolution: This implies that spherical harmonics basis functions are rotationally invariant, meaning that we can, for example, rotate any function in the spectral domain without aliasing by only looking at its unrotated counterpart.
+
+
+
 \section{Question 9}
+
+\textbf{Explain why spherical harmonics may not be well-suited for modeling high-frequency signals such as the sun. Describe an alternative representation that could better represent sunlight.}
+
+One problem of the full spherical harmonics transform is its prohibitive computing time. As such, people generally compute only the low frequency coefficients, leading to an incredibly precise approximation in some cases (e.g.\ irradiance on lambertian reflectance), but not so good in some other cases (e.g.\ radiance map). As this tuned-down version of the transform only represents low frequency components in the signal, this approximation cannot represent faithfully abrupt changes and spatially small but important variation, such as the radiance of the sun. It would need a combinations of high degree coefficients to approximate it correctly, which requires substantially more computational effort than estimating the low-frequency coefficients, which defeats the purpose of using spherical harmonics to perform efficient convolution.
+
+I see two alternative ways to model high-frequency signals such as the sky or the sunlight: 1) parametric (often physics-based) models and 2) non-parametric data-driven models. Many parametric sky models were developed---such as~\cite{preetham-siggraph-99,perez-se-93}---to capture the detail of the sun, the weather and the atmosphere. There is yet to come a database with enough skies to describe the sky using a data-driven approach, but my feeling is that it should appear soon in the literature.
+
+An interesting avenue to analyze would be the possibility to fit a low-frequency spherical harmonic to an environment map, superimposed with a fast-decay function. This combination could be used to represent more accurately the sun.
+
 
 {\small
 \bibliographystyle{acm}
