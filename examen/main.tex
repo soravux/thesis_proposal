@@ -245,45 +245,89 @@ This setup is perfect for Photometric Stereo, I will assume this is the techniqu
 
 I will suppose that YHG666 has no inclination, so the planar trajectory $\phi$ of the binary system (sun-like and black hole) is $90 -$ latitude of the immobile probe. If the planet had an inclination, the planar trajectory $\phi$ would be a combination of the latitude of the probe and the position of YHG666 with respect to the binary system (the season it's in).
 
-I will further suppose the monolith to be predominantly vertical. If the immobile probe is located in the northern hemisphere of the planet, the orientation of the flat surface to be reconstructed should be toward south. This ensures that the sun-like star shines upon the surface from dusk to dawn. For the same reason, if the probe landed in the southern hemisphere, the flat surface should be toward north. This setup is shown in fig.~\ref{q4:setup}. Given this setup, some of the possible trajectories of the binary system in the sky are shown in fig.~\ref{q4:trajectories}.
+I will further suppose the monolith to be predominantly vertical. If the immobile probe is located in the northern hemisphere of the planet, the orientation of the flat surface to be reconstructed should be toward south. This ensures that the sun-like star shines upon the surface from dusk to dawn. For the same reason, if the probe landed in the southern hemisphere, the flat surface should be toward north. This setup is shown in fig.~\ref{q4:setup}. Given this setup, some possible trajectories of the binary system in the sky are shown in fig.~\ref{q4:trajectories}.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.25\linewidth]{q4_setup.eps}
+  \includegraphics[width=0.2\linewidth]{q4_setup.eps}
   \caption[Setup of the experiment]
    {Experiment setup, assuming the immobile probe landed in the northern hemisphere.}
   \label{q4:setup}
 \end{figure}
 
-
 \begin{figure}
   \centering
-  %\begin{tabular}{cc}
-  \includegraphics[width=0.45\linewidth]{q4_trajectory_el45_dev10.png}
-  %\begin{minipage}[b][][b]{0.33\linewidth}
-  \includegraphics[width=0.45\linewidth]{q4_trajectory_el20_dev10.png} \\ \vspace{1em}
-  \includegraphics[width=0.45\linewidth]{q4_trajectory_el45_dev35.png}
-  \includegraphics[width=0.45\linewidth]{q4_trajectory_el45_dev35.png}
-  %\end{minipage}
-  %$\phi = 20\degree$, $c = 10\degree$ &
-  %$\phi = 45\degree$, $c = 10\degree$ &
-  %$\phi = 45\degree$, $c = 35\degree$ &
-  %$\phi = 75\degree$, $c = 20\degree$
-  %\end{tabular}
+  \begin{tabular}{cc}
+  \includegraphics[width=0.45\linewidth]{q4_trajectory_el20_dev10.png} &
+  \includegraphics[width=0.45\linewidth]{q4_trajectory_el45_dev10.png} \\ \vspace{1em}
+  (a) & (b) \\
+  \includegraphics[width=0.45\linewidth]{q4_trajectory_el45_dev35.png} &
+  \includegraphics[width=0.45\linewidth]{q4_trajectory_el75_dev25.png} \\
+  (c) & (d)
+  \end{tabular}
   \caption[Example trajectories]
-   {Example trajectories with various planar elevation $\phi$. Notice how the sun get visible again during nighttime when the angular deviation $c$ is high relatively to $\phi$.}
+   {Example trajectories with various planar elevation $\phi$ and angular deviation $c$. (a) $\phi = 20\degree$, $c = 10\degree$, (b) $\phi = 45\degree$, $c = 10\degree$, (c) $\phi = 45\degree$, $c = 35\degree$, (d) $\phi = 75\degree$, $c = 20\degree$. Notice how the sun get visible again during nighttime when the angular deviation $c$ is high relatively to $\phi$ ().}
   \label{q4:trajectories}
 \end{figure}
 
-least squares ->
+Reconstructing a scene could be done optimally (in a least-squares sense) by performing
 \begin{equation}
-\hat{\B{x}} \pm \B{\delta} , \quad \text{with} \delta_k = 1.96\frac{\sigma}{\rho}\lambda_k
+\hat{\B{n}} = \left( \B{L}^T\B{L}\right)^{-1} \B{L}^T \B{b}
 \quad,
 \end{equation}
-where $\sigma$ is the image noise ($\sigma_\text{CCD}$ in the question), $\rho$ is the albedo of the surface and $\lambda_k$ is the square root of the $k$-th element on the diagonal of $\left(\B{L}^T\B{L}\right)^{-1}$~\cite{Hastie-09},
-Maximum uncertainty noise gain factor, \cite{holdgeoffroy-3dv-15}
+where $b$ is the observed pixel intensities and $\left( \B{L}^T\B{L}\right)^{-1} \B{L}^T$ is the pseudoinverse of the lighting matrix $\B{L}$.
+As defined in \cite{holdgeoffroy-3dv-15}, a 95\% confidence interval for a normal $\B{n}$ is given by
+\begin{equation}
+\hat{\B{x}} \pm \B{\delta} , \quad \text{with} \delta_k = 1.96\frac{\sigma_{\text{CCD}}}{\rho}\lambda_k
+\quad,
+\end{equation}
+where $\sigma_\text{CCD}$ is the image noise, $\rho$ is the albedo of the surface and $\lambda_k$ is the square root of the $k$-th element on the diagonal of $\left(\B{L}^T\B{L}\right)^{-1}$~\cite{Hastie-09}.
+Supposing the albedo to be constant, the uncertainty of the reconstruction can then be seen as the product of $\sigma_\text{CCD}$ and a conditioning marker $\lambda_k$. This $\lambda_k$ can thus be seen as a direct gain factor on the noise $\sigma_\text{CCD}$. First, I will describe $\lambda_k$ in the problem setup, which will explain the impact of the angular deviation $c$ on the stability of the reconstruction, in terms of noise gain. Then, I will present simulations taking into account the noise $\sigma_\text{CCD}$.
 
-[$\sigma_\text{CCD}$ is directly a multiplier for the uncertainty b]
+\begin{figure}
+  \centering
+  \begin{tabular}{ccc}
+  \includegraphics[width=0.30\linewidth]{q4_noise_10.pdf} &
+  \includegraphics[width=0.30\linewidth]{q4_noise_45.pdf} &
+  \includegraphics[width=0.30\linewidth]{q4_noise_75.pdf} \\
+  (a) &
+  (b) &
+  (c)
+  \end{tabular}
+  \caption[Per-component noise amplification factor]
+   {Noise amplification factor $\lambda_k$, per-component ($\lambda_x$ in blue, $\lambda_y$ in red and $\lambda_z$ in orange). The $x$-axis is west-east, the $y$-axis is nadir-zenith and the $z$-axis is toward the camera. Note how $x$-axis uncertainty is relatively low and the $y$- and $z$-axes uncertainty very high when the angular deviation $c$ is low. This means that the surface reconstruction is well constrained on the west-east axis, but has little constraints on the other axes. The abrupt slope around $c = 30\degree$ on the $x$-axis in (b) is because the sun-like star falls under the horizon during the ``day'', making those captures unusable (see \ref{q4:trajectories} (c)).}
+  \label{q4:lambda}
+\end{figure}
+
+The noise gain per-component $\lambda_k$ is presented in fig.~\ref{q4:lambda}. [...]
+
+The impact of the noise $\sigma_\text{CCD}$ on the reconstruction normal is shown in fig.~\ref{q4:recons_err}. For the three first figures, three different noise values were selected: 0.5\%, 1\% and 5\% over the total dynamic range of the image sensed. They represent respectively, very roughly speaking, a top-of-the-line camera sensor (like a Nikon D5 or a Canon 1D), a good D-SLR and a very bad point-and-shoot camera. As can be seen on these figures, the distribution is mostly similar. As we predicted, the noise amplification factors $\lambda_k$ is multiplied by the sensor noise $\sigma_\text{CCD}$ to give the reconstruction error. If the amplification factors are constant, doubling the sensor noise would double the reconstruction error, as shown in the figure.
+
+For the three last figures [...]
+Noise multiplies [1\% only example]!
+
+Next time I plan to deploy an immobile probe on a planet, I will equip it with a polarizer [...]
+
+\begin{figure}
+  \centering
+  \begin{tabular}{ccc}
+  \includegraphics[width=0.30\linewidth]{q4_error_el_20_dev_10_noise_0_005000.pdf} &
+  \includegraphics[width=0.30\linewidth]{q4_error_el_20_dev_10_noise_0_010000.pdf} &
+  \includegraphics[width=0.30\linewidth]{q4_error_el_20_dev_10_noise_0_050000.pdf} \\
+  (a) &
+  (b) &
+  (c) \\
+  \includegraphics[width=0.30\linewidth]{q4_error_el_45_dev_10_noise_0_010000.pdf} &
+  \includegraphics[width=0.30\linewidth]{q4_error_el_45_dev_35_noise_0_010000.pdf} &
+  \includegraphics[width=0.30\linewidth]{q4_error_el_75_dev_25_noise_0_010000.pdf} \\
+  (d) &
+  (e) &
+  (f) 
+  \end{tabular}
+  \caption[Reconstruction error with $\phi = 10\degree$.]
+   {Reconstruction error for a planar trajectory $\phi = 10\degree$ for noise level $\sigma_\text{CCD} = 0.5\%$ (a), $1\%$ (b) and $5\%$ (c). As predicted, these three distributions are all very similar since the varying noise factor $\sigma_\text{CCD}$ is multiplied by a constant amplification factors $\lambda_k$.}
+  \label{q4:recons_err}
+\end{figure}
 
 \chapter{Questions by Paulo Gotardo}
 
