@@ -362,9 +362,49 @@ This relation will provide as many eigenvectors as there are linearly independen
 
 \subsection{(b)}
 
+Performing optimization using a $L_1$-norm loss function, usually called a least absolute deviations (LAD), is quite different in practice from using a least squares ($L_2$-norm loss function). While the LAD is more robust that least squares, meaning that it is more resistant to outliers in the data, it is also more unstable, meaning that a small change in a single data point can potentially change the solution a lot. Furthermore, a main major difference is that while least square allows only a single optimal solution, LAD allows multiple solutions to be equivalent. An example of this phenomenon can be visualized in fig.~\ref{q5c:paths}.
 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.45\linewidth]{q8_a_pyramid_real.png}
+  \includegraphics[width=0.45\linewidth]{q8_a_pyramid_imag.png}
+  \caption[ Description ]
+   \todo{L1 vs L2 paths}
+   \label{q5c:paths}
+\end{figure}
+
+As such, least squares can be solved directly in a linear system of equation by taking the (pseudo-)inverse of the matrix. But LAD needs linear programming to be solved, as the constraints it poses may lead to multiple solutions. [ST]
+
+A soft-thresholding function is defined as such:
+\begin{equation}
+\begin{cases}
+  x + \lambda & \text{if } x\leq -\lambda \\
+  0           & \text{if } -\lambda < x < \lambda \\
+  x - \lambda & \text{if } x\geq \lambda
+\end{cases}
+\quad.
+\end{equation}
+\todo{validate}
+.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.45\linewidth]{q8_a_pyramid_real.png}
+  \includegraphics[width=0.45\linewidth]{q8_a_pyramid_imag.png}
+  \caption[ Description ]
+   {http://www.mathworks.com/help/wavelet/ref/wthresh.html}
+\end{figure}
+
+An example of an algorithm employing the soft-thresholding is explained by \cite{Kowalski2015}. It is possible to 
 
 \subsection{(c)}
+
+The problem is a least squares minimization. It is a generalization of the core of photometric stereo, where a given pixel intensity $b$ for an image $i$ should be explained by the multiplication of the light rays $\B{\omega}_j$ by the normal $\B{x}$ of a surface. The $\max$ ensures that light rays under the surface does not contribute to the pixel intensity.
+
+An optimization strategy could be thought as the standard least squares sense.
+
+Another could be using the result from (b).
+
 \section{Question 6}
 
 Temporally-multiplexed Photometric Stereo employs captures at different times yielding different lighting directions. This means that each row of the lighting matrix $\B{L}$ are taken at a different time, when the scene's lighting condition changed. Contrarily, as \cite{Fyffe2011} puts it, ``In Spectrally-multiplexed photometric stereo, a scene is illuminated by multiple spectrally distinct light sources, and photographed by a camera system configured to capture multiple spectrally distinct color channels.'' In their work, they propose to divide the light spectrum in two using the Dolby\textsuperscript{\textregistered} dichroic filters, both having some non-overlapping red, green, and blue in their response spectrum.
