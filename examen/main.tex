@@ -362,40 +362,61 @@ This relation will provide as many eigenvectors as there are linearly independen
 
 \subsection{(b)}
 
-Performing optimization using a $L_1$-norm loss function, usually called a least absolute deviations (LAD), is quite different in practice from using a least squares ($L_2$-norm loss function). While the LAD is more robust that least squares, meaning that it is more resistant to outliers in the data, it is also more unstable, meaning that a small change in a single data point can potentially change the solution a lot. Furthermore, a main major difference is that while least square allows only a single optimal solution, LAD allows multiple solutions to be equivalent. An example of this phenomenon can be visualized in fig.~\ref{q5c:paths}.
+Performing optimization using a $L_1$-norm loss function, usually called a least absolute deviations (LAD), is quite different in practice from using a least squares ($L_2$-norm loss function). While the LAD is more robust that least squares, meaning that it is more resistant to outliers in the data, it is also more unstable, meaning that a small change in a single data point can potentially change the solution a lot. Furthermore, a main major difference is that while least square allows only a single optimal solution, LAD allows multiple solutions to be equivalent. An example of this phenomenon can be visualized in fig.~\ref{q5b:paths}.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.45\linewidth]{q8_a_pyramid_real.png}
-  \includegraphics[width=0.45\linewidth]{q8_a_pyramid_imag.png}
-  \caption[ Description ]
-   \todo{L1 vs L2 paths}
-   \label{q5c:paths}
+  \includegraphics[width=0.45\linewidth]{q5b_manhattan_distance.pdf}
+  \caption[ Examples of $L_1$ and $L_2$ distances ]
+   {The distance between two black dots is shown in $L_1$ (red, blue and yellow) and $L_2$ (green) space. Note that there is only one optimal solution in $L_2$, there are many possible optimal solutions in $L_1$ which yield the same $L_1$ distance. Image under public domain license from Wikimedia Commons.}
+   \label{q5b:paths}
 \end{figure}
 
-As such, least squares can be solved directly in a linear system of equation by taking the (pseudo-)inverse of the matrix. But LAD needs linear programming to be solved, as the constraints it poses may lead to multiple solutions. [ST]
+As such, least squares can be solved directly in a linear system of equation by taking the (pseudo-)inverse of the matrix. But LAD needs linear programming to be solved, as the constraints it poses may lead to multiple solutions. Fortunately, this problem is a convex, simplifying a great deal the strategies applying to it. Unfortunately, this loss function is not strictly differentiable, making gradient descent methods more difficult to apply.
 
-A soft-thresholding function is defined as such:
+One way to compute this is by performing an iterative method. Suppose the problem is written in matrix form
 \begin{equation}
+\B{x}^* = \arg \min_{\B{x}} \| \B{b} - \B{A}^T\B{x} \|_1 \quad, \B{x} \in \mathbb{R}^m,
+\quad.
+\end{equation}
+Then, one can propose this algorithm to solve the problem:
+\begin{enumerate}
+  \item Let $e_i^(k)$ = 0, and $k = 0$;
+  \item Compute $\B{x} = \arg \min_{\B{x}} \B{Ax} - b - e$;
+  \item Compute $e_i^{k} = \B{Ax} - \B{b}$;
+  \item Let $k = k + 1$;
+  \item Repeat the three last steps until convergence.
+\end{enumerate}
+
+One way to get around this is to perform soft-thresholding. A soft-thresholding function is defined as such:
+\begin{equation}
+\Phi(x) = 
 \begin{cases}
-  x + \lambda & \text{if } x\leq -\lambda \\
+  x + \lambda & \text{if } x\leq -\lambda \\ 
   0           & \text{if } -\lambda < x < \lambda \\
   x - \lambda & \text{if } x\geq \lambda
 \end{cases}
 \quad.
 \end{equation}
 \todo{validate}
-.
+The general appearance of this function is shown in fig.~\ref{q5b:soft-thresh}.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.45\linewidth]{q8_a_pyramid_real.png}
-  \includegraphics[width=0.45\linewidth]{q8_a_pyramid_imag.png}
-  \caption[ Description ]
-   {http://www.mathworks.com/help/wavelet/ref/wthresh.html}
+  \includegraphics[width=0.45\linewidth]{q5c_soft_threshold_example.pdf}
+  \caption[ Example soft-thresholding function ]
+   {Example of soft-thresholding function, with $lambda = 0.5$.}
+  \label{q5b:soft-thresh}
 \end{figure}
 
-An example of an algorithm employing the soft-thresholding is explained by \cite{Kowalski2015}. It is possible to 
+
+[An example of an algorithm employing the soft-thresholding is explained by \cite{Kowalski2015}.]
+\begin{equation}
+\Phi \left(  \right)
+\quad,
+\end{equation}
+
+
 
 \subsection{(c)}
 
