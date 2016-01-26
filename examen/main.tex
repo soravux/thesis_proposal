@@ -85,9 +85,53 @@
 
 Suppose q as the distance between the strip light and P along the x-axis.
 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\linewidth]{q1a_setup.pdf}
+  \caption[Problem setup]
+   {Cross-section view of the problem setup.}
+  \label{q1a:setup}
+\end{figure}
+
+The irradiance equation is defined as \todo{1/pi???}
 \begin{equation}
 E(r) = \frac{1}{\pi} \int_{\Omega} L(r,\omega)\cos(\theta) d\omega
+\quad,
 \end{equation}
+where $L(r,\omega)$ is the radiance of the emitting surface and $\theta$ is the angle between the receiving surface normal and the light ray, for the whole hemisphere lighting the surface $\Omega$.
+
+In Cartesian coordinates, this can be written as
+\begin{equation}
+E(r) = \int_{z= -r - \frac{w}{2}}^{-r+\frac{w}{2}} \int_{y= - \frac{q}{2}}^{\frac{q}{2}} L \cos(\theta) d\omega
+\quad,
+\label{q1a:irr}
+\end{equation}
+as $L$ is constant over the surface.
+
+It is possible to rewrite $\cos(\theta)$ as
+\begin{align}
+\cos(\theta)  &= \frac{-q}{r} \\
+              &= \frac{-h}{\sqrt{h^2 + y^2 + z^2}}
+\quad,
+\label{q1a:cos}
+\end{align}
+and $d\omega$ as
+\begin{align}
+d\omega &= \frac{\cos(\theta)}{r^2} dA \\
+        &= \frac{h}{r} \frac{1}{r^2} dA \\
+        &= \frac{h}{\left(h^2 + y^2 + z^2\right)^\frac{3}{2}} dA
+\quad.
+\label{q1a:dw}
+\end{align}
+
+Rewriting equation equation \eqref{q1a:irr} using equations \eqref{q1a:cos} and \eqref{q1a:dw} gives
+\begin{align}
+E(r) &= \int_{z= -r - \frac{w}{2}}^{-r+\frac{w}{2}} \int_{y= - \frac{q}{2}}^{\frac{q}{2}} L \frac{-h}{\sqrt{h^2 + y^2 + z^2}} \frac{h}{\left(h^2 + y^2 + z^2\right)^\frac{3}{2}} dzdy \\
+     &= L \int_{z= -r - \frac{w}{2}}^{-r+\frac{w}{2}} \int_{y= - \frac{q}{2}}^{\frac{q}{2}} \frac{-h^2}{\left(h^2 + y^2 + z^2\right)^2} dzdy
+\quad.
+\end{align}
+
+
 \begin{align*}
 E(r) &= \frac{1}{\pi} \int_{-\arctan(\frac{\frac{H}{2}}{\sqrt{q^2+r^2}})}^{\arctan(\frac{\frac{H}{2}}{\sqrt{q^2+r^2}})} \int_{0}^{\arctan(\frac{w}{q})} L(r,\omega)\cos(\theta) \sin(\theta) d\theta d\phi \\
      &= 2 \cdot \arctan(\frac{\frac{H}{2}}{\sqrt{q^2+r^2}}) \cdot \int_{\arctan(\frac{q}{r-W/2})}^{\arctan(\frac{q}{r+W/2})} L(r,\omega)\cos(\theta) \sin(\theta) d\theta \\
@@ -97,11 +141,26 @@ E(r) &= \frac{1}{\pi} \int_{-\arctan(\frac{\frac{H}{2}}{\sqrt{q^2+r^2}})}^{\arct
 
 \subsection{(b)}
 
-As H gets bigger, the integral along the elevation axis gets closer toward $\pi$.
+As H gets bigger, the fraction $\frac{-h^2}{\left(h^2 + y^2 + z^2\right)^2}$ tends toward $0$, as the values of $y$ grows bigger while the rest stay constant.
+
+In spherical coordinates, the integral along the elevation axis gets closer toward $\pi$.
 
 \subsection{(c)}
 
+Supposing $r$ stays roughly the same, the difference is that the $\cos(\theta)$ factor should be removed, as there is always a complete cylinder cross-section shining on the surface element (?) P, as can be seen in fig.~\ref{q1c:setup}. This means that the expression of $E_{\text{tube}}$ is
+\begin{align}
+E_{\text{tube}} &= E_{\text{strip}} \frac{1}{\cos(\theta)}
+                &= E_{\text{strip}} \frac{\sqrt{h^2+y^2+z^2}}{h}
+\quad.
+\end{align}
 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\linewidth]{q1c_setup.pdf}
+  \caption[Problem setup]
+   {Cross-section view of the problem setup.}
+  \label{q1c:setup}
+\end{figure}
 
 \section{Question 2}
 \subsection{(a)}
@@ -163,7 +222,7 @@ Given the simple lambertian reflectance equation (supposing unit albedo), we can
 b = \B{L}\B{n}
 \quad.
 \end{equation}
-Photometric Stereo is the inverse process, where the normals $\B{n} = \left[ n_x \; n_y \; n_z\right]^T$ are deduced from the lighting matrix $\B{L}$ and the pixel intensity $b$. This can be done by inverting the light matrix $\B{L}$, hence performing a least squares fit to the problem, as such:
+Photometric Stereo is the inverse process, where the normals $\B{n} = \left[ n_x \; n_y \; n_z\right]^T$ are solved from the lighting matrix $\B{L}$ and the pixel intensity $b$. This can be done by inverting the light matrix $\B{L}$, as such:
 \begin{equation}
 \B{L}^{-1}\B{b} = \B{n} = 
 \begin{bmatrix}
@@ -200,7 +259,7 @@ where the normal components $n_x$, $n_y$ and $n_z$ are all multiplied by a non-u
   \label{q3:analytical}
 \end{figure}
 
-Until now, the noise impact was given analytically. If we try to actually perform a reconstruction on simulated data, there is something important to take into account. The conditioning of the matrix $\B{L}$ is very important, as it bounds the stability of the least-squares solution. This is even more related to this particular question because of the definition of the conditioning of the matrix $\kappa \left(\B{L}\right)$, as related by~\cite{ElGhaoui2002}:
+Until now, the noise impact was given analytically. If we try to actually perform a reconstruction on simulated data, there is something important to take into account that was left behind in the analytical analysis, namely the noise. The conditioning of the matrix $\B{L}$ is very important, as it bounds the stability of the solution when noise disturbs the matrix. This is even more related to this particular question because of the definition of the conditioning of the matrix $\kappa \left(\B{L}\right)$, as related by~\cite{ElGhaoui2002}:
 \begin{equation}
 \frac{ \| \B{L}_\epsilon ^{-1} - \B{L}^{-1} \| }{ \| \B{L}^{-1} \| }
 \le \kappa\left(\B{L} \right) \frac{ \| \B{L}_\epsilon - \B{L}  \| }{ \| \B{L} \| }
@@ -484,6 +543,15 @@ This analyze takes into account a single image. When merging the images together
 \sigma_{\mu_{X_{ij}}}^2 = \frac{1}{\sum_{j \in S_i} \frac{t_j^2 g^2 a_i^2}{g^2 t_j \left( a_i \mu_{X_i} + 2 \mu_{D_i} \right) + 2 \sigma_R^2}} \quad,
 \end{equation}
 when taking into account the set of images $S_i$ at pixel $i$.
+
+If we suppose a simpler model with standard Gaussian noise $\mathcal{N}(0,\sigma_i^2$ instead, the overall noise when using an optimal fusion algorithm such as the one described previously is
+\begin{equation}
+\sigma_{\mu_{X_{ij}}}^2 = \frac{1}{\sum_{j \in S_i} \frac{1}{\sigma_j^2}}
+\quad,
+\end{equation}
+where $\sigma_j^2$ is proportional to $X_i$.
+
+Its implications to photometric stereo are multiple. First, having better HDR environment maps allows a better estimation of the lighting shining over a given surface, improving the estimation of the $\B{L}$ matrix. Second, when using HDR object pictures, this would improve the quality of each pixel intensity $b_i$. Finally, a better noise model allows us to understand where lies the uncertainty in the reconstruction, which 3D axis is uncertain and where should we inject more priors (i.e.\ regularization) or where we should rely on a different technique to improve the reconstruction of a particular portion of surface or an uncertain component of the surface normal.
 
 \chapter{Questions by Jean-François Lalonde}
 
