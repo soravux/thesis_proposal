@@ -32,6 +32,7 @@
 \usepackage{gensymb}
 \usepackage{xcolor}
 \usepackage{nicefrac}
+\usepackage{placeins}
 %\usepackage{adjustbox}
 %\usepackage{authblk}
 % to control spacing in item lists
@@ -43,13 +44,16 @@
 \usepackage{titlesec}
 \titleformat{\chapter}[display]
   {\normalfont\sffamily\huge\bfseries}
-  %{\chaptertitlename\ \thechapter}{20pt}{\Huge}
   {}{0pt}{\Large}
-
 \titlespacing\chapter{0pt}{12pt plus 4pt minus 2pt}{8pt plus 2pt minus 2pt}
+
 \titleformat{\section}
   {\normalfont\sffamily\large\bfseries}
-  {\large\thesection}{1em}{}
+  {}{1em}{}
+
+\titleformat{\subsection}
+  {\normalfont\large\bfseries}
+  {}{1em}{}
 
 \linespread{1.5}
 
@@ -242,10 +246,15 @@ But, instead of solving the usual equation, the problem suppose we have a system
 Solving this problem gives us:
 \begin{equation}
 \B{L}_\epsilon^{-1}\B{b} = \B{n}_\epsilon = 
-\left[\begin{array}{c} n_x \cdot \frac{\sin\!\left(r\right)}{\sin\!\left(\epsilon_r + r\right)}\\ n_y \cdot \frac{\sin\!\left(r\right)}{\sin\!\left(\epsilon_r + r\right)}\\ n_z \cdot \frac{\sqrt{1 - {\sin\!\left(r\right)}^2}}{\sqrt{1 - {\sin\!\left(\epsilon_r + r\right)}^2}} \end{array}\right]
+\left[\begin{array}{c} n_x \cdot \frac{\sin\!\left(r\right)}{\sin\!\left(\epsilon_r + r\right)}\\ n_y \cdot \frac{\sin\!\left(r\right)}{\sin\!\left(\epsilon_r + r\right)}\\ n_z \cdot \frac{\sqrt{1 - {\sin\!\left(r\right)}^2}}{\sqrt{1 - {\sin\!\left(\epsilon_r + r\right)}^2}} \end{array}\right] =
+\begin{bmatrix}
+n_x \cdot \Delta_{\epsilon_x} \\
+n_y \cdot \Delta_{\epsilon_y} \\
+n_z \cdot \Delta_{\epsilon_z} \\
+\end{bmatrix}
 \quad,
 \end{equation}
-where the normal components $n_x$, $n_y$ and $n_z$ are all multiplied by a non-unit factor due to the measurement error $\epsilon_r$. These factors are shown in fig.~\ref{q3:analytical}.
+where the normal components $n_x$, $n_y$ and $n_z$ are all multiplied by a non-unit factor due to the measurement error $\epsilon_r$. Note that $\Delta_{\epsilon_x} = \Delta_{\epsilon_y}$. These factors are shown in fig.~\ref{q3:analytical}. Given a large measure error ($\epsilon_r$ near $30\degree$ or $-30\degree$), it is interesting to note that the $x$ and $y$-axis components of the recovered normal are more stable given a large lighting triangle (high value of $r$), while the $z$-axis component is more stable at lower values of $r$. Globally, the $x$ and $y$-axis components are more unstable, as even with no measurement error ($\epsilon_r = 0\degree$), they cannot be solved accurately for small values of $r$.
 
 \begin{figure}
   \centering
@@ -259,7 +268,7 @@ where the normal components $n_x$, $n_y$ and $n_z$ are all multiplied by a non-u
   \label{q3:analytical}
 \end{figure}
 
-Until now, the noise impact was given analytically. If we try to actually perform a reconstruction on simulated data, there is something important to take into account that was left behind in the analytical analysis, namely the noise. The conditioning of the matrix $\B{L}$ is very important, as it bounds the stability of the solution when noise disturbs the matrix. This is even more related to this particular question because of the definition of the conditioning of the matrix $\kappa \left(\B{L}\right)$, as related by~\cite{ElGhaoui2002}:
+Until now, the noise impact was given analytically. If we try to actually perform a reconstruction on simulated data, there is something important to take into account that was left behind in the analytical analysis, namely the noise. The conditioning of the matrix $\B{L}$ is an interesting stability measure, as it bounds the stability of the solution when noise disturbs the matrix. This is even more related to this particular question because of the definition of the conditioning of the matrix $\kappa \left(\B{L}\right)$, as related by~\cite{ElGhaoui2002},
 \begin{equation}
 \frac{ \| \B{L}_\epsilon ^{-1} - \B{L}^{-1} \| }{ \| \B{L}^{-1} \| }
 \le \kappa\left(\B{L} \right) \frac{ \| \B{L}_\epsilon - \B{L}  \| }{ \| \B{L} \| }
@@ -267,23 +276,38 @@ Until now, the noise impact was given analytically. If we try to actually perfor
 \end{equation}
 where $\kappa \left(\B{L}\right) = \|\B{L}\| \cdot \|\B{L}^{-1}\|$. As~\cite{ElGhaoui2002} explains, ``the classical condition number $\kappa \left(\B{L}\right)$ is a measure of (relative) errors in the inverse of A when the latter is perturbed by an arbitrary, infinitesimally small matrix.''.
 
-Two experiments are presented: first, in fig.~\ref{q3:exp1}, a surface normal $\B{n}$ is fixed while the lighting angle $r$ and measurement error $\epsilon_r$ varies. In the second experiment shown in fig~\ref{q3:exp2} and \ref{q3:exp2a}, a given lighting angle $r$ is fixed, while the surface normal $\B{n}$ and the measurement error $\epsilon_r$ varies. In both experiments, the angular error and reciprocal condition number $\frac{1}{\kappa\left(L\right)}$ are shown.
+Two experiments are presented: first, a surface normal $\B{n}$ is fixed while the lighting angle $r$ and measurement error $\epsilon_r$ varies. The results are presented in fig.~\ref{q3:exp1}. In the second experiment, a given lighting angle $r$ is fixed, while the surface normal $\B{n}$ and the measurement error $\epsilon_r$ varies. The results are shown in fig~\ref{q3:exp2} and \ref{q3:exp2a}. In both experiments, the angular error and reciprocal condition number $\nicefrac{1}{\kappa\left(L\right)}$ are displayed.
+
+\begin{figure}
+  \centering
+  \begin{tabular}{ccc}
+  \includegraphics[width=0.2\linewidth]{q3_surface_normal_18-5.eps} &
+  \includegraphics[width=0.2\linewidth]{q3_surface_normal_45.eps} &
+  \includegraphics[width=0.2\linewidth]{q3_surface_normal_90.eps} \\
+  (a) & (b) & (c)
+  \end{tabular}
+  \caption[Surface normal examples]
+   {Top-down view of three example surfaces normals where $\theta_{\text{azimuth}}$ is (a) $18.5\degree$, (b) $45\degree$ and (c) $90\degree$.}
+  \label{q3:angle_setup}
+\end{figure}
 
 \begin{figure}
   \centering
   \includegraphics[width=0.45\linewidth]{q3_experiment_1_view_1.pdf}
   \includegraphics[width=0.45\linewidth]{q3_experiment_1_view_2.pdf}
   \caption[Experiment 1]
-   {Angular error in degrees (z-axis) and reciprocal condition number (color) in function of $r \in \left[0, 70\right]$ (y-axis) and $\epsilon_r \in \left[-30, 30\right]$ (x-axis). The surface ground truth was set to 40\degree. \todo{make from normal/camera, not sphere} Both figures are two different point of views of the same function. Note how the region around $r = 30$ and $\epsilon = 10$ have a relatively good conditioning, but the result is much worse than regions with a lower measurement error $\epsilon$.}
+   {Angular error in degrees (z-axis) and reciprocal condition number (color) in function of $r \in \left[0, 70\right]$ (y-axis) and $\epsilon_r \in \left[-30, 30\right]$ (x-axis). The surface ground truth $\theta_{\text{azimuth}}$ is set to 40\degree on the plane containing the first light, the center of the triangle and the surface element to reconstruct (see fig.~\ref{q3:angle_setup}). Both figures are two different point of views of the same function. Note how the region around $r = 30$ and $\epsilon = 10$ have a relatively good conditioning, but the result is much worse than regions with a lower measurement error $\epsilon$.}
   \label{q3:exp1}
 \end{figure}
+
+
 
 \begin{figure}
   \centering
   \includegraphics[width=0.45\linewidth]{q3_experiment_2_view_1.pdf}
   \includegraphics[width=0.45\linewidth]{q3_experiment_2_view_2.pdf}
   \caption[Experiment 2]
-   {Angular error in degrees (z-axis) and reciprocal condition number (color) in function of $\theta_{\mathrm{azimuth}} \in \left[0, 180\right]$ (y-axis) and $r \in \left[0, 70\right]$ (x-axis). Both figures are two different point of views of the same function. Note how the region around $r = 30$ and $\epsilon = 10$ have a relatively good conditioning, but the result is much worse than regions with a lower measurement error $\epsilon$.}
+   {Angular error in degrees (z-axis) and reciprocal condition number (color) in function of $\theta_{\text{azimuth}} \in \left[0, 180\right]$ (y-axis) and $r \in \left[0, 70\right]$ (x-axis). Some example angles for $\theta_{\text{azimuth}}$ are shown in fig.~\ref{q3:angle_setup}. Both figures are two different point of views of the same function. Note how the region around $r = 30$ and $\epsilon = 10$ have a relatively good conditioning, but the result is much worse than regions with a lower measurement error $\epsilon$.}
   \label{q3:exp2}
 \end{figure}
 
@@ -291,26 +315,31 @@ Two experiments are presented: first, in fig.~\ref{q3:exp1}, a surface normal $\
   \centering
   \includegraphics[width=0.45\linewidth]{q3_experiment_2a_view_1.pdf}
   \includegraphics[width=0.45\linewidth]{q3_experiment_2a_view_2.pdf}
-  \caption[Experiment 2 on extreme values]
-   {Experiment setup.}
+  \caption[Experiment 2 on a small lighting angle]
+   {Same experiment as fig.~\ref{q3:exp2}, but with an lighting angle $r = 5\degree$. The missing section in the surface is when the error is $\epsilon_r = -5\degree$, meaning that the measure positioned all three light sources at the exact same location ($r = 0\degree$).}
   \label{q3:exp2a}
 \end{figure}
 
-It is interesting to note [...].
+\todo{DO WITH ANOTHER PLAN}
 
+It is interesting to note from fig~\ref{q3:exp2} and \ref{q3:exp2a} that if a surface normal is pointing directly to the center of the triangle formed by the three lights, its recovery will always be correct, even in sub-optimal lighting condition. This is because the values of the three pixel intensities are always equal, making the ground truth the only possible solution to the linear system of equation. Furthermore, the reconstruction gives the right result when no error is applied ($\epsilon_r = 0\degree$), except when not all three light sources are shining on the surface (when $\theta_{\text{azimuth}}$ is near $0\degree$ or $180\degree$). In this particular problem, it is interesting to note that the most stable matrix won't necessarily result in the most accurate reconstruction, because of the systematic measurement error $\epsilon_r$. In this particular problem, as long as the three lighting sources are in line of sight with the target surface, the reconstruction angular error is a function of the ground truth surface normal and the lighting measurement error.
+
+\todo{DEFINE X-Y-Z}
+
+\FloatBarrier
 \section{Question 4}
 
-This setup is perfect for Photometric Stereo, I will assume this is the technique to be analyzing. I will ssuppose that YHG666 has no atmosphere and that the captures are performed whenever the sun-like star is shining over the monolith surface (nighttime comprised). I will also assume that the black hole does not curve the light rays coming from the sun-like star and that its gamma rays are always perturbing the sensor equally (even if the black hole is not in direct line of sight with the CCD sensor).
+I will assume the reconstruction technique to analyze is photometric stereo. I will suppose that YHG666 has no atmosphere and that the captures are performed whenever the sun-like star is shining over the monolith surface (nighttime comprised). I will also assume that the black hole does not disturb the light rays coming from the sun-like star (no lighting curvature) and that its gamma rays are always perturbing the sensor equally (even if the black hole is not in direct line of sight with the CCD sensor).
 
-I will suppose that YHG666 has no inclination, so the planar trajectory $\phi$ of the binary system (sun-like and black hole) is $90 -$ latitude of the immobile probe. If the planet had an inclination, the planar trajectory $\phi$ would be a combination of the latitude of the probe and the position of YHG666 with respect to the binary system (the season it's in).
+I will suppose that YHG666 has no inclination, so the planar trajectory $\phi$ of the binary system (sun-like and black hole) is $90\degree$ minus the latitude of the immobile probe. If the planet had an inclination, the planar trajectory $\phi$ would be a combination of the latitude of the probe and the position of YHG666 with respect to the binary system (its day of the year). Furthermore, this inclination would create an angle of declination making the sun-like star not totally planar, as explained in~\cite{shen-pg-14}, improving the reconstruction performance when performed at another time than the equinoxes.
 
-I will further suppose the monolith to be predominantly vertical. If the immobile probe is located in the northern hemisphere of the planet, the orientation of the flat surface to be reconstructed should be toward south. This ensures that the sun-like star shines upon the surface from dusk to dawn. For the same reason, if the probe landed in the southern hemisphere, the flat surface should be toward north. This setup is shown in fig.~\ref{q4:setup}. Given this setup, some possible trajectories of the binary system in the sky are shown in fig.~\ref{q4:trajectories}.
+I will further suppose the monolith to be predominantly vertical. If the immobile probe is located in the northern hemisphere of the planet, the orientation of the flat surface to be reconstructed should be toward south to maximize the reconstruction performance. This ensures that the sun-like star shines upon the surface from dusk to dawn. For the same reason, if the probe landed in the southern hemisphere, the flat surface should be toward north. An example setup is shown in fig.~\ref{q4:setup}. Some possible trajectories of the binary system in the sky are shown in fig.~\ref{q4:trajectories}. For the rest of the answer, I will suppose the probe to have landed in the northern hemisphere.
 
 \begin{figure}
   \centering
   \includegraphics[width=0.2\linewidth]{q4_setup.eps}
-  \caption[Setup of the experiment]
-   {Experiment setup, assuming the immobile probe landed in the northern hemisphere.}
+  \caption[Experiment setup]
+   {Top-down view of the experiment setup, assuming the immobile probe landed in the northern hemisphere. The $x$-axis is west-east, the $y$-axis is nadir-zenith (toward ``top'') and the $z$-axis is north-south toward the camera. }
   \label{q4:setup}
 \end{figure}
 
@@ -325,7 +354,7 @@ I will further suppose the monolith to be predominantly vertical. If the immobil
   (c) & (d)
   \end{tabular}
   \caption[Example trajectories]
-   {Example trajectories with various planar elevation $\phi$ and angular deviation $c$. (a) $\phi = 20\degree$, $c = 10\degree$, (b) $\phi = 45\degree$, $c = 10\degree$, (c) $\phi = 45\degree$, $c = 35\degree$, (d) $\phi = 75\degree$, $c = 20\degree$. Notice how the sun get visible again during nighttime when the angular deviation $c$ is high relatively to $\phi$ ().}
+   {Example trajectories with various planar elevation $\phi$ and angular deviation $c$. (a) $\phi = 20\degree$, $c = 10\degree$, (b) $\phi = 45\degree$, $c = 10\degree$, (c) $\phi = 45\degree$, $c = 35\degree$, (d) $\phi = 75\degree$, $c = 20\degree$. Notice how the sun get visible again during nighttime when the angular deviation $c$ is high relatively to $\phi$, as in (c).}
   \label{q4:trajectories}
 \end{figure}
 
@@ -341,7 +370,7 @@ As defined in \cite{holdgeoffroy-3dv-15}, a 95\% confidence interval for a norma
 \quad,
 \end{equation}
 where $\sigma_\text{CCD}$ is the image noise, $\rho$ is the albedo of the surface and $\lambda_k$ is the square root of the $k$-th element on the diagonal of $\left(\B{L}^T\B{L}\right)^{-1}$~\cite{Hastie-09}.
-Supposing the albedo to be constant, the uncertainty of the reconstruction can then be seen as the product of $\sigma_\text{CCD}$ and a conditioning marker $\lambda_k$. This $\lambda_k$ can thus be seen as a direct gain factor on the noise $\sigma_\text{CCD}$. First, I will describe $\lambda_k$ in the problem setup, which will explain the impact of the angular deviation $c$ on the stability of the reconstruction, in terms of noise gain. Then, I will present simulations taking into account the noise $\sigma_\text{CCD}$.
+Supposing the albedo to be constant, the uncertainty of the reconstruction can then be seen as the product of $\sigma_\text{CCD}$ and a conditioning marker $\lambda_k$. This $\lambda_k$ can be interpreted as a gain factor, amplifying the uncertainty due to the noise $\sigma_\text{CCD}$. First, I will explain the impact of the angular deviation $c$ on the stability of the reconstruction in terms of noise gain. Then, I will present simulations results taking into account the noise $\sigma_\text{CCD}$.
 
 \begin{figure}
   \centering
@@ -354,18 +383,19 @@ Supposing the albedo to be constant, the uncertainty of the reconstruction can t
   (c)
   \end{tabular}
   \caption[Per-component noise amplification factor]
-   {Noise amplification factor $\lambda_k$, per-component ($\lambda_x$ in blue, $\lambda_y$ in red and $\lambda_z$ in orange). The $x$-axis is west-east, the $y$-axis is nadir-zenith and the $z$-axis is toward the camera. Note how $x$-axis uncertainty is relatively low and the $y$- and $z$-axes uncertainty very high when the angular deviation $c$ is low. This means that the surface reconstruction is well constrained on the west-east axis, but has little constraints on the other axes. The abrupt slope around $c = 30\degree$ on the $x$-axis in (b) is because the sun-like star falls under the horizon during the ``day'', making those captures unusable (see \ref{q4:trajectories} (c)).}
+   {Noise amplification factor $\lambda_k$, per-component ($\lambda_x$ in blue, $\lambda_y$ in red and $\lambda_z$ in orange), as defined in fig.~\ref{q4:setup}.}
   \label{q4:lambda}
 \end{figure}
 
-The noise gain per-component $\lambda_k$ is presented in fig.~\ref{q4:lambda}. [...]
+A different noise gain $\lambda_k$ is applied to each of the 3D axes, namely $\lambda_x$, $\lambda_y$ and $\lambda_z$ for the $x$, $y$ and $z$-axis, respectively. For the current setup, these three noise gain factors are presented in fig.~\ref{q4:lambda}. It is worth noting that for small to medium deviation angles $c$, the noise gain for the $x$-axis is relatively small, whereas the two other components are large. This means that the $x$-axis component of the reconstruction is relatively certain, while the reconstruction is more uncertain on the $y$ and $z$-axis. This is coherent with the problem setup: a lot of information is present in the west-east axis, but the small angular deviation $c$ gives almost no information on the other axes (see \ref{q4:setup} for the axis definition). The abrupt slope around $c = 30\degree$ on the $x$-axis in fig.~\ref{q4:lambda} (b) is caused by the sun-like star falling under the horizon during the ``day'', making those capture times unusable, as the surface normal points toward south (see \ref{q4:trajectories} (c)).
 
-The impact of the noise $\sigma_\text{CCD}$ on the reconstruction normal is shown in fig.~\ref{q4:recons_err}. For the three first figures, three different noise values were selected: 0.5\%, 1\% and 5\% over the total dynamic range of the image sensed. They represent respectively, very roughly speaking, a top-of-the-line camera sensor (like a Nikon D5 or a Canon 1D), a good D-SLR and a very bad point-and-shoot camera. As can be seen on these figures, the distribution is mostly similar. As we predicted, the noise amplification factors $\lambda_k$ is multiplied by the sensor noise $\sigma_\text{CCD}$ to give the reconstruction error. If the amplification factors are constant, doubling the sensor noise would double the reconstruction error, as shown in the figure.
+The impact of the noise $\sigma_\text{CCD}$ on the reconstruction normal is shown in fig.~\ref{q4:recons_err}. For the three first figures (a-c), three different noise values were selected: 0.5\%, 1\% and 5\% over the total dynamic range of the image sensed. They represent respectively, very roughly speaking, the usual noise (on earth, without prominent noise source) of a top-of-the-line camera sensor (like a Nikon D5 or a Canon 1D), a good D-SLR and a pretty bad point-and-shoot camera. The others parameters (angular deviation $c$ and planar trajectory elevation $\phi$) were kept fixed for these three figures. The angular error distribution among for these figures is mostly similar. As predicted, the noise amplification factors $\lambda_k$ is multiplied by the sensor noise $\sigma_\text{CCD}$ to give the reconstruction error. If the amplification factors are constant (same angular deviation $c$ and planar trajectory elevation $\phi$), doubling the sensor noise would double the reconstruction error.
 
-For the three last figures [...]
-Noise multiplies [1\% only example]!
+For fig.~\ref{q4:recons_err} (d-f), the noise $\sigma_\text{CCD}$ was set to $1\%$. For a different noise level, just multiply the $x$-axis of the histogram with the desired amount of noise. The general idea of these figures is that increasing the angular deviation $c$ improves the reconstruction performance, as a quick comparison of fig.~\ref{q4:recons_err} (d) and (e) can confirm. This is coherent with the noise gain analysis in fig.~\ref{q4:lambda}, where increasing the angular deviation $c$ yields a better overall reconstruction, where the uncertainty decreases for the $y$ and $z$-axis components. Only the $x$-axis increases, first insignificantly in (a) and (c) versus the gain brought by the other components. In (b), as explained previously, the sun-like star is lost below the horizon during the course of the day, generating the bump in the $x$-axis uncertainty.
 
-Next time I plan to deploy an immobile probe on a planet, I will equip it with a polarizer [...]
+The second variable influencing the reconstruction is the planar trajectory elevation $\phi$. Fig.~\ref{q4:recons_err} (f) has a slightly better reconstruction performance than (d), even if its angular deviation $c$ is smaller, simply because the planar trajectory elevation $\phi$ is better suited in this case. This effect can also be seen in fig.~\ref{q4:lambda} (a) where the $y$-axis component (the red line) is very uncertain until an angular deviation $c \approx 30\degree$ for a planar trajectory elevation $\phi = 10\degree$, whereas in (b) a planar trajectory elevation of $\phi = 45\degree$ yields pretty good overall certainty at $c \approx 20\degree$.
+
+%Next time I plan to deploy an immobile probe on a planet, I will equip it with a polarizing filter. Since most light reflected by a non-metallic surface is polarized, it could help block some of the unwanted
 
 \begin{figure}
   \centering
@@ -394,11 +424,11 @@ Next time I plan to deploy an immobile probe on a planet, I will equip it with a
 \subsection{(a)}
 \textbf{Let $\B{A} \in \mathbb{R}^{m \times n}$, with $m \gg n$. Show how the eigenvalues and (unit) eigenvectors of $\B{AA}^T$ can be obtained from the eigen decomposition of the smaller matrix $\B{A}^T\B{A}$.}
 
-By the definition of the Singular Value Decomposition (SVD), any matrix real $A$ can be factored such as
+By the definition of the Singular Value Decomposition (SVD), any real matrix $\B{A}$ can be factored such as
 \begin{equation}
 \B{A} = \B{U \Sigma V}^T \quad.
 \end{equation}
-Matrices $\B{U}$, $\B{\Sigma}$ and $\B{V}$ are closely related to the eigen decomposition. First, $\Sigma$ is a diagonal matrix yielding the singular values of $A$, which are the square roots of the eigenvalues of both $\B{AA}^T$ and $\B{A}^T\B{A}$. Second, the columns of $\B{U}$ and $\B{V}$ are, by definition, the eigenvectors of $\B{AA}^T$ and $\B{A}^T\B{A}$, respectively. We can convince ourselves of both with these relations:
+These matrices $\B{U}$, $\B{\Sigma}$ and $\B{V}$ are closely related to the eigen decomposition. First, $\Sigma$ is a diagonal matrix yielding the singular values of $A$, which are the square roots of the eigenvalues of both $\B{AA}^T$ and $\B{A}^T\B{A}$. Second, the columns of $\B{U}$ and $\B{V}$ are, by definition, the eigenvectors of $\B{AA}^T$ and $\B{A}^T\B{A}$, respectively. We can convince ourselves of both statements with these relations:
 \begin{align*}
 \B{AA}^T           &= \B{V\Sigma}^T\B{U}^T \; \B{U\Sigma V}^T
                         &&= \B{V\Sigma}^T\B{IU\Sigma V}^T 
@@ -407,9 +437,9 @@ Matrices $\B{U}$, $\B{\Sigma}$ and $\B{V}$ are closely related to the eigen deco
                         &&= \B{U\Sigma V}^T \; \B{V\Sigma}^T\B{U}^T
                         &&&= \B{U\Sigma}\B{\Sigma}^T\B{U}^T \quad.
 \end{align*}
-As the columns of $\B{U}$ and $\B{V}$ are a orthonormal basis (as they hold the eigenvectors), both $\B{U}^T\B{U}^T$ and $\B{V}^T\B{V}$ gives the identity matrix $\B{I}$ as result.
+As the columns of $\B{U}$ and $\B{V}$ are a orthonormal basis (as they hold the eigenvectors), both $\B{U}^T\B{U}$ and $\B{V}^T\B{V}$ result in the identity matrix $\B{I}$.
 
-Two relationships are sought in the question: the eigenvalues and eigenvectors of both pre and post multiplication by the transpose. First, the relationship between the eigenvalues of $\B{A}^T\B{A}$ and $\B{AA}^T$ is pretty simple: they are the same. On the other hand, both their eigenvectors is only related through $\B{A}$:
+Two relationships are sought in the question: the eigenvalues and eigenvectors of both pre and post multiplication by the transpose. First, the relationship between the eigenvalues of $\B{A}^T\B{A}$ and $\B{AA}^T$ is pretty simple: they are the same. On the other hand, their eigenvectors are only related through $\B{A}$:
 \begin{align*}
 \B{A}  &= \B{U \Sigma V}^T \\
 \B{AV} &= \B{U \Sigma V}^T \B{V} = \B{U \Sigma I} \\
@@ -421,13 +451,13 @@ This relation will provide as many eigenvectors as there are linearly independen
 
 \subsection{(b)}
 
-Performing optimization using a $L_1$-norm loss function, usually called a least absolute deviations (LAD), is quite different in practice from using a least squares ($L_2$-norm loss function). While the LAD is more robust that least squares, meaning that it is more resistant to outliers in the data, it is also more unstable, meaning that a small change in a single data point can potentially change the solution a lot. Furthermore, a main major difference is that while least square allows only a single optimal solution, LAD allows multiple solutions to be equivalent. An example of this phenomenon can be visualized in fig.~\ref{q5b:paths}.
+Performing optimization using a $L_1$-norm loss function, sometimes called a least absolute deviations (LAD), is quite different in practice from using a least squares ($L_2$-norm loss function). While the LAD is more robust that least squares, meaning that it is more resistant to outliers in the data, it is also more unstable, meaning that a small change in a single data point can potentially change the solution a lot. Furthermore, a main major difference is that while least square allows only a single optimal solution, LAD allows multiple solutions to be equivalent. An example of this phenomenon can be visualized in fig.~\ref{q5b:paths}.
 
 \begin{figure}
   \centering
   \includegraphics[width=0.45\linewidth]{q5b_manhattan_distance.pdf}
   \caption[ Examples of $L_1$ and $L_2$ distances ]
-   {The distance between two black dots is shown in $L_1$ (red, blue and yellow) and $L_2$ (green) space. Note that there is only one optimal solution in $L_2$, there are many possible optimal solutions in $L_1$ which yield the same $L_1$ distance. Image under public domain license from Wikimedia Commons.}
+   {The distance between two black dots is shown in $L_1$ (red, blue and yellow) and $L_2$ (green) space. Note that while there is only one optimal solution in $L_2$, there are many possible optimal solutions in $L_1$ which yield the same $L_1$ distance. Image under public domain license from Wikimedia Commons.}
    \label{q5b:paths}
 \end{figure}
 
@@ -435,14 +465,14 @@ As such, least squares can be solved directly in a linear system of equation by 
 
 One way to compute this is by performing an iterative method. Suppose the problem is written in matrix form
 \begin{equation}
-\B{x}^* = \arg \min_{\B{x}} \| \B{b} - \B{A}^T\B{x} \|_1 \quad, \B{x} \in \mathbb{R}^m,
-\quad.
+\B{x}^* = \arg \min_{\B{x}} \| \B{b} - \B{A}^T\B{x} \|_1 \quad, \B{x} \in \mathbb{R}^m
+\quad,
 \end{equation}
 Then, one can propose this algorithm to solve the problem:
 \begin{enumerate}
-  \item Let $e_i^(k)$ = 0, and $k = 0$;
-  \item Compute $\B{x} = \arg \min_{\B{x}} \B{Ax} - b - e$;
-  \item Compute $e_i^{k} = \B{Ax} - \B{b}$;
+  \item Let $e_i^{(0)}$ = 0, and $k = 0$;
+  \item Compute $\B{x}^{(k+1)} = \arg \min_{\B{x}} \B{Ax}^{(k)} - b - e$;
+  \item Compute $e_i^{k} = \B{Ax}^{(k+1)} - \B{b}$;
   \item Let $k = k + 1$;
   \item Repeat the three last steps until convergence.
 \end{enumerate}
@@ -479,24 +509,23 @@ The general appearance of this function is shown in fig.~\ref{q5b:soft-thresh}.
 
 \subsection{(c)}
 
-The problem is a least squares minimization. It is a generalization of the core of photometric stereo, where a given pixel intensity $b$ for an image $i$ should be explained by the multiplication of the light rays $\B{\omega}_j$ by the normal $\B{x}$ of a surface. The $\max$ ensures that light rays under the surface does not contribute to the pixel intensity.
+The problem is a least squares minimization. It is a generalization of the core of photometric stereo, where a given pixel intensity $b$ for an image $i$ is explained by the multiplication of the light rays $\B{\omega}_j$ by the normal $\B{x}$ of a surface. The $\max$ ensures that light rays under the surface does not contribute to the pixel intensity.
 
 An optimization strategy could be thought as the standard least squares sense.
+[sensitive to outliers] [Multiple similar values will drive the solution towards them.]
 
 Another could be using the result from (b).
 
 \section{Question 6}
 
-Temporally-multiplexed Photometric Stereo employs captures at different times yielding different lighting directions. This means that each row of the lighting matrix $\B{L}$ are taken at a different time, when the scene's lighting condition changed. Contrarily, as \cite{Fyffe2011} puts it, ``In Spectrally-multiplexed photometric stereo, a scene is illuminated by multiple spectrally distinct light sources, and photographed by a camera system configured to capture multiple spectrally distinct color channels.'' In their work, they propose to divide the light spectrum in two using the Dolby\textsuperscript{\textregistered} dichroic filters, both having some non-overlapping red, green, and blue in their response spectrum.
+Temporally-multiplexed Photometric Stereo employs captures at different times yielding different lighting directions. This means that each row of the lighting matrix $\B{L}$ are taken at a different time, when the scene's lighting conditions changed. Contrarily, as \cite{Fyffe2011} puts it, ``In Spectrally-multiplexed photometric stereo, a scene is illuminated by multiple spectrally distinct light sources, and photographed by a camera system configured to capture multiple spectrally distinct color channels.'' In their work, they propose to divide the light spectrum in two using the Dolby\textsuperscript{\textregistered} dichroic filters, both having some non-overlapping red, green, and blue in their response spectrum.
 
-Typically, PS is performed on pixel intensities, also called the luminance $y_i$ of a pixel $i$. This luminance can be expressed as a weighted sum of each pixel components, red $r_i$, green $g_i$ and blue $b_i$. The coefficients of the weighted sum depends on the colorspace used and on the measure (e.g.\ energy or perception). The two main luminance coefficients are based on the CIE 1931 colorspace, $y_i = 0.2126r_i + 0.7152g_i + 0.0722b_i$ and its perceptually based counterpart, $y_i = 0.299r_i + 0.587g_i + 0.114b_i$. This conversion to luminance can be problematic when analyzing natural illumination, though. Most of the energy in natural illumination, aside from the sun, is contained in the blue channel (as the sky is blue). However, this particular channel gets weighted down the most, as the blue channel coefficient is the lowest ($0.0722$ or $0.114$ in the earlier examples), making its impact on luminance much less than the other channels. To mitigate this issue, sophisticated channel fusion techniques have been proposed (e.g.\ \cite{jung-cvpr-15}), but this approach is clearly not a panacea to the problem.
+Typically, PS is performed on pixel intensities, also called the luminance $y_i$ of a pixel $i$. This luminance can be expressed as a weighted sum of each pixel components, red $r_i$, green $g_i$ and blue $b_i$. The coefficients of the weighted sum depends on the colorspace used and on the measure (e.g.\ energy or perception). The two main luminance conversion functions are based on the CIE 1931 colorspace, $y_i = 0.2126r_i + 0.7152g_i + 0.0722b_i$ and its perceptually based counterpart, $y_i = 0.299r_i + 0.587g_i + 0.114b_i$. This conversion to luminance can be problematic when analyzing natural illumination, though. Most of the energy in natural illumination, aside from the small sun in the sky, is contained in the blue channel (as the sky is blue). However, this particular channel gets weighted down the most, as the blue channel coefficient is the lowest ($0.0722$ or $0.114$ in the earlier examples), making its impact on luminance much less than the other channels. To mitigate this issue, sophisticated channel fusion techniques have been proposed (e.g.\ \cite{jung-cvpr-15}), but this approach is clearly not a panacea to the problem.
 
-This is where temporally-multiplexed outdoor photometric stereo can benefit from the color spectrum. To prevent the loss of information of merging the color channels together, \cite{johnson-cvpr-11} proposes to take each color channel as different captures, yielding different light sources. They argue that the information contained in every color channel of an image lit by natural illumination is enough in most cases to bring new constraints to the PS problem, helping the reconstruction. Hence, every picture taken could fill 3 rows of the $\B{L}$ matrix, one row per channel. This works because natural illumination is complex and may yield sensibly different lighting vectors for each channel. Cloud occlusion could notably shift the color of the sun \todo{untested}.
+This is where temporally-multiplexed outdoor photometric stereo can benefit from the color spectrum. To prevent the loss of information of merging the color channels together, \cite{johnson-cvpr-11} proposes to take each color channel as different captures, yielding different light sources. They argue that the information contained in every color channel of an image lit by natural illumination is enough in most cases to bring new constraints to the PS problem, helping the reconstruction. Hence, every picture taken could fill 3 rows of the $\B{L}$ matrix, one row per channel. This works because natural illumination is complex and may yield sensibly different lighting vectors for each channel. Cloud occlusion could possibly shift the color of the sun, sending the mean light in different directions depending on its wavelength.
 
-There is a reason why \cite{Fyffe2011} employed such a complex apparatus using dichroic filters, though, instead of simply using the three channels of a common camera. If the albedo of the target object is mostly red, for example, it will have an almost null pixel intensity in the green and blue channels, potentially boosting the noise of the latter channels. \todo{bad example} Considering purely red, green or blue lights sometimes becomes a two-sources problem if a source a particular channel is in shadow. Furthermore, the algorithm provided by \cite{johnson-cvpr-11} suppose a constant albedo over the whole surface.
+While using spectral cues in temporally-multiplexed photometric stereo is worth investigating, it is far from being trivial to incorporate in general. For example, \cite{johnson-cvpr-11} supposed a constant albedo over the whole reconstructed surface in order to make their algorithm work. \cite{Fyffe2011} made the idea work on more generic surfaces, but used dichroic filters instead of simply using the three channels of a common camera, making the capture apparatus more complex. It is nevertheless an interesting idea to explore when performing further analysis on photometric stereo.
 %\cite{MacDonald-2007}.
-
-It is nevertheless an interesting idea worth exploring when performing further analysis on photometric stereo.
 
 \section{Question 7}
 
@@ -512,16 +541,16 @@ Such an algorithm is presented in~\cite{Granados2010a}. The goal is to estimate,
 
 The optimal weighting function $w_{\mathrm{opt}}\left(v_j\right)$ of every pixel intensity $v_j$ is the reciprocal of the pixel variances $\frac{1}{\hat{\sigma}_{X_j}^2}$.
 
-This algorithm is based on the idea that the pixel $i$ on an image of given exposure $j$ has an irradiance $X_{ij}$ related to the according to the image taken $V_j$ dark frame $B_j$, the exposure time $t_j$ and the camera gains $g$ (global) and $a$ (non-uniform, pixel-dependent) as such:
+This algorithm is based on the idea that the pixel $i$ on an image of given exposure $j$ has an irradiance $X_{ij}$ related to the according to the pixel intensity $V_j$, its related dark frame $B_j$, the exposure time $t_j$ and the camera gains $g$ (global) and $a_i$ (non-uniform, pixel-dependent) as such:
 \begin{equation}
 \label{q7:eqirr}
-X_{ij} \approx \frac{V_{ij} - B_{ij}}{t_j \cdot g \cdot a}
+X_{ij} \approx \frac{V_{ij} - B_{ij}}{t_j \cdot g \cdot a_i}
 \quad.
 \end{equation}
 
-Two types of noise is taken into account in this analysis: the thermal noise and spatial noise. In the first category fall the Photon Shot Noise, accounting the uncertainty of photons arrival and amounting to $\sqrt{\frac{X}{t_j}}$, the Dark Current Shot Noise, accounting for electron movement not caused by incoming photons, and the readout noise, explaining the noise and imprecision in the electronic circuit producing the output digital values. The second category, spatial noise, regroup Photo-Response Non-Uniformity, accounting for variability in gain over the various pixels, and the Dark Current Non-Uniformity, accounting for dark current variability across the sensor surface due to temperature differences.
+Two types of noise is taken into account in this analysis: the thermal noise and spatial noise. In the first category fall the photon shot noise, accounting the uncertainty of photons arrival, the dark current shot noise, accounting for electron movement not caused by incoming photons, and the readout noise, explaining the noise and imprecision in the electronic circuit producing the output digital values. The second category, spatial noise, regroup photo-response non-uniformity, accounting for variability in gain over the various pixels, and the dark current non-uniformity, accounting for dark current variability across the sensor surface due to temperature differences.
 
-The output digital value $V$ of a pixel $i$ on image $j$ is related to the irradiance it received $X_{ij}$ by the exposure time $t_j$, the dark current $D_i$, the readout noise $N_R$ and sensor gains $g$ and $a_i$ as such:
+The output digital value $V_{ij}$ of a pixel $i$ on image $j$ is related to the irradiance it received $X_{ij}$ by the exposure time $t_j$, the dark current $D_i$, the readout noise $N_R$ and sensor gains $g$ and $a_i$ as such:
 \begin{equation}
 V_{ij} = \left[ g \cdot \left( t_j \left( a_i X_i + D_i \right ) + N_R\right) \right] \quad,
 \end{equation}
@@ -531,27 +560,27 @@ where $\left[ \cdot \right]$ is the rounding operator. The variance of this pixe
 \sigma_{V_{ij}}^2 = g^2 \sigma_{E_{ij}}^2 + \sigma_R^2
 \quad,
 \end{equation}
-where $\sigma_{E_{ij}}^2$ is the Photon Shot Noise and Dark Current Shot Noise combined, and $\sigma_R^2$ the readout noise, including the quantization error.
+where $\sigma_{E_{ij}}^2$ is the photon shot noise and dark current shot noise combined, and $\sigma_R^2$ the readout noise, including the quantization error.
 
-Plugging the variance of pixel output values~\eqref{q7:noisevariance} into the irradiance equation \eqref{q7:eqirr}, we get:
+Plugging the pixel output variance described in equation~\eqref{q7:noisevariance} into the irradiance equation~\eqref{q7:eqirr}, we get:
 \begin{equation}
 \sigma_{X_{ij}}^2 = \frac{\sigma_{V_{ij}}^2 + \sigma_{B_{ij}}^2}{t_j^2 g^2 a_i^2} \quad.
 \end{equation}
 
-This analyze takes into account a single image. When merging the images together to form a HDR restoration, the variance due to noise becomes:
+Until now, this analysis takes into account a single image. When merging the images together to form a HDR restoration, the variance due to noise becomes:
 \begin{equation}
 \sigma_{\mu_{X_{ij}}}^2 = \frac{1}{\sum_{j \in S_i} \frac{t_j^2 g^2 a_i^2}{g^2 t_j \left( a_i \mu_{X_i} + 2 \mu_{D_i} \right) + 2 \sigma_R^2}} \quad,
 \end{equation}
 when taking into account the set of images $S_i$ at pixel $i$.
 
-If we suppose a simpler model with standard Gaussian noise $\mathcal{N}(0,\sigma_i^2$ instead, the overall noise when using an optimal fusion algorithm such as the one described previously is
+If we suppose a simpler model with standard Gaussian noise $\mathcal{N}(0,\sigma_j^2)$ instead, the overall noise when using an optimal fusion algorithm such as the one described previously is
 \begin{equation}
 \sigma_{\mu_{X_{ij}}}^2 = \frac{1}{\sum_{j \in S_i} \frac{1}{\sigma_j^2}}
 \quad,
 \end{equation}
 where $\sigma_j^2$ is proportional to $X_i$.
 
-Its implications to photometric stereo are multiple. First, having better HDR environment maps allows a better estimation of the lighting shining over a given surface, improving the estimation of the $\B{L}$ matrix. Second, when using HDR object pictures, this would improve the quality of each pixel intensity $b_i$. Finally, a better noise model allows us to understand where lies the uncertainty in the reconstruction, which 3D axis is uncertain and where should we inject more priors (i.e.\ regularization) or where we should rely on a different technique to improve the reconstruction of a particular portion of surface or an uncertain component of the surface normal.
+Its implications to photometric stereo are multiple. First, having better HDR environment maps allows a better estimation of the lighting shining over a given surface, improving the estimation of the lighting matrix $\B{L}$. Second, when using HDR object pictures, this would improve the accuracy of every pixel intensity $b_i$. Finally, a better noise model allows us to understand where lies the uncertainty in the reconstruction, which 3D axis is uncertain and where should we inject more priors (i.e.\ regularization) or where should we rely on a different technique to improve the reconstruction of a particular portion of surface or an uncertain component of the surface normal.
 
 \chapter{Questions by Jean-François Lalonde}
 

@@ -31,25 +31,42 @@ r = Le\b;
 %angle = acosd(normc((Le\b)')*N);
 
 %%
-clear x y z;
+%clear x y z;
 %syms x y z;
 [x, y] = meshgrid(0:70, -30:30);
 
 r1 = sind(x)./sind(y+x);
 r3 = sqrt(1-sind(x).^2)./sqrt(1-sind(y+x).^2);
 %ezplot(r1,[0 10], [0 10]);
-surf(x, y, r1);
+h = surf(x, y, r1);
 view(-155, 30);
-xlabel('r'); ylabel('\epsilon'); zlabel('\Delta_\epsilon')
+
+numberOfXTicks = 8;
+xData = get(h,'XData');
+set(gca,'Xtick',linspace(xData(1),xData(end),numberOfXTicks))
+numberOfXTicks = 5;
+yData = get(h,'YData');
+set(gca,'Ytick',linspace(yData(1),yData(end),numberOfXTicks))
+xlabel('r'); ylabel('\epsilon'); zlabel('\Delta_{\epsilon_{x,y}}')
 zlim([-2 5])
-title('Components n_x and n_y')
+title('Coefficients of x-axis and y-axis components')
+set(gca,'fontsize', 16);
+set(gcf, 'Position', [676   504   635   434]);
 export_fig('q3_analytic_nx_ny.pdf', '-transparent');
 
 %%
 
-surf(x, y, r3);
+h = surf(x, y, r3);
+numberOfXTicks = 8;
+xData = get(h,'XData');
+set(gca,'Xtick',linspace(xData(1),xData(end),numberOfXTicks))
+numberOfXTicks = 5;
+yData = get(h,'YData');
+set(gca,'Ytick',linspace(yData(1),yData(end),numberOfXTicks))
 view(-55, 30);
-xlabel('r'); ylabel('\epsilon'); zlabel('\Delta_\epsilon')
+xlabel('r'); ylabel('\epsilon'); zlabel('\Delta_{\epsilon_z}')
 zlim([0, 5]);
-title('Component n_z')
+title('Coefficients of the z-axis component')
+set(gca,'fontsize', 16);
+set(gcf, 'Position', [676   504   635   434]);
 export_fig('q3_analytic_nz.pdf', '-transparent');
