@@ -42,6 +42,7 @@
 \usepackage{defs}
 \usepackage{amsmath,esint}
 \usepackage{titlesec}
+%\usepackage{breqn}
 \titleformat{\chapter}[display]
   {\normalfont\sffamily\huge\bfseries}
   {}{0pt}{\Large}
@@ -86,6 +87,7 @@
 \section{Question 1}
 
 \subsection{(a)}
+\textbf{What is the illuminance $E_{\text{strip}}$ at point $P$ lying on a plane parallel to the $yz$ plane and located opposite the middle of the strip and at a distance $r$?}
 
 Suppose q as the distance between the strip light and P along the x-axis.
 
@@ -93,7 +95,7 @@ Suppose q as the distance between the strip light and P along the x-axis.
   \centering
   \includegraphics[width=0.45\linewidth]{q1a_setup.eps}
   \caption[Problem setup]
-   {Cross-section view of the problem setup.}
+   {Top-down view of the problem. Note that $\theta = \theta'$.}
   \label{q1a:setup}
 \end{figure}
 
@@ -106,7 +108,7 @@ where $L(r,\omega)$ is the radiance of the emitting surface and $\theta$ is the 
 
 In Cartesian coordinates, this can be written as
 \begin{equation}
-E(r) = \int_{z= -r - \frac{w}{2}}^{-r+\frac{w}{2}} \int_{y= - \frac{q}{2}}^{\frac{q}{2}} L \cos(\theta) d\omega
+E(r) = \int\limits_{z= -r - \frac{W}{2}}^{-r+\frac{W}{2}} \int\limits_{y= - \frac{H}{2}}^{\frac{H}{2}} L \cos(\theta) d\omega
 \quad,
 \label{q1a:irr}
 \end{equation}
@@ -114,47 +116,57 @@ as $L$ is constant over the surface.
 
 It is possible to rewrite $\cos(\theta)$ as
 \begin{align}
-\cos(\theta)  &= \frac{-q}{r} \\
-              &= \frac{-h}{\sqrt{h^2 + y^2 + z^2}}
+\cos(\theta)  &= \frac{q}{d} \\
+              &= \frac{q}{\sqrt{q^2 + y^2 + z^2}}
 \quad,
 \label{q1a:cos}
 \end{align}
 and $d\omega$ as
 \begin{align}
-d\omega &= \frac{\cos(\theta)}{r^2} dA \\
-        &= \frac{h}{r} \frac{1}{r^2} dA \\
-        &= \frac{h}{\left(h^2 + y^2 + z^2\right)^\frac{3}{2}} dA
+d\omega &= \frac{\cos(\theta)}{d^2} dA \\
+        &= \frac{q}{d} \frac{1}{d^2} dA \\
+        &= \frac{q}{\left(q^2 + y^2 + z^2\right)^\frac{3}{2}} dA
 \quad.
 \label{q1a:dw}
 \end{align}
 
 Rewriting equation equation \eqref{q1a:irr} using equations \eqref{q1a:cos} and \eqref{q1a:dw} gives
 \begin{align}
-E(r) &= \int_{z= -r - \frac{w}{2}}^{-r+\frac{w}{2}} \int_{y= - \frac{q}{2}}^{\frac{q}{2}} L \frac{-h}{\sqrt{h^2 + y^2 + z^2}} \frac{h}{\left(h^2 + y^2 + z^2\right)^\frac{3}{2}} dzdy \\
-     &= L \int_{z= -r - \frac{w}{2}}^{-r+\frac{w}{2}} \int_{y= - \frac{q}{2}}^{\frac{q}{2}} \frac{-h^2}{\left(h^2 + y^2 + z^2\right)^2} dzdy
+E(r) &= \int\limits_{z= -r - \frac{W}{2}}^{-r+\frac{W}{2}} \int\limits_{y= - \frac{H}{2}}^{\frac{H}{2}} L \frac{q}{\sqrt{q^2 + y^2 + z^2}} \frac{q}{\left(q^2 + y^2 + z^2\right)^\frac{3}{2}} dydz \\
+     &= L \int\limits_{z= -r - \frac{W}{2}}^{-r+\frac{W}{2}} \int\limits_{y= - \frac{H}{2}}^{\frac{H}{2}} \frac{q^2}{\left(q^2 + y^2 + z^2\right)^2} dydz 
+     %&= L \int\limits_{z= -r - \frac{W}{2}}^{-r+\frac{W}{2}} - \frac{q^2\, \arctan\!\left(\frac{y}{\sqrt{q^2 + z^2}}\right)}{2\, {\left(q^2 + z^2\right)}^{\frac{3}{2}}} - \frac{q^2\, y}{2\, \left(q^2 + z^2\right)\, \left(q^2 + y^2 + z^2\right)} \Big|_{-\frac{H}{2}}^{\frac{H}{2}} dz \\
+     %&= L \int\limits_{z= -r - \frac{W}{2}}^{-r+\frac{W}{2}} - \frac{q^2\, \arctan\!\left(\frac{H}{2\, \sqrt{q^2 + z^2}}\right)}{{\left(q^2 + z^2\right)}^{\frac{3}{2}}} - \frac{H\, q^2}{2\, \left(q^2 + z^2\right)\, \left(\frac{H^2}{4} + q^2 + z^2\right)} dz \\
 \quad.
 \end{align}
 
-
-\begin{align*}
-E(r) &= \frac{1}{\pi} \int_{-\arctan(\frac{\frac{H}{2}}{\sqrt{q^2+r^2}})}^{\arctan(\frac{\frac{H}{2}}{\sqrt{q^2+r^2}})} \int_{0}^{\arctan(\frac{w}{q})} L(r,\omega)\cos(\theta) \sin(\theta) d\theta d\phi \\
-     &= 2 \cdot \arctan(\frac{\frac{H}{2}}{\sqrt{q^2+r^2}}) \cdot \int_{\arctan(\frac{q}{r-W/2})}^{\arctan(\frac{q}{r+W/2})} L(r,\omega)\cos(\theta) \sin(\theta) d\theta \\
-     &= 2 \cdot \arctan(\frac{H}{2\sqrt{q^2+r^2}}) \cdot \left[ - \frac{1}{2} \cos^2(x) \right]_{\arctan(\frac{q}{r-W/2})}^{\arctan(\frac{q}{r+W/2})} \\
-     &= 2 \cdot \arctan(\frac{H}{2\sqrt{q^2+r^2}}) \cdot \left[ - \frac{1}{2} \cos^2(\arctan(\frac{q}{r+W/2})) - - \frac{1}{2} \cos^2(\arctan(\frac{q}{r-W/2})) \right] \\
-\end{align*}
-
 \subsection{(b)}
+\textbf{ What becomes the expression of $E_{\text{strip}}$ found in (a) when the length H of the light strip is very large with respect to the distance r between the center point of the strip and $P$ ?}
 
-As H gets bigger, the fraction $\frac{-h^2}{\left(h^2 + y^2 + z^2\right)^2}$ tends toward $0$, as the values of $y$ grows bigger while the rest stay constant.
+As H gets bigger, making the fraction $\frac{-h^2}{\left(h^2 + y^2 + z^2\right)^2}$ tend towards $0$ for, as the values of $y$ grows bigger while the rest stay constant.
 
-In spherical coordinates, the integral along the elevation axis gets closer toward $\pi$.
+The way the irradiance $E(r)$ is defined in cartesian coordinates in (a) won't give us insights on this question. As such, it is more interesting to derive the same irradiance $E(r)$ in spherical coordinates:
+\begin{align}
+E(r) &= \frac{1}{\pi} \int\limits_{-\arctan(\frac{\frac{H}{2}}{\sqrt{q^2+r^2}})}^{\arctan(\frac{\frac{H}{2}}{\sqrt{q^2+r^2}})} \int\limits_{\arctan \left(\frac{r-\frac{W}{2}}{q} \right)}^{\arctan \left(\frac{r+\frac{W}{2}}{q} \right)} L \cos(\theta) \sin(\theta) d\theta d\phi \\
+     &= 2 L \cdot \arctan \left(\frac{\frac{H}{2}}{\sqrt{q^2+r^2}}\right) \cdot \int\limits_{\arctan \left(\frac{r-\frac{W}{2}}{q} \right)}^{\arctan \left(\frac{r+\frac{W}{2}}{q} \right)} \cos(\theta) \sin(\theta) d\theta \\
+     &= 2 L \cdot \arctan \left(\frac{H}{2\sqrt{q^2+r^2}} \right) \cdot \left[ - \frac{1}{2} \cos^2(x) \right]_{\arctan(\frac{r-W/2}{q})}^{\arctan \left(\frac{r+W/2}{q} \right)} \\
+     &= 2 L \cdot \arctan \left(\frac{H}{2\sqrt{q^2+r^2}} \right) \cdot \left[ - \frac{1}{2} \cos^2\left(\arctan\left(\frac{r+W/2}{q}\right)\right) - - \frac{1}{2} \cos^2\left(\arctan\left(\frac{r-W/2}{q}\right)\right) \right] \\
+     &= 2 L \cdot \arctan\!\left(\frac{H}{2\, \sqrt{q^2 + r^2}}\right) \cdot \left(\frac{1}{2\, \left(\frac{{\left(\frac{W}{2} - r\right)}^2}{q^2} + 1\right)} - \frac{1}{2\, \left(\frac{{\left(\frac{W}{2} + r\right)}^2}{q^2} + 1\right)}\right)
+     \label{q1b:irr_sph}
+\end{align}
+
+As can be seen from eq.~\eqref{q1b:irr_sph}, having a large $H$ in the $\arctan$ makes the left part of the equation equal to $2 \cdot \frac{\pi}{2}$:
+\begin{equation}
+E(r) = \pi L \left(\frac{1}{2\, \left(\frac{{\left(\frac{W}{2} - r\right)}^2}{q^2} + 1\right)} - \frac{1}{2\, \left(\frac{{\left(\frac{W}{2} + r\right)}^2}{q^2} + 1\right)}\right)
+\end{equation}
 
 \subsection{(c)}
+\textbf{What is the expression of the illuminance $E_{\text{tube}}$ at $P$ as a function of $E_{\text{strip}}$ ?
+What is the expression of this illuminance $E_{\text{tube}}$ when $r$ is equal to 0?}
 
 Supposing $r$ stays roughly the same, the difference is that the $\cos(\theta)$ factor should be removed, as there is always a complete cylinder cross-section shining on the surface element (?) P, as can be seen in fig.~\ref{q1c:setup}. This means that the expression of $E_{\text{tube}}$ is
 \begin{align}
 E_{\text{tube}} &= E_{\text{strip}} \frac{1}{\cos(\theta)} \\
-                &= E_{\text{strip}} \frac{\sqrt{h^2+y^2+z^2}}{h}
+                &= E_{\text{strip}} \frac{\sqrt{q^2+y^2+z^2}}{q}
 \quad.
 \end{align}
 
@@ -168,27 +180,52 @@ E_{\text{tube}} &= E_{\text{strip}} \frac{1}{\cos(\theta)} \\
 
 \section{Question 2}
 \subsection{(a)}
+\textbf{What is the expression of the illuminance at $P$ ?}
 
-$\Omega$
+Let's start with the irradiance integral,
 \begin{equation}
 E(r) = \frac{1}{\pi} \int_{\Omega} L(r,\omega)\cos(\theta) d\omega
+\quad.
 \end{equation}
-\begin{align*}
-E(r) &= \frac{1}{\pi} \int_{0}^{\arctan(\frac{h}{q})} \int_{0}^{\arctan(\frac{w}{q})} L(r,\omega)\cos(\theta) \sin(\theta) d\theta d\phi \\
-     &= \arctan(\frac{h}{q}) \cdot \int_{0}^{\arctan(\frac{w}{q})} L(r,\omega)\cos(\theta) \sin(\theta) d\theta \\
-     &= \arctan(\frac{h}{q}) \cdot \left[ - \frac{1}{2} \cos^2(x) \right]_{0}^{\arctan(\frac{w}{q})} \\
-     &= \arctan(\frac{h}{q}) \cdot \left[ - \frac{1}{2} \cdot \cos^2(\arctan(\frac{w}{q})) - -\frac{1}{2} \right] \\
-\end{align*}
+As the luminance is constant, $L(r,\omega)$ can be changed to $L$. When solving 
+
+\begin{align}
+E(r) &= \int_{0}^{\arctan(\frac{h}{q})} \int_{0}^{\arctan(\frac{w}{q})} L\cos(\theta) \sin(\theta) d\theta d\phi \\
+     &= \arctan\left(\frac{h}{q}\right) \cdot \int_{0}^{\arctan(\frac{w}{q})} L\cos(\theta) \sin(\theta) d\theta \\
+     %&= \arctan(\frac{h}{q}) \cdot \left[ - \frac{1}{2} \cos^2(x) \right]_{0}^{\arctan(\frac{w}{q})} \\
+     %&= \arctan(\frac{h}{q}) \cdot \left[ - \frac{1}{2} \cdot \cos^2(\arctan(\frac{w}{q})) - -\frac{1}{2} \right] \\
+     %&= - \arctan\!\left(\frac{h}{q}\right)\, \left(\frac{1}{2\, \sqrt{\frac{w^2}{q^2} + 1}} - \frac{1}{2}\right)
+     &= \arctan\left(\frac{h}{q}\right) \cdot \frac{w^2}{2 \left(q^2 + w^2\right)} L
+\end{align}
 
 
-\begin{equation}
-E(r) = \frac{M}{2\pi} \sum_{i=1}^{n} \beta_i \cos(\alpha_i)
-\end{equation}
-\begin{align*}
-E(r) = \frac{M}{2\pi} \left( \arctan(\frac{w}{q}) + \arctan(\frac{h}{q}) + \arctan(\frac{w}{q}) \cdot \cos(\arctan(\frac{h}{q})) + \arctan(\frac{w}{q}) \cdot \cos(\arctan(\frac{w}{q})) \right)
-\end{align*}
+%\begin{equation}
+%E(r) = \frac{L}{2\pi} \sum_{i=1}^{n} \beta_i \cos(\alpha_i)
+%\end{equation}
+%\begin{align*}
+%E(r) &= \frac{L}{2\pi} \left( \arctan(\frac{w}{q}) + \arctan(\frac{h}{q}) + \arctan(\frac{w}{q}) \cdot \cos(\arctan(\frac{h}{q})) + \arctan(\frac{w}{q}) \cdot \cos(\arctan(\frac{w}{q})) \right) \\
+%     &= \arctan\!\left(\frac{w}{q}\right) + \arctan\!\left(\frac{h}{q}\right) + \frac{\arctan\!\left(\frac{w}{q}\right)}{\sqrt{\frac{h^2}{q^2} + 1}} + \frac{\arctan\!\left(\frac{h}{q}\right)}{\sqrt{\frac{w^2}{q^2} + 1}}
+%\end{align*}
 
 \subsection{(b)}
+\textbf{What is the illuminance at $P$ if the light plane is the one shown in~\ref{q2b:setup}?}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.2\linewidth]{q2b_setup.eps}
+  \caption[Problem setup]
+   {Problem setup.}
+  \label{q2b:setup}
+\end{figure}
+
+The setup of this surface makes shifts the lower bounds of the definite integral from $0$ to some arbitrary value $r$ and $s$ on the $x$ and $y$ axis, respectively. Instead of performing the integral again, it is possible to use a simple trick, as shown in fig~\ref{q2b:setup}. The new surface $w \times h$ can be derived from the previous answer (for a surface $r+w \times s+h$). All is left to do is subtract the extraneous surfaces $a$, $b$ and $c$. To do so, it is possible to reuse the previous answer to find surface $a+c$ and $b+c$, and then re-add $c$, as it was subtracted twice (the inclusion-exclusion principle). The answer is then
+\begin{align*}
+E(r) =& \biggl( \arctan\left(\frac{s+h}{q}\right) \cdot \frac{\left(r+w\right)^2}{2 \left(q^2 + \left(r+w\right)^2\right)}
+- \arctan\left(\frac{s+h}{q}\right) \cdot \frac{\left(r\right)^2}{2 \left(q^2 + r^2\right)} \\
+&- \arctan\left(\frac{s}{q}\right) \cdot \frac{\left(r+w\right)^2}{2 \left(q^2 + \left(r+w\right)^2\right)}
++ \arctan\left(\frac{s}{q}\right) \cdot \frac{\left(r\right)^2}{2 \left(q^2 + r^2\right)} \biggr) L
+\quad.
+\end{align*}
 
 \chapter{Questions by Philippe Giguère}
 
