@@ -212,7 +212,7 @@ E(r) &= \int_{0}^{\arctan(\frac{h}{q})} \int_{0}^{\arctan(\frac{w}{q})} L\cos(\t
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.2\linewidth]{q2b_setup.eps}
+  \includegraphics[width=0.33\linewidth]{q2b_setup.eps}
   \caption[Problem setup]
    {Problem setup.}
   \label{q2b:setup}
@@ -239,7 +239,7 @@ The setup for this experiment is shown in fig.~\ref{q3:setup}. Three light sourc
   \centering
   \includegraphics[width=0.9\linewidth]{q3_setup.png}
   \caption[Experiment setup]
-   {Experiment setup.}
+   {Experiment setup. The $x$-axis is the red line from left to right, $y$-axis is the green line from down to up and $z$-axis from the sphere to the camera. The sphere is posed at $\left[0, 0, 0\right]$}
   \label{q3:setup}
 \end{figure}
 
@@ -249,7 +249,7 @@ On this setup, each light, when lit, generate a row $\B{l}$ in the lighting matr
 \left[\begin{array}{c} \cos\!\left(\theta\right)\, \sin\!\left(r\right) \\ \sin\!\left(r\right)\, \sin\!\left(\theta\right) \\ \sqrt{ - {\cos\!\left(\theta\right)}^2\, {\sin\!\left(r\right)}^2 - {\sin\!\left(r\right)}^2\, {\sin\!\left(\theta\right)}^2 + 1} \end{array}\right]^T
 \quad .
 \end{equation}
-The $x$ and $y$ components are directly the position on the plane, while the $z$ component is specified to make the light unit, so they are all the same intensity.
+The $x$ and $y$ components are directly the position on the plane, while the $z$ component is specified to make the light unit, so they are all the same intensity. The axes are defined as west-east for $x$, south-north for $y$ and zenith-nadir for $z$ (see fig.~\ref{q3:setup}). The surface normals are taken outwards and the lighting vectors from the surface to the light.
 
 In the current setup, since the lights are on the vertex of an equilateral triangle, they are $120\degree$ apart on the $xy$-plane, so $\theta = \left[ 0\degree, 120\degree, 240\degree \right]$. This translates in the following lighting matrix:
 \begin{equation}
@@ -360,8 +360,6 @@ Two experiments are presented: first, a surface normal $\B{n}$ is fixed while th
 \todo{DO WITH ANOTHER PLAN}
 
 It is interesting to note from fig~\ref{q3:exp2} and \ref{q3:exp2a} that if a surface normal is pointing directly to the center of the triangle formed by the three lights, its recovery will always be correct, even in sub-optimal lighting condition. This is because the values of the three pixel intensities are always equal, making the ground truth the only possible solution to the linear system of equation. Furthermore, the reconstruction gives the right result when no error is applied ($\epsilon_r = 0\degree$), except when not all three light sources are shining on the surface (when $\theta_{\text{azimuth}}$ is near $0\degree$ or $180\degree$). In this particular problem, it is interesting to note that the most stable matrix won't necessarily result in the most accurate reconstruction, because of the systematic measurement error $\epsilon_r$. In this particular problem, as long as the three lighting sources are in line of sight with the target surface, the reconstruction angular error is a function of the ground truth surface normal and the lighting measurement error.
-
-\todo{DEFINE X-Y-Z}
 
 \FloatBarrier
 \section{Question 4}
@@ -487,6 +485,7 @@ where $\B{\Sigma}^\dagger$ is the pseudoinverse of $\B{\Sigma}$. This $\B{\Sigma
 This relation will provide as many eigenvectors as there are linearly independent vectors of $\B{AA}^T$. Since $m \gg n$, this means that at most $n$ eigenvectors of $\B{AA}^T$ will be found. The rest of the resulting matrix will contain only zeros. The vectors that are missing span the null space of $\B{A}^T$ (and $\B{AA}^T$).
 
 \subsection{(b)}
+\textbf{Describe the soft-thresholding algorithm for solving  an over-determined system of linear equations with the $L_1$-norm loss function [...]. When is this method more appropriate than least squares ($L_2$-norm loss function)? When is least squares preferable (i.e., optimal)?}
 
 Performing optimization using a $L_1$-norm loss function, sometimes called a least absolute deviations (LAD), is quite different in practice from using a least squares ($L_2$-norm loss function). While the LAD is more robust that least squares, meaning that it is more resistant to outliers in the data, it is also more unstable, meaning that a small change in a single data point can potentially change the solution a lot. Furthermore, a main major difference is that while least square allows only a single optimal solution, LAD allows multiple solutions to be equivalent. An example of this phenomenon can be visualized in fig.~\ref{q5b:paths}.
 
@@ -498,23 +497,35 @@ Performing optimization using a $L_1$-norm loss function, sometimes called a lea
    \label{q5b:paths}
 \end{figure}
 
-As such, least squares can be solved directly in a linear system of equation by taking the (pseudo-)inverse of the matrix. But LAD needs linear programming to be solved, as the constraints it poses may lead to multiple solutions. Fortunately, this problem is a convex, simplifying a great deal the strategies applying to it. Unfortunately, this loss function is not strictly differentiable, making gradient descent methods more difficult to apply.
+While a least squares optimization has an analytical solving method---the (pseudo-)inverse of the matrix---, LAD does not. This optimization problem needs an iterative approach to be solved, such as gradient descent, linear programming or similar to be solved. Fortunately, this problem is a convex, simplifying a great deal the strategies applying to it. Unfortunately, this loss function is not strictly differentiable, making gradient descent methods more difficult to apply.
 
-One way to compute this is by performing an iterative method. Suppose the problem is written in matrix form
+Rewriting the posed problem in its matrix form,
 \begin{equation}
 \B{x}^* = \arg \min_{\B{x}} \| \B{b} - \B{A}^T\B{x} \|_1 \quad, \B{x} \in \mathbb{R}^m
 \quad,
 \end{equation}
-Then, one can propose this algorithm to solve the problem:
-\begin{enumerate}
-  \item Let $e_i^{(0)}$ = 0, and $k = 0$;
-  \item Compute $\B{x}^{(k+1)} = \arg \min_{\B{x}} \B{Ax}^{(k)} - b - e$;
-  \item Compute $e_i^{k} = \B{Ax}^{(k+1)} - \B{b}$;
-  \item Let $k = k + 1$;
-  \item Repeat the three last steps until convergence.
-\end{enumerate}
+this optimization can be solved using the iterative reweighted least squares
+\begin{equation}
+\B{x}^{(k+1)} = \arg \min_{\B{x}} \B{w}^{(t)} \| \B{b} - \B{A}^T\B{x} \|^2
+\quad.
+\end{equation}
+Upon convergence, this will perform the optimization
+\begin{equation}
+\arg \min_{\B{x}} \lvert \B{b} - \B{A}^T\B{x} \rvert_p
+\quad,
+\end{equation}
+when using the weighting scheme
+\begin{align}
+\B{w}^{(0)} &= \text{diag}(1_m) \\
+\B{w}^{(k)} &= \lvert \B{b} - \B{A}^T\B{x}^{(k)} \rvert^{p-2}
+\quad,
+\end{align}
+where $m$ is the quantities of rows in $\B{A}$. Any $L^p$ norm can be computed using this algorithm, but we are currently interested in the case $p = 1$. Division by zero can be avoided by thresholding by an arbitrary small value $\delta$, as:
+\begin{equation}
+\B{w}^{(t)} = \frac{1}{ \left\lvert \max\left(\delta, \B{b} - \B{A}^T\B{x}^{(k)}\right) \right\rvert}
+\end{equation}
 
-One way to get around this is to perform soft-thresholding. A soft-thresholding function is defined as such:
+The problem asked to employ the soft-thresholding algorithm, which is based on the soft-thresholding function:
 \begin{equation}
 \Phi(x) = 
 \begin{cases}
@@ -522,10 +533,9 @@ One way to get around this is to perform soft-thresholding. A soft-thresholding 
   0           & \text{if } -\lambda < x < \lambda \\
   x - \lambda & \text{if } x\geq \lambda
 \end{cases}
-\quad.
+\quad,
 \end{equation}
-\todo{validate}
-The general appearance of this function is shown in fig.~\ref{q5b:soft-thresh}.
+for an arbitrary $\lambda$ value. The general appearance of this function is shown in fig.~\ref{q5b:soft-thresh}.
 
 \begin{figure}
   \centering
@@ -535,20 +545,31 @@ The general appearance of this function is shown in fig.~\ref{q5b:soft-thresh}.
   \label{q5b:soft-thresh}
 \end{figure}
 
+One can incorporate this soft-thresholding in the iterative reweighted least squares algorithm, like so:
+\begin{enumerate}
+  \item Let $\B{e}^{(0)} = 0_m$, $\delta = 1\times10^{-5}$, $\B{w}^{(0)} = \text{diag}(1_m)$ and $k = 1$;
+  \item Compute $\B{x}^{(k)} = \arg \min_{\B{x}} \B{w}^{(k-1)} \| \B{b} - \B{A}^T\B{x}^{(k-1)} - \B{e} \|^2$ = $\left( \B{A}^T\B{w}^{(k)}\B{A} \right)^{-1} \B{A}^T\B{w}^{(k)}\left(\B{b} - \B{e}\right)$;
+  \item Compute $\B{e}^{k} = \Phi\left( \B{Ax}^{(k)} - \B{b} \right)$;
+  \item Compute $\B{w}^{(k)} = \frac{1}{\left\lvert \max\left(\delta, \B{b} - \B{A}^T\B{x}^{(k)}\right) \right\rvert}$;
+  \item Let $k = k + 1$;
+  \item Repeat the four last steps until convergence.
+\end{enumerate}
 
-[An example of an algorithm employing the soft-thresholding is explained by \cite{Kowalski2015}.]
-\begin{equation}
-\Phi \left(  \right)
-\quad,
-\end{equation}
-
-
+In addition to the robustness of the LAD method discussed earlier, adding a soft-thresholding step would enhance the technique to remove the a priori priors on outliers. Outliers deviating from the solution hyperplane would iteratively be given a lower weight, meaning a lower importance in the solution \todo{link to lambda}.
 
 \subsection{(c)}
+\textbf{ Propose and discuss two different optimization strategies (with their advantages and disadvantages) for the following problem:
+\begin{equation}
+\B{x^*} = \arg \min_{\B{x}} \sum_{i=1}^N \left( b_i - \sum_{j=1}^L \max\left( 0, \omega_j^T\B{x}\right) \right)^2, \quad \B{x} \in \mathbb{R}^m,
+\end{equation}
+for given scalars $b_i (i = 1, \dots, N)$ and vectors $\B{\omega}_j \in \mathbb{R}^m (j = 1, \dots, L)$. \emph{Hint: revisit soft-thresholding}.}
 
-The problem is a least squares minimization. It is a generalization of the core of photometric stereo, where a given pixel intensity $b$ for an image $i$ is explained by the multiplication of the light rays $\B{\omega}_j$ by the normal $\B{x}$ of a surface. The $\max$ ensures that light rays under the surface does not contribute to the pixel intensity.
+The problem is a least squares minimization. It happens to be a generalization of the core of photometric stereo, where a given pixel intensity $b$ for an image $i$ is explained by the multiplication of the light rays $\B{\omega}_j$ by the normal $\B{x}$ of a surface ($m = 3$ in this interpretation). The $\max$ operator ensures that light rays under the surface does not contribute to the pixel intensity.
 
-An optimization strategy could be thought as the standard least squares sense.
+An iterative solution is mandatory here because of the non-linearity of the $\max$ operator. Two optimization strategies will be discussed, the Particule Swarm Optimization (PSO) and the [...].
+
+It is possible to perform a PSO, where many candidates $\B{x}_i$ are uniformly distributed over the domain of possible answers. Through each iteration, each candidate, called a particule, is moved toward its closest optimum. This process is repeated until a convergence condition is met. It is possible to
+
 [sensitive to outliers] [Multiple similar values will drive the solution towards them.]
 
 Another could be using the result from (b).
