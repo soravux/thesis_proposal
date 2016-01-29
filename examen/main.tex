@@ -1,5 +1,5 @@
 \documentclass{report}
-\title{Thesis proposal: Understanding Outdoor Photometric Stereo}
+\title{GEL-8000 Pre-doctoral exam}
 \author{Yannick Hold-Geoffroy}
 %\programme{Doctorat en g\'enie \'electrique}
 %\annee{2015}
@@ -99,9 +99,9 @@ Suppose q as the distance between the strip light and P along the x-axis.
   \label{q1a:setup}
 \end{figure}
 
-The irradiance equation is defined as \todo{1/pi???}
+The irradiance equation is defined as
 \begin{equation}
-E(r) = \frac{1}{\pi} \int_{\Omega} L(r,\omega)\cos(\theta) d\omega
+E(r) = \int_{\Omega} L(r,\omega)\cos(\theta) d\omega
 \quad,
 \end{equation}
 where $L(r,\omega)$ is the radiance of the emitting surface and $\theta$ is the angle between the receiving surface normal and the light ray, for the whole hemisphere lighting the surface $\Omega$.
@@ -357,9 +357,9 @@ Two experiments are presented: first, a surface normal $\B{n}$ is fixed while th
   \label{q3:exp2a}
 \end{figure}
 
-\todo{DO WITH ANOTHER PLAN}
-
 It is interesting to note from fig~\ref{q3:exp2} and \ref{q3:exp2a} that if a surface normal is pointing directly to the center of the triangle formed by the three lights, its recovery will always be correct, even in sub-optimal lighting condition. This is because the values of the three pixel intensities are always equal, making the ground truth the only possible solution to the linear system of equation. Furthermore, the reconstruction gives the right result when no error is applied ($\epsilon_r = 0\degree$), except when not all three light sources are shining on the surface (when $\theta_{\text{azimuth}}$ is near $0\degree$ or $180\degree$). In this particular problem, it is interesting to note that the most stable matrix won't necessarily result in the most accurate reconstruction, because of the systematic measurement error $\epsilon_r$. In this particular problem, as long as the three lighting sources are in line of sight with the target surface, the reconstruction angular error is a function of the ground truth surface normal and the lighting measurement error.
+
+All these analysis is performed with normals lying on the plane comprising the first light, the camera and the surface. No particular new insight is gained from changing this normal plane. The results are the same, as long as the three lights shine onto the surface.
 
 \FloatBarrier
 \section{Question 4}
@@ -555,26 +555,47 @@ One can incorporate this soft-thresholding in the iterative reweighted least squ
   \item Repeat the four last steps until convergence.
 \end{enumerate}
 
-In addition to the robustness of the LAD method discussed earlier, adding a soft-thresholding step would enhance the technique to remove the a priori priors on outliers. Outliers deviating from the solution hyperplane would iteratively be given a lower weight, meaning a lower importance in the solution \todo{link to lambda}.
+In addition to the robustness of the LAD method discussed earlier, adding a soft-thresholding step would enhance the technique to remove the a priori priors on outliers. Outliers deviating from the solution hyperplane would iteratively be given a lower weight, meaning a lower importance in the solution. The outlier state of a data point is selected through the $\lambda$ value, which specifies the distance to the current solution a data point should be weighted down in the next iteration.
 
 \subsection{(c)}
 \textbf{ Propose and discuss two different optimization strategies (with their advantages and disadvantages) for the following problem:
 \begin{equation}
-\B{x^*} = \arg \min_{\B{x}} \sum_{i=1}^N \left( b_i - \sum_{j=1}^L \max\left( 0, \omega_j^T\B{x}\right) \right)^2, \quad \B{x} \in \mathbb{R}^m,
+\B{x^*} = \arg \min_{\B{x}} \sum_{i=1}^N \left( b_i - \sum_{j=1}^L \max\left( 0, \omega_{ij}^T\B{x}\right) \right)^2, \quad \B{x} \in \mathbb{R}^m,
 \end{equation}
-for given scalars $b_i (i = 1, \dots, N)$ and vectors $\B{\omega}_j \in \mathbb{R}^m (j = 1, \dots, L)$. \emph{Hint: revisit soft-thresholding}.}
+for given scalars $b_i (i = 1, \dots, N)$ and vectors $\B{\omega}_{ij} \in \mathbb{R}^m (j = 1, \dots, L)$. \emph{Hint: revisit soft-thresholding}.}
 
 The problem is a least squares minimization. It happens to be a generalization of the core of photometric stereo, where a given pixel intensity $b$ for an image $i$ is explained by the multiplication of the light rays $\B{\omega}_j$ by the normal $\B{x}$ of a surface ($m = 3$ in this interpretation). The $\max$ operator ensures that light rays under the surface does not contribute to the pixel intensity.
 
-An iterative solution is mandatory here because of the non-linearity of the $\max$ operator. Two optimization strategies will be discussed, the Particule Swarm Optimization (PSO) and the [...].
+An iterative solution is mandatory here because of the non-linearity of the $\max$ operator. Two optimization strategies will be discussed, a least squares variation and a Particule Swarm Optimization (PSO) approach.
 
-It is possible to perform a PSO, where many candidates $\B{x}_i$ are uniformly distributed over the domain of possible answers. Through each iteration, each candidate, called a particule, is moved toward its closest optimum. This process is repeated until a convergence condition is met. It is possible to
+The first intuitive strategy is the standard least squares, as used by~\cite{hung-wacv-15} for a similar problem. Their approach to the problem is interesting and worth analyzing: they sample some possible unit-length $\B{x}$ which they multiply only with the $\B{\omega}_j$ variables that give a positive result. All the vectors in $\B{\omega}_i$ that are positive when multiplied to $\B{x}$ form a space called $\psi$. The inner sum can thus be made over $\psi$ instead of the whole $L$ vectors. This definition removes the need for the $\max$ operator, as only the vectors yielding a positive value are considered. Then, for every candidate vector $\B{x}_c$, they optimize a factor $\rho$ which corresponds to the length of the optimal solution pointing in the direction of the candidate $\B{x}_c$:
+\begin{equation}
+\arg \min_{\B{x}_c} \sum_{i=1}^N \left( \| b_i - \rho \sum_{j \in \psi}\B{\omega}_{ij}^T\B{x}_c \| \right)^2
+\quad.
+\end{equation}
+While this approach is interesting, it requires the sampling of the domain of possible answers (a 3D icosahedron in their case). Constraining this sampling to unit-length vectors is an interesting approach, making the domain of possible answers tractable. This approach is somewhat similar to a PSO approach, where many candidates $\B{x}_i$ are uniformly distributed over the domain of possible answers. Through each iteration, each candidate, called a particule, is moved toward its closest optimum. This process is repeated until a convergence condition is met.
 
-[sensitive to outliers] [Multiple similar values will drive the solution towards them.]
-
-Another could be using the result from (b).
+It is possible to rewrite the problem a bit differently
+\begin{equation}
+\B{x^*} = \arg \min_{\B{x}} \sum_{i=1}^N \left( b_i - \left( \sum_{j\in\psi} \B{\omega}_{ij}^T\right) \B{x} \right)^2
+\quad.
+\end{equation}
+This formulation uses the following factorization:
+\begin{align}
+\B{\omega}_{(i,1)}\B{x} + \B{\omega}_{(i,2)}\B{x} + \dots + \B{\omega}_{(i,\lvert \psi \rvert)}\B{x} &= \left(\B{\omega}_{(i,1)} + \B{\omega}_{(i,2)} + \dots + \B{\omega}_{(i,\lvert \psi \rvert)}\right)\B{x} \\
+&= \left( \sum_{j\in\psi} \B{\omega}_{ij}^T\right) \B{x}
+\quad.
+\end{align}
+It is then possible to define $\Omega$ where each column $\omega_i = \left( \sum_{j\in\psi} \B{\omega}_{ij}\right)$. This operation is similar to considering the mean light vector instead of the whole integral in photometric stereo literature. Performing least squares optimization is now pretty straightforward, as
+\begin{equation}
+\B{x^*} = \arg \min_{\B{x}} \left( \B{b} - \B{\Omega}\B{x} \right)^2 = \left(\B{\Omega}^T \B{\Omega}\right)^{-1}\B{\Omega}^T \B{b}
+\quad.
+\label{q5c:optim}
+\end{equation}
+Keep in mind that $\psi$ is defined in function of $\B{x}$, though, meaning that $\B{\Omega}$ will change once a new $\B{x^*}$ is found. This is why eq.~\eqref{q5c:optim} should be repeated, in order to perform an iterative refinement of the solution.
 
 \section{Question 6}
+\textbf{What are the differences between temporally-multiplexed and spectrally-multiplexed photometric stereo? How does temporally-multiplexed outdoor photometric stereo benefit from the color spectrum of natural outdoor illumination?}
 
 Temporally-multiplexed Photometric Stereo employs captures at different times yielding different lighting directions. This means that each row of the lighting matrix $\B{L}$ are taken at a different time, when the scene's lighting conditions changed. Contrarily, as \cite{Fyffe2011} puts it, ``In Spectrally-multiplexed photometric stereo, a scene is illuminated by multiple spectrally distinct light sources, and photographed by a camera system configured to capture multiple spectrally distinct color channels.'' In their work, they propose to divide the light spectrum in two using the Dolby\textsuperscript{\textregistered} dichroic filters, both having some non-overlapping red, green, and blue in their response spectrum.
 
@@ -586,6 +607,8 @@ While using spectral cues in temporally-multiplexed photometric stereo is worth 
 %\cite{MacDonald-2007}.
 
 \section{Question 7}
+\textbf{7. Describe an algorithm for computing an HDR image that operates linearly on the input data.
+Assume the N input images are perfectly aligned and taken at different, known exposure values $e_i (i = 1, \dots , N )$. In addition, assume the pixels in the i-th input image are corrupted by additive, i.i.d.\ Gaussian noise $\mathcal{N} (0, \sigma_i^2)$, and are linearly related to the scene radiance. Ignore any over-(under-)saturation effects. Derive a model for the noise distribution of the resulting HDR image. How can this model be used to compute better solutions in outdoor photometric stereo?}
 
 Such an algorithm is presented in~\cite{Granados2010a}. The goal is to estimate, as best as possible, the irradiance $X_i$ of each pixel $i$. This is done by merging images of different exposures $j$ together. Basically, the proposed algorithm is as follows:
 \begin{enumerate}
