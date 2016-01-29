@@ -89,7 +89,7 @@
 \subsection{(a)}
 \textbf{What is the illuminance $E_{\text{strip}}$ at point $P$ lying on a plane parallel to the $yz$ plane and located opposite the middle of the strip and at a distance $r$?}
 
-Suppose q as the distance between the strip light and P along the x-axis.
+I will suppose q as the distance between the strip light and P along the x-axis, as shown on fig.~\ref{q1a:setup}.
 
 \begin{figure}
   \centering
@@ -108,7 +108,7 @@ where $L(r,\omega)$ is the radiance of the emitting surface and $\theta$ is the 
 
 In Cartesian coordinates, this can be written as
 \begin{equation}
-E(r) = \int\limits_{z= -r - \frac{W}{2}}^{-r+\frac{W}{2}} \int\limits_{y= - \frac{H}{2}}^{\frac{H}{2}} L \cos(\theta) d\omega
+E(r) = L \int\limits_{z= -r - \frac{W}{2}}^{-r+\frac{W}{2}} \int\limits_{y= - \frac{H}{2}}^{\frac{H}{2}} \cos(\theta) d\omega
 \quad,
 \label{q1a:irr}
 \end{equation}
@@ -132,32 +132,34 @@ d\omega &= \frac{\cos(\theta)}{d^2} dA \\
 
 Rewriting equation equation \eqref{q1a:irr} using equations \eqref{q1a:cos} and \eqref{q1a:dw} gives
 \begin{align}
-E(r) &= \int\limits_{z= -r - \frac{W}{2}}^{-r+\frac{W}{2}} \int\limits_{y= - \frac{H}{2}}^{\frac{H}{2}} L \frac{q}{\sqrt{q^2 + y^2 + z^2}} \frac{q}{\left(q^2 + y^2 + z^2\right)^\frac{3}{2}} dydz \\
+E(r) &= L \int\limits_{z= -r - \frac{W}{2}}^{-r+\frac{W}{2}} \int\limits_{y= - \frac{H}{2}}^{\frac{H}{2}} \frac{q}{\sqrt{q^2 + y^2 + z^2}} \frac{q}{\left(q^2 + y^2 + z^2\right)^\frac{3}{2}} dydz \\
      &= L \int\limits_{z= -r - \frac{W}{2}}^{-r+\frac{W}{2}} \int\limits_{y= - \frac{H}{2}}^{\frac{H}{2}} \frac{q^2}{\left(q^2 + y^2 + z^2\right)^2} dydz 
      %&= L \int\limits_{z= -r - \frac{W}{2}}^{-r+\frac{W}{2}} - \frac{q^2\, \arctan\!\left(\frac{y}{\sqrt{q^2 + z^2}}\right)}{2\, {\left(q^2 + z^2\right)}^{\frac{3}{2}}} - \frac{q^2\, y}{2\, \left(q^2 + z^2\right)\, \left(q^2 + y^2 + z^2\right)} \Big|_{-\frac{H}{2}}^{\frac{H}{2}} dz \\
      %&= L \int\limits_{z= -r - \frac{W}{2}}^{-r+\frac{W}{2}} - \frac{q^2\, \arctan\!\left(\frac{H}{2\, \sqrt{q^2 + z^2}}\right)}{{\left(q^2 + z^2\right)}^{\frac{3}{2}}} - \frac{H\, q^2}{2\, \left(q^2 + z^2\right)\, \left(\frac{H^2}{4} + q^2 + z^2\right)} dz \\
 \quad.
+\label{q1a:eq}
 \end{align}
 
 \subsection{(b)}
 \textbf{ What becomes the expression of $E_{\text{strip}}$ found in (a) when the length H of the light strip is very large with respect to the distance r between the center point of the strip and $P$ ?}
 
-As H gets bigger, making the fraction $\frac{-h^2}{\left(h^2 + y^2 + z^2\right)^2}$ tend towards $0$ for, as the values of $y$ grows bigger while the rest stay constant.
+As H gets bigger, making the fraction $\frac{q^2}{\left(q^2 + y^2 + z^2\right)^2}$ in eq.~\eqref{q1a:eq} tend towards $0$ for, as the values of $y$ grows bigger while the rest stay constant. This means that an ever decreasing amount of energy will be added, bringing $E(r)$ to an asymptote.
 
-The way the irradiance $E(r)$ is defined in cartesian coordinates in (a) won't give us insights on this question. As such, it is more interesting to derive the same irradiance $E(r)$ in spherical coordinates:
+The way the irradiance $E(r)$ is defined in cartesian coordinates in (a) won't give us all the possible insights on this question. As such, it is more interesting to derive the same irradiance $E(r)$ in spherical coordinates:
 \begin{align}
-E(r) &= \frac{1}{\pi} \int\limits_{-\arctan(\frac{\frac{H}{2}}{\sqrt{q^2+r^2}})}^{\arctan(\frac{\frac{H}{2}}{\sqrt{q^2+r^2}})} \int\limits_{\arctan \left(\frac{r-\frac{W}{2}}{q} \right)}^{\arctan \left(\frac{r+\frac{W}{2}}{q} \right)} L \cos(\theta) \sin(\theta) d\theta d\phi \\
-     &= 2 L \cdot \arctan \left(\frac{\frac{H}{2}}{\sqrt{q^2+r^2}}\right) \cdot \int\limits_{\arctan \left(\frac{r-\frac{W}{2}}{q} \right)}^{\arctan \left(\frac{r+\frac{W}{2}}{q} \right)} \cos(\theta) \sin(\theta) d\theta \\
-     &= 2 L \cdot \arctan \left(\frac{H}{2\sqrt{q^2+r^2}} \right) \cdot \left[ - \frac{1}{2} \cos^2(x) \right]_{\arctan(\frac{r-W/2}{q})}^{\arctan \left(\frac{r+W/2}{q} \right)} \\
-     &= 2 L \cdot \arctan \left(\frac{H}{2\sqrt{q^2+r^2}} \right) \cdot \left[ - \frac{1}{2} \cos^2\left(\arctan\left(\frac{r+W/2}{q}\right)\right) - - \frac{1}{2} \cos^2\left(\arctan\left(\frac{r-W/2}{q}\right)\right) \right] \\
-     &= 2 L \cdot \arctan\!\left(\frac{H}{2\, \sqrt{q^2 + r^2}}\right) \cdot \left(\frac{1}{2\, \left(\frac{{\left(\frac{W}{2} - r\right)}^2}{q^2} + 1\right)} - \frac{1}{2\, \left(\frac{{\left(\frac{W}{2} + r\right)}^2}{q^2} + 1\right)}\right)
+E(r) &= \int\limits_{\arctan \left(\frac{r-\frac{W}{2}}{q} \right)}^{\arctan \left(\frac{r+\frac{W}{2}}{q} \right)} \int\limits_{-\arctan(\frac{\frac{H}{2}}{\sqrt{q^2+r^2}})}^{\arctan(\frac{\frac{H}{2}}{\sqrt{q^2+r^2}})} L \cos(\theta) \sin(\theta) d\theta d\phi \\
+     &= 2 L \cdot \int\limits_{\arctan \left(\frac{r-\frac{W}{2}}{q} \right)}^{\arctan \left(\frac{r+\frac{W}{2}}{q} \right)} \frac{H^2}{H^2 + 4\, q^2 + 4\, r^2} d\phi \\
+     &= 2 L \cdot \frac{H^2\, \left(\arctan\!\left(\frac{r - \frac{W}{2}}{q}\right) - \arctan\!\left(\frac{r + \frac{W}{2}}{q}\right)\right)}{H^2 + 4\, q^2 + 4\, r^2}
      \label{q1b:irr_sph}
 \end{align}
 
-As can be seen from eq.~\eqref{q1b:irr_sph}, having a large $H$ in the $\arctan$ makes the left part of the equation equal to $2 \cdot \frac{\pi}{2}$:
-\begin{equation}
-E(r) = \pi L \left(\frac{1}{2\, \left(\frac{{\left(\frac{W}{2} - r\right)}^2}{q^2} + 1\right)} - \frac{1}{2\, \left(\frac{{\left(\frac{W}{2} + r\right)}^2}{q^2} + 1\right)}\right)
-\end{equation}
+As can be seen from eq.~\eqref{q1b:irr_sph}, having a large $H$ will make the distance $q$ and $r$ negligible in the denominator, simplifying the equation to
+\begin{align}
+E(r) &= 2 L \cdot \frac{H^2}{H^2} \cdot \left(\arctan\!\left(\frac{r - \frac{W}{2}}{q}\right) - \arctan\!\left(\frac{r + \frac{W}{2}}{q}\right)\right) \\
+     &= 2 L \cdot \left(\arctan\!\left(\frac{r - \frac{W}{2}}{q}\right) - \arctan\!\left(\frac{r + \frac{W}{2}}{q}\right)\right)
+\quad.
+\end{align}
+This simplifies a lot the equation, making making the irradiance dependent only on the left and right edges.
 
 \subsection{(c)}
 \textbf{What is the expression of the illuminance $E_{\text{tube}}$ at $P$ as a function of $E_{\text{strip}}$ ?
@@ -165,10 +167,11 @@ What is the expression of this illuminance $E_{\text{tube}}$ when $r$ is equal t
 
 Supposing $r$ stays roughly the same, the difference is that the $\cos(\theta)$ factor should be removed, as there is always a complete cylinder cross-section shining on the surface element (?) P, as can be seen in fig.~\ref{q1c:setup}. This means that the expression of $E_{\text{tube}}$ is
 \begin{align}
-E_{\text{tube}} &= E_{\text{strip}} \frac{1}{\cos(\theta)} \\
-                &= E_{\text{strip}} \frac{\sqrt{q^2+y^2+z^2}}{q}
+E_{\text{tube}} &= E_{\text{strip}} \frac{1}{\cos(\phi)}% \\
+                %&= E_{\text{strip}} \frac{\sqrt{q^2+y^2+z^2}}{q}
 \quad.
 \end{align}
+When $r = 0$, $E_{\text{tube}} = E_{\text{strip}}$, as $\cos(0\degree) = 1$.
 
 \begin{figure}
   \centering
@@ -184,18 +187,18 @@ E_{\text{tube}} &= E_{\text{strip}} \frac{1}{\cos(\theta)} \\
 
 Let's start with the irradiance integral,
 \begin{equation}
-E(r) = \frac{1}{\pi} \int_{\Omega} L(r,\omega)\cos(\theta) d\omega
+E(r) = \int_{\Omega} L(r,\omega)\cos(\theta) d\omega
 \quad.
 \end{equation}
 As the luminance is constant, $L(r,\omega)$ can be changed to $L$. When solving 
 
 \begin{align}
-E(r) &= \int_{0}^{\arctan(\frac{h}{q})} \int_{0}^{\arctan(\frac{w}{q})} L\cos(\theta) \sin(\theta) d\theta d\phi \\
-     &= \arctan\left(\frac{h}{q}\right) \cdot \int_{0}^{\arctan(\frac{w}{q})} L\cos(\theta) \sin(\theta) d\theta \\
+E(r) &= L \int\limits_{0}^{\arctan\left(\frac{w}{q}\right)} \int\limits_{0}^{\arctan\left(\frac{h}{q}\right)} \cos(\theta) \sin(\theta) d\theta d\phi \\
+     &= L \arctan\left(\frac{w}{q}\right) \cdot \int\limits_{0}^{\arctan\left(\frac{h}{q}\right)} \cos(\theta) \sin(\theta) d\theta \\
      %&= \arctan(\frac{h}{q}) \cdot \left[ - \frac{1}{2} \cos^2(x) \right]_{0}^{\arctan(\frac{w}{q})} \\
      %&= \arctan(\frac{h}{q}) \cdot \left[ - \frac{1}{2} \cdot \cos^2(\arctan(\frac{w}{q})) - -\frac{1}{2} \right] \\
      %&= - \arctan\!\left(\frac{h}{q}\right)\, \left(\frac{1}{2\, \sqrt{\frac{w^2}{q^2} + 1}} - \frac{1}{2}\right)
-     &= \arctan\left(\frac{h}{q}\right) \cdot \frac{w^2}{2 \left(q^2 + w^2\right)} L
+     &= \arctan\left(\frac{w}{q}\right) \cdot \frac{h^2}{2 \left(q^2 + h^2\right)} L
 \end{align}
 
 
@@ -220,10 +223,10 @@ E(r) &= \int_{0}^{\arctan(\frac{h}{q})} \int_{0}^{\arctan(\frac{w}{q})} L\cos(\t
 
 The setup of this surface makes shifts the lower bounds of the definite integral from $0$ to some arbitrary value $r$ and $s$ on the $x$ and $y$ axis, respectively. Instead of performing the integral again, it is possible to use a simple trick, as shown in fig~\ref{q2b:setup}. The new surface $w \times h$ can be derived from the previous answer (for a surface $r+w \times s+h$). All is left to do is subtract the extraneous surfaces $a$, $b$ and $c$. To do so, it is possible to reuse the previous answer to find surface $a+c$ and $b+c$, and then re-add $c$, as it was subtracted twice (the inclusion-exclusion principle). The answer is then
 \begin{align*}
-E(r) =& \biggl( \arctan\left(\frac{s+h}{q}\right) \cdot \frac{\left(r+w\right)^2}{2 \left(q^2 + \left(r+w\right)^2\right)}
-- \arctan\left(\frac{s+h}{q}\right) \cdot \frac{\left(r\right)^2}{2 \left(q^2 + r^2\right)} \\
-&- \arctan\left(\frac{s}{q}\right) \cdot \frac{\left(r+w\right)^2}{2 \left(q^2 + \left(r+w\right)^2\right)}
-+ \arctan\left(\frac{s}{q}\right) \cdot \frac{\left(r\right)^2}{2 \left(q^2 + r^2\right)} \biggr) L
+E(r) =& L\biggl( \arctan\left(\frac{s+w}{q}\right) \cdot \frac{\left(r+h\right)^2}{2 \left(q^2 + \left(r+h\right)^2\right)} \\
+&- \arctan\left(\frac{s}{q}\right) \cdot \frac{\left(r+w\right)^2}{2 \left(q^2 + \left(r+w\right)^2\right)} \\
+&- \arctan\left(\frac{s+w}{q}\right) \cdot \frac{r^2}{2 \left(q^2 + r^2\right)} \\
+&+ \arctan\left(\frac{s}{q}\right) \cdot \frac{r^2}{2 \left(q^2 + r^2\right)} \biggr)
 \quad.
 \end{align*}
 
@@ -239,14 +242,14 @@ The setup for this experiment is shown in fig.~\ref{q3:setup}. Three light sourc
   \centering
   \includegraphics[width=0.9\linewidth]{q3_setup.png}
   \caption[Experiment setup]
-   {Experiment setup. The $x$-axis is the red line from left to right, $y$-axis is the green line from down to up and $z$-axis from the sphere to the camera. The sphere is posed at $\left[0, 0, 0\right]$}
+   {Experiment setup. The $x$-axis is the red line from left to right, $y$-axis is the green line from down to up and $z$-axis from the sphere to the camera. The sphere is posed at $\left[0, 0, 0\right]$.}
   \label{q3:setup}
 \end{figure}
 
 On this setup, each light, when lit, generate a row $\B{l}$ in the lighting matrix $\B{L}$ as such:
 \begin{equation}
 \B{l} =
-\left[\begin{array}{c} \cos\!\left(\theta\right)\, \sin\!\left(r\right) \\ \sin\!\left(r\right)\, \sin\!\left(\theta\right) \\ \sqrt{ - {\cos\!\left(\theta\right)}^2\, {\sin\!\left(r\right)}^2 - {\sin\!\left(r\right)}^2\, {\sin\!\left(\theta\right)}^2 + 1} \end{array}\right]^T
+\left[\begin{array}{c} \sin\!\left(r\right)\, \cos\!\left(\theta\right) \\ \sin\!\left(r\right)\, \sin\!\left(\theta\right) \\ \sqrt{ - {\cos\!\left(\theta\right)}^2\, {\sin\!\left(r\right)}^2 - {\sin\!\left(r\right)}^2\, {\sin\!\left(\theta\right)}^2 + 1} \end{array}\right]^T
 \quad .
 \end{equation}
 The $x$ and $y$ components are directly the position on the plane, while the $z$ component is specified to make the light unit, so they are all the same intensity. The axes are defined as west-east for $x$, south-north for $y$ and zenith-nadir for $z$ (see fig.~\ref{q3:setup}). The surface normals are taken outwards and the lighting vectors from the surface to the light.
@@ -258,12 +261,12 @@ In the current setup, since the lights are on the vertex of an equilateral trian
 \quad .
 \end{equation}
 
-Given the simple lambertian reflectance equation (supposing unit albedo), we can compute the pixel intensity of a camera pointed directly to a surface with normal $\B{n}$:
+Given the simple lambertian reflectance equation (supposing unit albedo), we can compute the pixel intensity of a surface with normal $\B{n}$:
 \begin{equation}
 b = \B{L}\B{n}
 \quad.
 \end{equation}
-Photometric Stereo is the inverse process, where the normals $\B{n} = \left[ n_x \; n_y \; n_z\right]^T$ are solved from the lighting matrix $\B{L}$ and the pixel intensity $b$. This can be done by inverting the light matrix $\B{L}$, as such:
+Photometric Stereo is the inverse process, where the normals $\B{n} = \left[ n_x \; n_y \; n_z\right]^T$ are the solution of the system of linear equations formed by from the lighting matrix $\B{L}$ and the pixel intensity $b$. This can be solved in the least squares sense by inverting the light matrix $\B{L}$, as such:
 \begin{equation}
 \B{L}^{-1}\B{b} = \B{n} = 
 \begin{bmatrix}
@@ -273,14 +276,14 @@ n_z
 \end{bmatrix}
 \quad.
 \end{equation}
-We can see that, unless matrix $\B{L}$ is singular or affected by noise, we retrieve the three components of the normal $\B{n}$ directly.
+We can see that, unless matrix $\B{L}$ is singular or affected by noise, are retrieved the three components of the normal $\B{n}$ directly.
 
 But, instead of solving the usual equation, the problem suppose we have a systematic error $\epsilon_r$ in the measurement of $r$, making the noisy lighting matrix $\B{L}_\epsilon$ a bit different that the original matrix:
 \begin{equation}
 \B{L}_\epsilon = \left[\begin{array}{ccc} \sin\!\left(\epsilon_r + r\right) & 0 & \sqrt{1 - {\sin\!\left(\epsilon_r + r\right)}^2}\\ -\frac{\sin\!\left(\epsilon_r + r\right)}{2} & \frac{\sqrt{3}\, \sin\!\left(\epsilon_r + r\right)}{2} & \sqrt{1 - {\sin\!\left(\epsilon_r + r\right)}^2}\\ -\frac{\sin\!\left(\epsilon_r + r\right)}{2} & -\frac{\sqrt{3}\, \sin\!\left(\epsilon_r + r\right)}{2} & \sqrt{1 - {\sin\!\left(\epsilon_r + r\right)}^2} \end{array}\right]
 \quad.
 \end{equation}
-Solving this problem gives us:
+Performing photometric stereo using the least squares solution yields
 \begin{equation}
 \B{L}_\epsilon^{-1}\B{b} = \B{n}_\epsilon = 
 \left[\begin{array}{c} n_x \cdot \frac{\sin\!\left(r\right)}{\sin\!\left(\epsilon_r + r\right)}\\ n_y \cdot \frac{\sin\!\left(r\right)}{\sin\!\left(\epsilon_r + r\right)}\\ n_z \cdot \frac{\sqrt{1 - {\sin\!\left(r\right)}^2}}{\sqrt{1 - {\sin\!\left(\epsilon_r + r\right)}^2}} \end{array}\right] =
@@ -291,7 +294,7 @@ n_z \cdot \Delta_{\epsilon_z} \\
 \end{bmatrix}
 \quad,
 \end{equation}
-where the normal components $n_x$, $n_y$ and $n_z$ are all multiplied by a non-unit factor due to the measurement error $\epsilon_r$. Note that $\Delta_{\epsilon_x} = \Delta_{\epsilon_y}$. These factors are shown in fig.~\ref{q3:analytical}. Given a large measure error ($\epsilon_r$ near $30\degree$ or $-30\degree$), it is interesting to note that the $x$ and $y$-axis components of the recovered normal are more stable given a large lighting triangle (high value of $r$), while the $z$-axis component is more stable at lower values of $r$. Globally, the $x$ and $y$-axis components are more unstable, as even with no measurement error ($\epsilon_r = 0\degree$), they cannot be solved accurately for small values of $r$.
+where the normal components $n_x$, $n_y$ and $n_z$ are all multiplied by a non-unit factor due to the measurement error $\epsilon_r$. Note that $\Delta_{\epsilon_x} = \Delta_{\epsilon_y}$, meaning that both the $x$ and $y$-axis are equally uncertain in every case. These factors are shown in fig.~\ref{q3:analytical}. Given a large measure error ($\epsilon_r$ near $30\degree$ or $-30\degree$), the $x$ and $y$-axis components of the recovered normal are more stable given a large lighting triangle (high value of $r$), while the $z$-axis component is more stable at lower values of $r$. Globally, the $x$ and $y$-axis components are more unstable, as even with no measurement error ($\epsilon_r = 0\degree$), they cannot be solved accurately for small values of $r$.
 
 \begin{figure}
   \centering
@@ -301,11 +304,11 @@ where the normal components $n_x$, $n_y$ and $n_z$ are all multiplied by a non-u
   (a) & (b)
   \end{tabular}
   \caption[Analytical normal component coefficients]
-   {The theoretical factor $\Delta_\epsilon$ that multiplies each normal component (a) $n_x$, $n_y$ and (b) $n_z$ in the presence of a measure error $\epsilon_r$. When the factor is 1, no error is made on this component during the reconstruction (as it is the case when $\epsilon = 0$). A value less than 1 means the reconstructed normal component is smaller than the ground truth, while a value over 1 means a bigger component than the ground truth.}
+   {The theoretical factor $\Delta_\epsilon$ that multiplies each normal component (a) $n_x$, $n_y$ and (b) $n_z$ in the presence of a measure error $\epsilon_r$. When the factor $\Delta_\epsilon$ is 1, no error is made on this component during the reconstruction (as it is the case when $\epsilon = 0$). A value $\Delta_\epsilon < 1$ means the reconstructed normal component is smaller than the ground truth, while a value $\Delta_\epsilon > 1$ means a bigger component than the ground truth is is recovered.}
   \label{q3:analytical}
 \end{figure}
 
-Until now, the noise impact was given analytically. If we try to actually perform a reconstruction on simulated data, there is something important to take into account that was left behind in the analytical analysis, namely the noise. The conditioning of the matrix $\B{L}$ is an interesting stability measure, as it bounds the stability of the solution when noise disturbs the matrix. This is even more related to this particular question because of the definition of the conditioning of the matrix $\kappa \left(\B{L}\right)$, as related by~\cite{ElGhaoui2002},
+Until now, the noise impact was given analytically. Practically, the conditioning of the matrix $\B{L}$ is an interesting stability measure in presence of noise, as it bounds the stability of the solution when disturbed by a small matrix. The definition of the conditioning of the matrix $\kappa \left(\B{L}\right)$, as related by~\cite{ElGhaoui2002},
 \begin{equation}
 \frac{ \| \B{L}_\epsilon ^{-1} - \B{L}^{-1} \| }{ \| \B{L}^{-1} \| }
 \le \kappa\left(\B{L} \right) \frac{ \| \B{L}_\epsilon - \B{L}  \| }{ \| \B{L} \| }
@@ -333,18 +336,16 @@ Two experiments are presented: first, a surface normal $\B{n}$ is fixed while th
   \includegraphics[width=0.45\linewidth]{q3_experiment_1_view_1.pdf}
   \includegraphics[width=0.45\linewidth]{q3_experiment_1_view_2.pdf}
   \caption[Experiment 1]
-   {Angular error in degrees (z-axis) and reciprocal condition number (color) in function of $r \in \left[0, 70\right]$ (y-axis) and $\epsilon_r \in \left[-30, 30\right]$ (x-axis). The surface ground truth $\theta_{\text{azimuth}}$ is set to 40\degree on the plane containing the first light, the center of the triangle and the surface element to reconstruct (see fig.~\ref{q3:angle_setup}). Both figures are two different point of views of the same function. Note how the region around $r = 30$ and $\epsilon = 10$ have a relatively good conditioning, but the result is much worse than regions with a lower measurement error $\epsilon$.}
+   {Angular error in degrees (z-axis) and reciprocal condition number (color) in function of $r \in \left[0, 70\degree\right]$ (y-axis) and $\epsilon_r \in \left[-30\degree, 30\degree\right]$ (x-axis). The surface ground truth $\theta_{\text{azimuth}}$ is set to 40\degree on the plane containing the first light, the center of the triangle and the surface element to reconstruct (see fig.~\ref{q3:angle_setup}). Both figures represent the same function from two different viewpoints. Note how the region around $r = 30\degree$ and $\epsilon = 10\degree$ have a relatively good conditioning (shown in green), but the reconstructed normal is far from the ground truth compared to regions with a lower measurement error $\epsilon$.}
   \label{q3:exp1}
 \end{figure}
-
-
 
 \begin{figure}
   \centering
   \includegraphics[width=0.45\linewidth]{q3_experiment_2_view_1.pdf}
   \includegraphics[width=0.45\linewidth]{q3_experiment_2_view_2.pdf}
   \caption[Experiment 2]
-   {Angular error in degrees (z-axis) and reciprocal condition number (color) in function of $\theta_{\text{azimuth}} \in \left[0, 180\right]$ (y-axis) and $r \in \left[0, 70\right]$ (x-axis). Some example angles for $\theta_{\text{azimuth}}$ are shown in fig.~\ref{q3:angle_setup}. Both figures are two different point of views of the same function. Note how the region around $r = 30$ and $\epsilon = 10$ have a relatively good conditioning, but the result is much worse than regions with a lower measurement error $\epsilon$.}
+   {Angular error in degrees (z-axis) and reciprocal condition number (color) in function of $\theta_{\text{azimuth}} \in \left[0, 180\degree\right]$ (y-axis) and $r \in \left[0, 70\degree\right]$ (x-axis). Some example angles for $\theta_{\text{azimuth}}$ are shown in fig.~\ref{q3:angle_setup}. Both figures are two different point of views of the same function. Note how the region around $r = 30\degree$ and $\epsilon = 10\degree$ have a relatively good conditioning (shown in green), but the result is much worse than regions with a lower measurement error $\lvert \epsilon \rvert$.}
   \label{q3:exp2}
 \end{figure}
 
@@ -353,18 +354,18 @@ Two experiments are presented: first, a surface normal $\B{n}$ is fixed while th
   \includegraphics[width=0.45\linewidth]{q3_experiment_2a_view_1.pdf}
   \includegraphics[width=0.45\linewidth]{q3_experiment_2a_view_2.pdf}
   \caption[Experiment 2 on a small lighting angle]
-   {Same experiment as fig.~\ref{q3:exp2}, but with an lighting angle $r = 5\degree$. The missing section in the surface is when the error is $\epsilon_r = -5\degree$, meaning that the measure positioned all three light sources at the exact same location ($r = 0\degree$).}
+   {Same experiment as fig.~\ref{q3:exp2}, but with a lighting angle $r = 5\degree$. The missing section in the surface is when the error is $\epsilon_r = -5\degree$, meaning that the error-tainted measure positioned all three light sources at the exact same location ($r = 0\degree$).}
   \label{q3:exp2a}
 \end{figure}
 
-It is interesting to note from fig~\ref{q3:exp2} and \ref{q3:exp2a} that if a surface normal is pointing directly to the center of the triangle formed by the three lights, its recovery will always be correct, even in sub-optimal lighting condition. This is because the values of the three pixel intensities are always equal, making the ground truth the only possible solution to the linear system of equation. Furthermore, the reconstruction gives the right result when no error is applied ($\epsilon_r = 0\degree$), except when not all three light sources are shining on the surface (when $\theta_{\text{azimuth}}$ is near $0\degree$ or $180\degree$). In this particular problem, it is interesting to note that the most stable matrix won't necessarily result in the most accurate reconstruction, because of the systematic measurement error $\epsilon_r$. In this particular problem, as long as the three lighting sources are in line of sight with the target surface, the reconstruction angular error is a function of the ground truth surface normal and the lighting measurement error.
+It is interesting to note that if a surface normal is pointing directly to the center of the triangle formed by the three lights ($\theta_{\text{azimuth}} = 90\degree$), its recovery will always be correct, even in sub-optimal lighting condition. This is because the values of the three pixel intensities are always equal, making the ground truth the only possible solution to the system of linear equations. Furthermore, the reconstruction gives the right result when no error is applied ($\epsilon_r = 0\degree$), except when not all three light sources are shining on the surface (when $r > 50\degree$ in fig.~\ref{q3:exp1} or $\theta_{\text{azimuth}}$ is near $0\degree$ or $180\degree$ in fig.~\ref{q3:exp2} of \ref{q3:exp2a}). In this particular problem, it is interesting to note that the most stable matrix won't necessarily result in the most accurate reconstruction, because of the systematic measurement error $\epsilon_r$. In this particular problem, as long as the three lighting sources are in line of sight with the target surface, the reconstruction angular error is a function of the ground truth surface normal, the lighting measurement error and the distance between the lights.
 
 All these analysis is performed with normals lying on the plane comprising the first light, the camera and the surface. No particular new insight is gained from changing this normal plane. The results are the same, as long as the three lights shine onto the surface.
 
 \FloatBarrier
 \section{Question 4}
 
-I will assume the reconstruction technique to analyze is photometric stereo. I will suppose that YHG666 has no atmosphere and that the captures are performed whenever the sun-like star is shining over the monolith surface (nighttime comprised). I will also assume that the black hole does not disturb the light rays coming from the sun-like star (no lighting curvature) and that its gamma rays are always perturbing the sensor equally (even if the black hole is not in direct line of sight with the CCD sensor).
+I will assume the reconstruction technique to analyze is photometric stereo. I will suppose that YHG666 has no atmosphere and that the captures are performed whenever the sun-like star is shining over the monolith surface (nighttime comprised). I will also assume that the black hole does not disturb the light rays coming from the sun-like star (no light curvature) and that its gamma rays are always perturbing the sensor equally (even if the black hole is not in direct line of sight with the CCD sensor).
 
 I will suppose that YHG666 has no inclination, so the planar trajectory $\phi$ of the binary system (sun-like and black hole) is $90\degree$ minus the latitude of the immobile probe. If the planet had an inclination, the planar trajectory $\phi$ would be a combination of the latitude of the probe and the position of YHG666 with respect to the binary system (its day of the year). Furthermore, this inclination would create an angle of declination making the sun-like star not totally planar, as explained in~\cite{shen-pg-14}, improving the reconstruction performance when performed at another time than the equinoxes.
 
@@ -393,19 +394,19 @@ I will further suppose the monolith to be predominantly vertical. If the immobil
   \label{q4:trajectories}
 \end{figure}
 
-Reconstructing a scene could be done optimally (in a least-squares sense) by performing
+Reconstructing a surface normal could be done optimally (in a least-squares sense) by performing
 \begin{equation}
 \hat{\B{n}} = \left( \B{L}^T\B{L}\right)^{-1} \B{L}^T \B{b}
 \quad,
 \end{equation}
-where $b$ is the observed pixel intensities and $\left( \B{L}^T\B{L}\right)^{-1} \B{L}^T$ is the pseudoinverse of the lighting matrix $\B{L}$.
+where $b$ is the observed pixel intensities over different times of the day and $\left( \B{L}^T\B{L}\right)^{-1} \B{L}^T$ is the pseudoinverse of the lighting matrix $\B{L}$.
 As defined in \cite{holdgeoffroy-3dv-15}, a 95\% confidence interval for a normal $\B{n}$ is given by
 \begin{equation}
-\hat{\B{x}} \pm \B{\delta} , \quad \text{with} \delta_k = 1.96\frac{\sigma_{\text{CCD}}}{\rho}\lambda_k
+\hat{\B{x}} \pm \B{\delta} , \quad \text{with} \; \delta_k = 1.96\frac{\sigma_{\text{CCD}}}{\rho}\lambda_k
 \quad,
 \end{equation}
 where $\sigma_\text{CCD}$ is the image noise, $\rho$ is the albedo of the surface and $\lambda_k$ is the square root of the $k$-th element on the diagonal of $\left(\B{L}^T\B{L}\right)^{-1}$~\cite{Hastie-09}.
-Supposing the albedo to be constant, the uncertainty of the reconstruction can then be seen as the product of $\sigma_\text{CCD}$ and a conditioning marker $\lambda_k$. This $\lambda_k$ can be interpreted as a gain factor, amplifying the uncertainty due to the noise $\sigma_\text{CCD}$. First, I will explain the impact of the angular deviation $c$ on the stability of the reconstruction in terms of noise gain. Then, I will present simulations results taking into account the noise $\sigma_\text{CCD}$.
+Supposing the albedo to be constant, the uncertainty of the reconstruction can then be seen as the product of $\sigma_\text{CCD}$ and a conditioning measure $\lambda_k$. This $\lambda_k$ can be interpreted as a gain factor, amplifying the uncertainty due to the noise $\sigma_\text{CCD}$. First, I will explain the impact of the angular deviation $c$ on the stability of the reconstruction in terms of noise gain. Then, I will present simulations results taking into account the noise $\sigma_\text{CCD}$.
 
 \begin{figure}
   \centering
@@ -422,13 +423,13 @@ Supposing the albedo to be constant, the uncertainty of the reconstruction can t
   \label{q4:lambda}
 \end{figure}
 
-A different noise gain $\lambda_k$ is applied to each of the 3D axes, namely $\lambda_x$, $\lambda_y$ and $\lambda_z$ for the $x$, $y$ and $z$-axis, respectively. For the current setup, these three noise gain factors are presented in fig.~\ref{q4:lambda}. It is worth noting that for small to medium deviation angles $c$, the noise gain for the $x$-axis is relatively small, whereas the two other components are large. This means that the $x$-axis component of the reconstruction is relatively certain, while the reconstruction is more uncertain on the $y$ and $z$-axis. This is coherent with the problem setup: a lot of information is present in the west-east axis, but the small angular deviation $c$ gives almost no information on the other axes (see \ref{q4:setup} for the axis definition). The abrupt slope around $c = 30\degree$ on the $x$-axis in fig.~\ref{q4:lambda} (b) is caused by the sun-like star falling under the horizon during the ``day'', making those capture times unusable, as the surface normal points toward south (see \ref{q4:trajectories} (c)).
+A different noise gain $\lambda_k$ is applied to each of the 3D axes, namely $\lambda_x$, $\lambda_y$ and $\lambda_z$ for the $x$, $y$ and $z$-axis, respectively. For the current setup, these three noise gain factors are presented in fig.~\ref{q4:lambda}. It is worth noting that for small to medium deviation angles $c$, the noise gain for the $x$-axis is relatively small, whereas the $y$ and $z$ components are large. This means that the $x$-axis component of the reconstruction is relatively certain, while the reconstruction is more uncertain on the $y$ and $z$-axis. This is coherent with the problem setup: a lot of information is present in the west-east axis, but the small angular deviation $c$ gives almost no information on the other axes (see \ref{q4:setup} for the axis definition). The abrupt slope around $c = 30\degree$ on the $x$-axis in fig.~\ref{q4:lambda} (b) is caused by the sun-like star falling under the horizon during the ``day'', making those capture times unusable, as the surface normal points toward south, as shown in fig.~\ref{q4:trajectories} (c).
 
-The impact of the noise $\sigma_\text{CCD}$ on the reconstruction normal is shown in fig.~\ref{q4:recons_err}. For the three first figures (a-c), three different noise values were selected: 0.5\%, 1\% and 5\% over the total dynamic range of the image sensed. They represent respectively, very roughly speaking, the usual noise (on earth, without prominent noise source) of a top-of-the-line camera sensor (like a Nikon D5 or a Canon 1D), a good D-SLR and a pretty bad point-and-shoot camera. The others parameters (angular deviation $c$ and planar trajectory elevation $\phi$) were kept fixed for these three figures. The angular error distribution among for these figures is mostly similar. As predicted, the noise amplification factors $\lambda_k$ is multiplied by the sensor noise $\sigma_\text{CCD}$ to give the reconstruction error. If the amplification factors are constant (same angular deviation $c$ and planar trajectory elevation $\phi$), doubling the sensor noise would double the reconstruction error.
+The impact of the noise $\sigma_\text{CCD}$ on the reconstruction normal is shown in fig.~\ref{q4:recons_err}. For the three first figures (a-c), three different noise values were selected: 0.5\%, 1\% and 5\% over the total dynamic range of the image sensed. They represent respectively, very roughly speaking, the usual noise (on earth, without prominent noise source) of a top-of-the-line camera sensor (like a Nikon D5 or a Canon 1D), a standard D-SLR and a pretty bad point-and-shoot camera. The others parameters (angular deviation $c$ and planar trajectory elevation $\phi$) were kept fixed for these first three figures. The angular error distribution among for these figures is mostly similar. As predicted, the noise amplification factors $\lambda_k$ is multiplied by the sensor noise $\sigma_\text{CCD}$ to give the reconstruction error. If the amplification factors are constant (same angular deviation $c$ and planar trajectory elevation $\phi$), doubling the sensor noise would double the reconstruction error.
 
-For fig.~\ref{q4:recons_err} (d-f), the noise $\sigma_\text{CCD}$ was set to $1\%$. For a different noise level, just multiply the $x$-axis of the histogram with the desired amount of noise. The general idea of these figures is that increasing the angular deviation $c$ improves the reconstruction performance, as a quick comparison of fig.~\ref{q4:recons_err} (d) and (e) can confirm. This is coherent with the noise gain analysis in fig.~\ref{q4:lambda}, where increasing the angular deviation $c$ yields a better overall reconstruction, where the uncertainty decreases for the $y$ and $z$-axis components. Only the $x$-axis increases, first insignificantly in (a) and (c) versus the gain brought by the other components. In (b), as explained previously, the sun-like star is lost below the horizon during the course of the day, generating the bump in the $x$-axis uncertainty.
+For fig.~\ref{q4:recons_err} (d-f), the noise $\sigma_\text{CCD}$ was set arbitrarily to $1\%$. For a different noise level, just multiply the $x$-axis of the histogram with the desired amount of noise. In general, increasing the angular deviation $c$ improves the reconstruction performance, as a quick comparison of fig.~\ref{q4:recons_err} (d) and (e) can confirm. This is coherent with the noise gain analysis in fig.~\ref{q4:lambda}, where increasing the angular deviation $c$ yields a better overall reconstruction, where the uncertainty decreases for the $y$ and $z$-axis components. Only the $x$-axis increases, first insignificantly in (a) and (c) versus the gain brought by the other components. In (b), as explained previously, the sun-like star is lost below the horizon during the course of the day, generating the bump in the $x$-axis uncertainty.
 
-The second variable influencing the reconstruction is the planar trajectory elevation $\phi$. Fig.~\ref{q4:recons_err} (f) has a slightly better reconstruction performance than (d), even if its angular deviation $c$ is smaller, simply because the planar trajectory elevation $\phi$ is better suited in this case. This effect can also be seen in fig.~\ref{q4:lambda} (a) where the $y$-axis component (the red line) is very uncertain until an angular deviation $c \approx 30\degree$ for a planar trajectory elevation $\phi = 10\degree$, whereas in (b) a planar trajectory elevation of $\phi = 45\degree$ yields pretty good overall certainty at $c \approx 20\degree$.
+The second variable influencing the reconstruction is the planar trajectory elevation $\phi$. Fig.~\ref{q4:recons_err} (f) has a slightly better reconstruction performance than (d), even if its angular deviation $c$ is smaller ($25\degree$ versus $35\degree$), simply because the planar trajectory elevation $\phi$ is better suited in this case. This effect can also be seen in fig.~\ref{q4:lambda} (a) where the $y$-axis component (the red line) is very uncertain until an angular deviation $c \approx 30\degree$ for a planar trajectory elevation $\phi = 10\degree$, whereas in (b) a planar trajectory elevation of $\phi = 45\degree$ yields pretty good overall certainty at $c \approx 20\degree$.
 
 %Next time I plan to deploy an immobile probe on a planet, I will equip it with a polarizing filter. Since most light reflected by a non-metallic surface is polarized, it could help block some of the unwanted
 
@@ -449,7 +450,7 @@ The second variable influencing the reconstruction is the planar trajectory elev
   (f) 
   \end{tabular}
   \caption[Reconstruction error with $\phi = 10\degree$.]
-   {Reconstruction error for a planar trajectory $\phi = 10\degree$ for noise level $\sigma_\text{CCD} = 0.5\%$ (a), $1\%$ (b) and $5\%$ (c). As predicted, these three distributions are all very similar since the varying noise factor $\sigma_\text{CCD}$ is multiplied by a constant amplification factors $\lambda_k$.}
+   {Reconstruction error for a planar trajectory $\phi = 10\degree$ for noise level $\sigma_\text{CCD} = 0.5\%$ (a), $1\%$ (b) and $5\%$ (c). As predicted, these three distributions are all very similar since the varying noise factor $\sigma_\text{CCD}$ is multiplied by a constant amplification factors $\lambda_k$. The last three figures shows different trajectory elevation (f) or angular deviation (d-e).}
   \label{q4:recons_err}
 \end{figure}
 
@@ -474,7 +475,7 @@ These matrices $\B{U}$, $\B{\Sigma}$ and $\B{V}$ are closely related to the eige
 \end{align*}
 As the columns of $\B{U}$ and $\B{V}$ are a orthonormal basis (as they hold the eigenvectors), both $\B{U}^T\B{U}$ and $\B{V}^T\B{V}$ result in the identity matrix $\B{I}$.
 
-Two relationships are sought in the question: the eigenvalues and eigenvectors of both pre and post multiplication by the transpose. First, the relationship between the eigenvalues of $\B{A}^T\B{A}$ and $\B{AA}^T$ is pretty simple: they are the same. On the other hand, their eigenvectors are only related through $\B{A}$:
+Two relationships are sought in the question: the eigenvalues and eigenvectors of both pre and post multiplication by the transpose. First, the relationship between the eigenvalues of $\B{A}^T\B{A}$ and $\B{AA}^T$ is pretty simple: they are the same (i.e.\ $\Sigma$). On the other hand, their eigenvectors are only related through $\B{A}$:
 \begin{align*}
 \B{A}  &= \B{U \Sigma V}^T \\
 \B{AV} &= \B{U \Sigma V}^T \B{V} = \B{U \Sigma I} \\
@@ -487,7 +488,7 @@ This relation will provide as many eigenvectors as there are linearly independen
 \subsection{(b)}
 \textbf{Describe the soft-thresholding algorithm for solving  an over-determined system of linear equations with the $L_1$-norm loss function [...]. When is this method more appropriate than least squares ($L_2$-norm loss function)? When is least squares preferable (i.e., optimal)?}
 
-Performing optimization using a $L_1$-norm loss function, sometimes called a least absolute deviations (LAD), is quite different in practice from using a least squares ($L_2$-norm loss function). While the LAD is more robust that least squares, meaning that it is more resistant to outliers in the data, it is also more unstable, meaning that a small change in a single data point can potentially change the solution a lot. Furthermore, a main major difference is that while least square allows only a single optimal solution, LAD allows multiple solutions to be equivalent. An example of this phenomenon can be visualized in fig.~\ref{q5b:paths}.
+Performing optimization using a $L_1$-norm loss function, sometimes called a Least Absolute Deviations (LAD), is quite different in practice from using a least squares ($L_2$-norm loss function). While the LAD is more robust that least squares, meaning that it is more resistant to outliers in the data, it is also more unstable, meaning that a small change in a single data point can potentially change the solution a lot. Furthermore, a main major difference is that while least square allows only a single optimal solution, LAD allows multiple solutions to be equivalent. An example of this phenomenon can be visualized in fig.~\ref{q5b:paths}.
 
 \begin{figure}
   \centering
@@ -503,18 +504,14 @@ Rewriting the posed problem in its matrix form,
 \begin{equation}
 \B{x}^* = \arg \min_{\B{x}} \| \B{b} - \B{A}^T\B{x} \|_1 \quad, \B{x} \in \mathbb{R}^m
 \quad,
+\label{q5b:optim}
 \end{equation}
 this optimization can be solved using the iterative reweighted least squares
 \begin{equation}
 \B{x}^{(k+1)} = \arg \min_{\B{x}} \B{w}^{(t)} \| \B{b} - \B{A}^T\B{x} \|^2
 \quad.
 \end{equation}
-Upon convergence, this will perform the optimization
-\begin{equation}
-\arg \min_{\B{x}} \lvert \B{b} - \B{A}^T\B{x} \rvert_p
-\quad,
-\end{equation}
-when using the weighting scheme
+Upon convergence, this will perform the desired optimization (eq.~\eqref{q5b:optim}) when using the weighting scheme
 \begin{align}
 \B{w}^{(0)} &= \text{diag}(1_m) \\
 \B{w}^{(k)} &= \lvert \B{b} - \B{A}^T\B{x}^{(k)} \rvert^{p-2}
@@ -568,7 +565,7 @@ The problem is a least squares minimization. It happens to be a generalization o
 
 An iterative solution is mandatory here because of the non-linearity of the $\max$ operator. Two optimization strategies will be discussed, a least squares variation and a Particule Swarm Optimization (PSO) approach.
 
-The first intuitive strategy is the standard least squares, as used by~\cite{hung-wacv-15} for a similar problem. Their approach to the problem is interesting and worth analyzing: they sample some possible unit-length $\B{x}$ which they multiply only with the $\B{\omega}_j$ variables that give a positive result. All the vectors in $\B{\omega}_i$ that are positive when multiplied to $\B{x}$ form a space called $\psi$. The inner sum can thus be made over $\psi$ instead of the whole $L$ vectors. This definition removes the need for the $\max$ operator, as only the vectors yielding a positive value are considered. Then, for every candidate vector $\B{x}_c$, they optimize a factor $\rho$ which corresponds to the length of the optimal solution pointing in the direction of the candidate $\B{x}_c$:
+The first intuitive strategy is the standard least squares, as used by~\cite{hung-wacv-15} for a similar problem. Their approach to the problem is interesting and worth analyzing: they sample some possible unit-length $\B{x}$ which they multiply only with the $\B{\omega}_j$ variables that give a positive result. All the vectors in $\B{\omega}_i$ that are positive when multiplied to $\B{x}$ form a space called $\psi$. The inner sum can thus be made over $\psi$ instead of the whole $L$ vectors. This definition removes the need for the $\max$ operator, as only the vectors yielding a positive value when multiplied by $\B{x}$ are considered. Then, for every candidate vector $\B{x}_c$, they optimize a factor $\rho$ which corresponds to the length of the optimal solution pointing in the direction of the candidate $\B{x}_c$:
 \begin{equation}
 \arg \min_{\B{x}_c} \sum_{i=1}^N \left( \| b_i - \rho \sum_{j \in \psi}\B{\omega}_{ij}^T\B{x}_c \| \right)^2
 \quad.
@@ -594,14 +591,16 @@ It is then possible to define $\Omega$ where each column $\omega_i = \left( \sum
 \end{equation}
 Keep in mind that $\psi$ is defined in function of $\B{x}$, though, meaning that $\B{\Omega}$ will change once a new $\B{x^*}$ is found. This is why eq.~\eqref{q5c:optim} should be repeated, in order to perform an iterative refinement of the solution.
 
+This simple formulation is quite efficient to compute and widely known in the literature, but is quite sensitive to outliers in data, as explained earlier.
+
 \section{Question 6}
 \textbf{What are the differences between temporally-multiplexed and spectrally-multiplexed photometric stereo? How does temporally-multiplexed outdoor photometric stereo benefit from the color spectrum of natural outdoor illumination?}
 
 Temporally-multiplexed Photometric Stereo employs captures at different times yielding different lighting directions. This means that each row of the lighting matrix $\B{L}$ are taken at a different time, when the scene's lighting conditions changed. Contrarily, as \cite{Fyffe2011} puts it, ``In Spectrally-multiplexed photometric stereo, a scene is illuminated by multiple spectrally distinct light sources, and photographed by a camera system configured to capture multiple spectrally distinct color channels.'' In their work, they propose to divide the light spectrum in two using the Dolby\textsuperscript{\textregistered} dichroic filters, both having some non-overlapping red, green, and blue in their response spectrum.
 
-Typically, PS is performed on pixel intensities, also called the luminance $y_i$ of a pixel $i$. This luminance can be expressed as a weighted sum of each pixel components, red $r_i$, green $g_i$ and blue $b_i$. The coefficients of the weighted sum depends on the colorspace used and on the measure (e.g.\ energy or perception). The two main luminance conversion functions are based on the CIE 1931 colorspace, $y_i = 0.2126r_i + 0.7152g_i + 0.0722b_i$ and its perceptually based counterpart, $y_i = 0.299r_i + 0.587g_i + 0.114b_i$. This conversion to luminance can be problematic when analyzing natural illumination, though. Most of the energy in natural illumination, aside from the small sun in the sky, is contained in the blue channel (as the sky is blue). However, this particular channel gets weighted down the most, as the blue channel coefficient is the lowest ($0.0722$ or $0.114$ in the earlier examples), making its impact on luminance much less than the other channels. To mitigate this issue, sophisticated channel fusion techniques have been proposed (e.g.\ \cite{jung-cvpr-15}), but this approach is clearly not a panacea to the problem.
+Typically, PS is performed on pixel intensities, also called the luminance $y_i$ of a pixel $i$. This luminance can be expressed as a weighted sum of each pixel components, red $r_i$, green $g_i$ and blue $b_i$. The coefficients of the weighted sum depends on the colorspace used and on the measure (e.g.\ energy or perception). The two main luminance conversion functions are $y_i = 0.2126r_i + 0.7152g_i + 0.0722b_i$ (NTSC) and $y_i = 0.299r_i + 0.587g_i + 0.114b_i$ (HDTV). This conversion to luminance can be problematic when analyzing natural illumination, though. Most of the energy in natural illumination, aside from the small sun in the sky, is contained in the blue channel (as the sky is blue). However, this particular channel gets weighted down the most, as the blue channel coefficient is the lowest ($0.0722$ or $0.114$ in the earlier examples), making its impact on luminance much less than the other channels. To mitigate this issue, sophisticated channel fusion techniques have been proposed (e.g.\ \cite{jung-cvpr-15}), but this approach is clearly not a panacea to the problem.
 
-This is where temporally-multiplexed outdoor photometric stereo can benefit from the color spectrum. To prevent the loss of information of merging the color channels together, \cite{johnson-cvpr-11} proposes to take each color channel as different captures, yielding different light sources. They argue that the information contained in every color channel of an image lit by natural illumination is enough in most cases to bring new constraints to the PS problem, helping the reconstruction. Hence, every picture taken could fill 3 rows of the $\B{L}$ matrix, one row per channel. This works because natural illumination is complex and may yield sensibly different lighting vectors for each channel. Cloud occlusion could possibly shift the color of the sun, sending the mean light in different directions depending on its wavelength.
+This is where temporally-multiplexed outdoor photometric stereo can benefit from the color spectrum. To prevent the loss of information of merging the color channels together, \cite{johnson-cvpr-11} proposes to consider each color channel as separate captures, yielding different light sources. They argue that the information contained in every color channel of an image lit by natural illumination is enough in most cases to bring new constraints to the PS problem, helping the reconstruction. Hence, every picture taken could fill 3 rows of the $\B{L}$ matrix, one row per channel. This works because natural illumination is complex and may yield sensibly different lighting vectors for each channel. Cloud occlusion could possibly shift the color of the sun, sending the mean light in different directions depending on its wavelength.
 
 While using spectral cues in temporally-multiplexed photometric stereo is worth investigating, it is far from being trivial to incorporate in general. For example, \cite{johnson-cvpr-11} supposed a constant albedo over the whole reconstructed surface in order to make their algorithm work. \cite{Fyffe2011} made the idea work on more generic surfaces, but used dichroic filters instead of simply using the three channels of a common camera, making the capture apparatus more complex. It is nevertheless an interesting idea to explore when performing further analysis on photometric stereo.
 %\cite{MacDonald-2007}.
@@ -679,7 +678,7 @@ In the discrete case, just like the environment map $\B{L}$, these functions can
 \begin{equation}
 s_n^m = \sum_{v=0}^{h} \sum_{u=0}^{w} \B{L}_{u,v} Y_n^m\left(u, v\right) \omega_{u,v}^2 \quad,
 \end{equation}
-for an environment map $\B{L}$ of width $w$ and height $h$. The solid angle subtended by pixel $u,v$, called $\omega_{u,v}$, is required to weight accordingly each pixel of both maps. Because of the latitude-longitude representation, each pixel covers a different surface area over the sphere. Multiplying each pixel by its solid angle weights them accordingly, ensuring that no pixel is more important than another one. The first 4 degrees of spherical harmonics real and imaginary bases are shown in fig.~\ref{q8a:sh_ex}.
+for an environment map $\B{L}$ of width $w$ and height $h$. The basis $Y_n^m$ must be generated on a regular 2D grid of pixels of the same size than the input image. The solid angle subtended by pixel $u,v$, called $\omega_{u,v}$, is required to weight accordingly each pixel of both maps. Because of the latitude-longitude representation, each pixel covers a different surface area over the sphere. Multiplying each pixel by its solid angle weights them accordingly, ensuring that no pixel is more important than another one. The first 4 degrees of spherical harmonics real and imaginary bases are shown in fig.~\ref{q8a:sh_ex}.
 
 Simply put, a given spherical harmonic coefficient---say $s_3^2$---is computed by doing
 \begin{equation}
@@ -708,6 +707,8 @@ s_3^2 = \sum \underbrace{\begin{minipage}{84pt}\includegraphics[height=42pt,widt
    \label{q8a:sh_ex}
 \end{figure}
 
+This operation must be repeated for each desired coefficient $s$.
+
 %Just like the Fourier transform, Spherical Harmonics is a transform using a principal root of unity as its kernel. Having a kernel based on a principal root of unity over the function's domain confers a plethora of interesting attributes. One of which is that the functions generated form an orthonormal basis spanning the whole domain, called a complete orthonormal system.
 
 %This pixelwise multiplication works because the SH basis forms an orthonormal system. Projecting something on an orthonormal basis can be called a dot product, because it yields the same properties. Thus, this relation holds \emph{iif} $f(x)$ and $g(x)$ are orthogonal over period $p$:
@@ -735,7 +736,7 @@ That being said, as~\cite{Sloan2008} relate, the amount of negative lighting can
   \item{Performing windowing on the signal;}
   \item{Performing the projection using an optimization with regularization to enforce positive light.}
 \end{enumerate}
-The first involves convolving the input signal with a window such as Hanning or Lanczos to limit the ringing effect of projecting onto a base---a major cause of negative reconstruction values---, called the Gibbs phenomenon. By the convolution theorem, performing an element-wise multiplication in the frequency domain after the projection would produce an identical result in a less expensive way, in terms of computational effort. Also, windowing generally attenuates high-frequencies, making the SH reconstructed approximation even smoother than without it.
+The first involves convolving the input signal with a window such as Hanning or Lanczos to limit the ringing effect of projecting onto a base---a major cause of negative reconstruction values---, called the Gibbs phenomenon. By the convolution theorem, this step can be performed in the frequency domain to be less expensive in terms of computational effort. Also, windowing generally attenuates high-frequencies, making the SH reconstructed approximation even smoother than without it.
 
 The second option changes the projection step to add a regularization, for example minimizing the curvature of the approximation:
 \begin{equation}
@@ -747,7 +748,7 @@ While this formulation cannot be performed by a simple dot product anymore, this
 \subsection{(c)}
 \textbf{As their name indicates, SH model full spherical signals. However, outdoor illumination is emitted from the sky \emph{hemisphere}. Describe Hemispherical Harmonics (HH), and how they differ from SH.}
 
-We use the Fourier transform, Spherical Harmonics, the Z-Transform, etc. because of their useful properties, mainly the convolution theorem---element-wise multiplication in the spectral domain is a convolution in the spatial domain---, which is inherited from the orthogonality of their kernel. For example, the Fourier transform basis are all orthogonal w.r.t. each other in $\mathrm{L}^1$ space over the interval $\left[-\pi, \pi\right]$. As Spherical Harmonics are defined over a surface, its bases must be orthogonal w.r.t. each other in $\mathrm{L}^2$ space. Such set of functions were first described by Legendre as the eponymous associated polynomials $P_n^m(x)$. These associated Legendre polynomials $P_n^m(x)$ define an orthogonal basis in $\mathrm{L}^2$ over the interval $\left[ -1, 1 \right]$. To use them in spherical harmonics, this interval must be shifted to $\left[ 0, \pi \right]$ to cover the elevation of a full side of the unit sphere (from zenith to nadir). This can be done by taking the $\cos$ of the input value, giving the new bases $P_n^m\left(\cos(\theta)\right)$. Each base is multiplied by a second variable, the azimuth $\phi$ on the interval $\left[ 0, 2\pi \right[$, to get a complete sphere surface.
+We use the Fourier transform, Spherical Harmonics, the Z-Transform, etc.\ because of their useful properties, mainly the convolution theorem---element-wise multiplication in the spectral domain is a convolution in the spatial domain---, which is inherited from the orthogonality of their kernel. For example, the Fourier transform basis are all orthogonal w.r.t. each other in $\mathrm{L}^1$ space over the interval $\left[-\pi, \pi\right]$. As Spherical Harmonics are defined over a surface, its bases must be orthogonal w.r.t. each other in $\mathrm{L}^2$ space. Such set of functions were first described by Legendre as the eponymous associated polynomials $P_n^m(x)$. These associated Legendre polynomials $P_n^m(x)$ define an orthogonal basis in $\mathrm{L}^2$ over the interval $\left[ -1, 1 \right]$. To use them in spherical harmonics, this interval must be shifted to $\left[ 0, \pi \right]$ to cover the elevation of a full side of the unit sphere (from zenith to nadir). This can be done by taking the $\cos$ of the input value, giving the new bases $P_n^m\left(\cos(\theta)\right)$. Each base is multiplied by a second variable, the azimuth $\phi$ on the interval $\left[ 0, 2\pi \right[$, to get a complete sphere surface.
 %For the Fourier transform, any pair of functions $\in e^{\frac{2\pi i}{N}kn}$ are orthogonal over the domain $\left[ 0, 2\pi \right]$, as $\int_{n=0}^{N}$
 
 To define the Spherical Harmonics on hemispheres instead of whole spheres, one must shift the interval of orthogonality of the basis from $\left[ 0, \pi \right]$ (from zenith to nadir) to $\left[ 0, \frac{\pi}{2} \right]$ (from zenith to equator). Just as the Spherical Harmonics use the $\cos$ of the input values, it is possible to define the function $2\cos(\theta)-1$, which keeps the orthogonality of the original associated Legendre polynomials over the interval $\left[ 0, \frac{\pi}{2} \right]$. All the rest is the same as the Spherical Harmonics transform, aside from the normalization which should be done over half an hemisphere (over $2\pi$) instead of a full sphere (over $4\pi$).
